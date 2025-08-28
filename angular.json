@@ -39,7 +39,17 @@
                             }
                         ],
                         "styles": [
-                            "src/styles.css"
+                            "src/styles.css",
+                            "node_modules/@tabler/icons-webfont/dist/tabler-icons.css",
+                            "node_modules/@mdi/font/css/materialdesignicons.min.css",
+                            "node_modules/weather-icons/css/weather-icons.css",
+                            "node_modules/remixicon/fonts/remixicon.css"
+                        ],
+                        "scripts": [
+                            "node_modules/iconify-icon/dist/iconify-icon.js",
+                            "public/assets/js/theme/app.init.js",
+                            "public/assets/js/theme/app.min.js",
+                            "public/assets/js/theme.js"
                         ]
                     },
                     "configurations": {
