@@ -1,4 +1,7 @@
 import { Component, OnInit, AfterViewInit, ViewEncapsulation } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+
+
 declare const AppMin: (() => void) | undefined;
 declare const Theme: (() => void) | undefined;
 
@@ -6,7 +9,8 @@ declare const Theme: (() => void) | undefined;
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  imports: [RouterOutlet]
 })
 export class AppComponent implements AfterViewInit {
   ngAfterViewInit(): void {

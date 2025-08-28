@@ -39,6 +39,7 @@
         "@tailwindcss/postcss": "^4.1.12",
         "iconify-icon": "^3.0.0",
         "ngrx-store-localstorage": "^20.0.0",
+        "ngx-mask": "^20.0.3",
         "postcss": "^8.5.6",
         "remixicon": "^4.6.0",
         "rxjs": "~7.8.0",
