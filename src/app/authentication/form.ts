@@ -1,4 +1,5 @@
-// <TextField [id]="'email'" [label]="'Correo Electrónico'" formControlName="email" placeholder="Correo" type="email" [control]="loginForm.get('email')" />
+import { TextFieldType } from "../components/text-field/text-field.component";
+
 export const authentication = {
     singIn: {
         email: {
@@ -6,7 +7,7 @@ export const authentication = {
             label: 'Correo Electrónico',
             formControlName: 'email',
             placeholder: 'Correo',
-            type: 'email',
+            type: 'email' as TextFieldType,
             control: 'email',
         },
         password: {
@@ -14,7 +15,7 @@ export const authentication = {
             label: 'Contraseña',
             formControlName: 'password',
             placeholder: 'Contraseña',
-            type: 'password',
+            type: 'password' as TextFieldType,
             control: 'password',
         },
     }

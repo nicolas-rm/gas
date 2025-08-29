@@ -37,17 +37,14 @@
                                 <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
                                     <div class="flex flex-col gap-4 mt-7">
                                         <div class="mb-3">
-                                            <TextField [id]="'email'" [label]="'Correo Electrónico'" formControlName="email" placeholder="Correo" [type]="'email'" [control]="loginForm.get('email')" />
+                                            <TextField [id]="authentication.email.id" [label]="authentication.email.label"
+                                                [formControlName]="authentication.email.formControlName" [placeholder]="authentication.email.placeholder" [type]="authentication.email.type"
+                                                [control]="loginForm.get(authentication.email.formControlName)" />
                                         </div>
                                         <div class="mb-4">
-                                            <TextField 
-                                                [id]="'password'" 
-                                                label="Contraseña"
-                                                formControlName="password" 
-                                                placeholder="Contraseña" 
-                                                [control]="loginForm.get('password')" 
-                                                [type]="'password'"
-                                                />
+                                            <TextField [id]="authentication.password.id" [label]="authentication.password.label"
+                                                [formControlName]="authentication.password.formControlName" [placeholder]="authentication.password.placeholder" [type]="authentication.password.type"
+                                                [control]="loginForm.get(authentication.password.formControlName)" />
                                         </div>
                                         <div>
                                             <div class="flex justify-between my-2">

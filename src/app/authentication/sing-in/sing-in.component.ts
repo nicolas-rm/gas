@@ -2,6 +2,7 @@ import { TextFieldComponent } from '@/app/components/components';
 import { ReactiveValidators } from '@/app/utils/ReactiveValidators';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { authentication } from '@/authentication/form';
 
 @Component({
     selector: 'app-sing-in',
@@ -11,6 +12,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 })
 export class SingInComponent {
 
+    authentication = authentication.singIn;
     loginForm: FormGroup;
 
     constructor(private readonly fb: FormBuilder) {
