@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ViewEncapsulation } from '@angular/core';
+import { afterNextRender, AfterViewInit, Component, ViewEncapsulation } from '@angular/core';
 import { ToastComponent, SidebarComponent, NavbarComponent, NavbarHorizontalComponent, MenuCanvasComponent, ShoppingCartComponent, CustomerSettingsComponent, ExampleComponent, SearchComponent, ContainerComponent } from '@/components/components';
 
 declare const AppMin: (() => void) | undefined;
@@ -11,11 +11,12 @@ declare const Theme: (() => void) | undefined;
     styleUrl: './dashboard.component.css',
     encapsulation: ViewEncapsulation.None,
 })
-export class DashboardComponent implements AfterViewInit {
-    ngAfterViewInit(): void {
-        setTimeout(() => {
+export class DashboardComponent {
+
+    constructor() {
+        afterNextRender(() => {
             try { AppMin && AppMin(); } catch { }
             try { Theme && Theme(); } catch { }
-        }, 200);
+        });
     }
 }

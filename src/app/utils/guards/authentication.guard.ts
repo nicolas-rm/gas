@@ -29,7 +29,7 @@ export class AuthenticationGuard implements CanActivate {
                     return true;
                 } else {
                     // Si no hay token, redirige al login
-                    void this.router.navigate(['/login']);
+                    void this.router.navigate(['/sign-in']);
                     return false;
                 }
             })

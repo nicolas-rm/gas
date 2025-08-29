@@ -16,6 +16,6 @@ export const appConfig: ApplicationConfig = {
         provideZonelessChangeDetection(),
         provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'top' })),
         { provide: LOCALE_ID, useValue: 'es' },
-        ...ngrxProviders
+        // ...ngrxProviders
     ]
 };

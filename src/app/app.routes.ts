@@ -6,16 +6,16 @@ import { dashboardRoutes } from '@/dashboard/dashboard.routes';
 
 // app.routes.ts
 export const routes: Routes = [
-    ...authenticationRoutes,
-    ...dashboardRoutes,
-    {
-        path: '',
-        redirectTo: 'sign-in',
-        pathMatch: 'full',
-    },
-    {
-        path: '**',
-        redirectTo: 'sign-in',
-        pathMatch: 'full',
-    },
+    // ...authenticationRoutes,
+    // ...dashboardRoutes,
+    // {
+    //     path: '',
+    //     redirectTo: '',
+    //     pathMatch: 'full',
+    // },
+    // {
+    //     path: '**',
+    //     redirectTo: '',
+    //     pathMatch: 'full',
+    // },
 ];
