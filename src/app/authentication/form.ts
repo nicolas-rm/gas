@@ -1,7 +1,7 @@
-import { TextFieldType } from "../components/text-field/text-field.component";
+import { TextFieldType } from "@/components/text-field/text-field.component";
 
 export const authentication = {
-    singIn: {
+    signIn: {
         email: {
             id: 'email',
             label: 'Correo Electrónico',

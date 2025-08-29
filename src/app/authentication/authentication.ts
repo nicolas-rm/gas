@@ -1,2 +1,3 @@
-export { SingInComponent } from "./sing-in/sing-in.component";
-export { SingUpComponent } from "./sing-up/sing-up.component";
+export { SignInComponent } from "@/app/authentication/sign-in/sign-in.component";
+export { SignUpComponent } from "@/app/authentication/sign-up/sign-up.component";
+

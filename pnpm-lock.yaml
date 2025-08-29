@@ -53,6 +53,9 @@ importers:
       '@ngrx/store-devtools':
         specifier: ^20.0.1
         version: 20.0.1(@angular/core@20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2))(@ngrx/store@20.0.1(@angular/core@20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2))(rxjs@7.8.2))(rxjs@7.8.2)
+      '@ngxpert/hot-toast':
+        specifier: ^5.1.1
+        version: 5.1.1(@angular/common@20.2.2(@angular/core@20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2))(@ngneat/overview@6.1.1(@angular/core@20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2)))
       '@tabler/icons-webfont':
         specifier: ^3.34.1
         version: 3.34.1
@@ -1059,6 +1062,11 @@ packages:
   '@napi-rs/wasm-runtime@1.0.3':
     resolution: {integrity: sha512-rZxtMsLwjdXkMUGC3WwsPwLNVqVqnTJT6MNIB6e+5fhMcSCPP0AOsNWuMQ5mdCq6HNjs/ZeWAEchpqeprqBD2Q==}
 
+  '@ngneat/overview@6.1.1':
+    resolution: {integrity: sha512-31gsEbSbLWTD/LD8KtUS2Qv+GVQS2pK00S9ZBP+pv2ZF1NIfwHjXs8fey8TQN1QuKPLa510YYN3rEwyP57UCfw==}
+    peerDependencies:
+      '@angular/core': '>=17'
+
   '@ngrx/data@20.0.1':
     resolution: {integrity: sha512-XZj2BxGB2n8shA6/3YsRpPdGCYMO+pl4bjuuqcLh/xoiWExsNKoZxV0jczmPikeLEmzaETQi1Z3bKiBXk7iWJA==}
     peerDependencies:
@@ -1116,6 +1124,13 @@ packages:
     peerDependencies:
       '@angular/core': ^20.0.0
       rxjs: ^6.5.3 || ^7.5.0
+
+  '@ngxpert/hot-toast@5.1.1':
+    resolution: {integrity: sha512-fpqPHxlOgk8tg+/pi6FvsZ0LeILz8RbU7s+FwG+3efpvs8S/M29xvDmbBvX86Sz/uKVnzqfdfJmztqL81HbLaw==}
+    peerDependencies:
+      '@angular/common': '>= 20.0.0'
+      '@angular/core': '>= 20.0.0'
+      '@ngneat/overview': 6.1.1
 
   '@npmcli/agent@3.0.0':
     resolution: {integrity: sha512-S79NdEgDQd/NGCay6TCoVzXSj74skRZIKJcpJjC5lOq34SZzyI6MqtiiWoiVWoVrTcGjNeC4ipbh1VIHlpfF5Q==}
@@ -4208,6 +4223,11 @@ snapshots:
       '@tybys/wasm-util': 0.10.0
     optional: true
 
+  '@ngneat/overview@6.1.1(@angular/core@20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2))':
+    dependencies:
+      '@angular/core': 20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2)
+      tslib: 2.8.1
+
   '@ngrx/data@20.0.1(@angular/common@20.2.2(@angular/core@20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2))(@ngrx/effects@20.0.1(@angular/core@20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2))(@ngrx/store@20.0.1(@angular/core@20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2))(rxjs@7.8.2))(rxjs@7.8.2))(@ngrx/entity@20.0.1(@angular/core@20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2))(@ngrx/store@20.0.1(@angular/core@20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2))(rxjs@7.8.2))(rxjs@7.8.2))(@ngrx/store@20.0.1(@angular/core@20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2))(rxjs@7.8.2))(rxjs@7.8.2)':
     dependencies:
       '@angular/common': 20.2.2(@angular/core@20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2))(rxjs@7.8.2)
@@ -4261,6 +4281,13 @@ snapshots:
     dependencies:
       '@angular/core': 20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2)
       rxjs: 7.8.2
+      tslib: 2.8.1
+
+  '@ngxpert/hot-toast@5.1.1(@angular/common@20.2.2(@angular/core@20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2))(@ngneat/overview@6.1.1(@angular/core@20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2)))':
+    dependencies:
+      '@angular/common': 20.2.2(@angular/core@20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2))(rxjs@7.8.2)
+      '@angular/core': 20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2)
+      '@ngneat/overview': 6.1.1(@angular/core@20.2.2(@angular/compiler@20.2.2)(rxjs@7.8.2))
       tslib: 2.8.1
 
   '@npmcli/agent@3.0.0':

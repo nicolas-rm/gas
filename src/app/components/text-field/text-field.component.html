@@ -1,9 +1,9 @@
 <!-- Input Component Template -->
 <div class="form-field">
     <!-- Label con indicador de requerido -->
-    <label *ngIf="label" [for]="id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+    <label *ngIf="label" [for]="id" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">
         {{ label }}
-        <span *ngIf="isRequired" class="text-red-500 ml-1">*</span>
+        <span *ngIf="isRequired" class="text-red-500 text-lg">*</span>
     </label>
 
     <!-- Contenedor relativo para el input y botón de password -->
@@ -36,14 +36,14 @@
 
         <!-- Botón toggle para password -->
         @if (type === 'password') {
-        <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+        <div class="absolute inset-y-0 right-0 flex items-center pr-0">
             <button *ngIf="type === 'password'" type="button"
-                class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-3 p-0 border-0 text-muted"
+                class="position-absolute top-50 end-0 translate-middle-y me-3 p-0 border-0 text-muted"
                 (click)="togglePasswordVisibility()"
                 [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
                 [title]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'" tabindex="-1">
-                <i class="ti ti-eye fs-5" *ngIf="!showPassword"></i>
-                <i class="ti ti-eye-off fs-5" *ngIf="showPassword"></i>
+                <i class="ti ti-eye text-xl" *ngIf="!showPassword"></i>
+                <i class="ti ti-eye-off text-xl" *ngIf="showPassword"></i>
             </button>
         </div>
         }
