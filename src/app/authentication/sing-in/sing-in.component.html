@@ -22,7 +22,7 @@
                         </div>
                     </div>
                     <div class="xl:w-2/6 w-full">
-                        <div class="card-body flex justify-center items-center bg-base-100 h-screen">
+                        <div class="card-body flex justify-center items-center h-screen">
                             <div class="max-w-[400px] sm:px-6 w-full">
                                 <h2 class="font-bold text-2xl">Bienvenido a ProxGas</h2>
                                 <p class="mb-7">Inicia sesión en tu cuenta</p>
@@ -34,33 +34,37 @@
                                         class="dark:block hidden rtl:hidden w-1/2" alt="Logo-light" />
                                 </div>
 
-                                <form>
+                                <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
                                     <div class="flex flex-col gap-4 mt-7">
-                                        <div>
-                                            <label
-                                                class="text-dark dark:text-darklink font-semibold mb-2 block ">Username</label>
-                                            <input type="text" class="form-control py-2" />
+                                        <div class="mb-3">
+                                            <TextField [id]="'email'" [label]="'Correo Electrónico'" formControlName="email" placeholder="Correo" [type]="'email'" [control]="loginForm.get('email')" />
                                         </div>
-                                        <div>
-                                            <label
-                                                class="text-dark dark:text-darklink font-semibold mb-2 block ">Password</label>
-                                            <input type="password" class="form-control py-2" />
+                                        <div class="mb-4">
+                                            <TextField 
+                                                [id]="'password'" 
+                                                label="Contraseña"
+                                                formControlName="password" 
+                                                placeholder="Contraseña" 
+                                                [control]="loginForm.get('password')" 
+                                                [type]="'password'"
+                                                />
                                         </div>
                                         <div>
                                             <div class="flex justify-between my-2">
-                                                <div>
+                                                <!-- <div>
                                                     <label class="cursor-pointer label flex items-center ">
                                                         <input type="checkbox"
+                                                            formControlName="rememberMe"
                                                             class="border-bordergray w-4 h-4 rounded-sm text-primary dark:border-darkborder bg-transparent dark:checked:bg-primary dark:checked:border-primary focus:ring-0 focus:ring-offset-0"
-                                                            checked id="checkbox1">
+                                                            id="checkbox1">
                                                         <span class="label-text ms-2">Remeber this Device</span>
                                                     </label>
-                                                </div>
+                                                </div> -->
                                                 <a href="../main/authentication-forgot-password.html"
                                                     class="text-primary font-semibold">Forgot Password ?</a>
                                             </div>
                                         </div>
-                                        <a href="../main/index.html" class="btn btn-md py-3">Sign In</a>
+                                        <button type="submit" class="btn btn-md py-3">Sign In</button>
                                         <div class="text-center mt-2.5">
                                             <span class="text-base  font-medium ">New to Modernize? <a
                                                     href="../main/authentication-register.html"

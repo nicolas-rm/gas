@@ -8,3 +8,4 @@ export { CustomerSettingsComponent } from "./customer-settings/customer-settings
 export { ExampleComponent } from "./example/example.component";
 export { SearchComponent } from "./search/search.component";
 export { ContainerComponent } from "./container/container.component";
+export { TextFieldComponent } from "./text-field/text-field.component";
