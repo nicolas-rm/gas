@@ -8,13 +8,14 @@ import { AuthPageActions } from '@/authentication/ngrx/authentication.actions';
 import { selectAuthLoading, selectAuthError } from '@/authentication/ngrx/authentication.selectors';
 
 // Componentes internos
-import { TextFieldComponent } from '@/app/components/components';
+import { TextFieldComponent } from '@/components/components';
 
 // Utilidades internas
-import { ReactiveValidators } from '@/app/utils/ReactiveValidators';
+import { ReactiveValidators } from '@/utils/validators/ReactiveValidators';
 
 // Configuración / formulario
 import { authentication } from '@/authentication/form';
+import { CommonModule } from '@angular/common';
 
 // Interfaces del formulario
 export interface SignIn {
@@ -29,7 +30,7 @@ export type SignInFormControl = {
 
 @Component({
     selector: 'app-sign-in',
-    imports: [TextFieldComponent, ReactiveFormsModule],
+    imports: [TextFieldComponent, ReactiveFormsModule, CommonModule],
     templateUrl: './sign-in.component.html',
     styleUrl: './sign-in.component.css',
 })

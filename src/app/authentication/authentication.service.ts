@@ -20,7 +20,22 @@ export class AuthenticationService {
             passwordHash: credentials.password
         };
 
-        return this.http.post<any>(`${environment.apiUrl}/auth/login`, loginRequest).pipe(catchError(error => throwError(() => this.extractErrorMessage(error))));
+        // Add 5 second delay before executing the login request
+        return new Observable(subscriber => {
+            setTimeout(() => {
+                this.http.post<any>(`${environment.apiUrl}/auth/login`, loginRequest)
+                    .pipe(catchError(error => throwError(() => this.extractErrorMessage(error))))
+                    .subscribe({
+                        next: (response) => {
+                            subscriber.next(response);
+                            subscriber.complete();
+                        },
+                        error: (error) => {
+                            subscriber.error(error);
+                        }
+                    });
+            }, 5000);
+        });
     }
 
     // Obtiene el refresh token del estado de NgRx en lugar del localStorage

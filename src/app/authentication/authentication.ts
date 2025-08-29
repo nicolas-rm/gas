@@ -1,3 +1,3 @@
-export { SignInComponent } from "@/app/authentication/sign-in/sign-in.component";
-export { SignUpComponent } from "@/app/authentication/sign-up/sign-up.component";
+export { SignInComponent } from "@/authentication/sign-in/sign-in.component";
+export { SignUpComponent } from "@/authentication/sign-up/sign-up.component";
 

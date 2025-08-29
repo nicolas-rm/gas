@@ -58,5 +58,8 @@ export const selectAuthTotal = selectTotal;
 // Si quieres conservar nombres anteriores con fixes:
 export const selectCurrentUser = selectUser;
 
+// Estado de autenticación
+export const selectAuthStatus = selectStatus;
+
 // “Success” como booleano:
 export const selectAuthSuccess = createSelector(selectUser, u => !!u);

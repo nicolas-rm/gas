@@ -21,16 +21,23 @@
       "@/authentication/*": [
         "src/app/authentication/*"
       ],
+      "@/utils/*": [
+        "src/app/utils/*"
+      ],
+      "@/validators/*": [
+        "src/app/utils/validators/*"
+      ],
       "@/dashboard/*": [
-        "src/app/features/dashboard/*"
+        "src/app/features/dashboard/*",
+        "src/app/dashboard/*"
       ],
       "@/shared/*": [
         "src/app/shared/*"
       ],
       "@/components/*": [
         "src/app/shared/components/*",
-        "src/app/components/*"
-        
+        "src/app/components/*",
+        "src/dashboard/components/*"
       ],
       "@/directives/*": [
         "src/app/shared/directives/*"
