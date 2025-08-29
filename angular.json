@@ -39,18 +39,21 @@
                             }
                         ],
                         "styles": [
-                            "@ngxpert/hot-toast/styles.css",
                             "src/styles.css",
+                            "@ngxpert/hot-toast/styles.css",
                             "node_modules/@tabler/icons-webfont/dist/tabler-icons.css",
                             "node_modules/@mdi/font/css/materialdesignicons.min.css",
                             "node_modules/weather-icons/css/weather-icons.css",
                             "node_modules/remixicon/fonts/remixicon.css"
                         ],
                         "scripts": [
-                            "node_modules/iconify-icon/dist/iconify-icon.js",
                             "public/assets/js/theme/app.init.js",
                             "public/assets/js/theme/app.min.js",
-                            "public/assets/js/theme.js"
+                            "public/assets/js/theme.js",
+                            "public/assets/libs/simplebar/dist/simplebar.min.js",
+                            "public/assets/libs/preline/dist/preline.js",
+                            "public/assets/js/dashboards/dashboard.js",
+                            "node_modules/iconify-icon/dist/iconify-icon.js"
                         ]
                     },
                     "configurations": {
@@ -74,10 +77,10 @@
                             "extractLicenses": false,
                             "sourceMap": true,
                             "fileReplacements": [
-                              {
-                                "replace": "src/environments/environment.ts",
-                                "with": "src/environments/environment.development.ts"
-                              }
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.development.ts"
+                                }
                             ]
                         }
                     },
