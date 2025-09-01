@@ -38,7 +38,6 @@ const MASK_PATTERNS: Record<MaskType, RegExp | null> = {
  */
 @Component({
     selector: 'TextField',
-    standalone: true,
     imports: [CommonModule, FormsModule, ReactiveFormsModule, NgxMaskDirective],
     templateUrl: './text-field.component.html',
     styleUrl: './text-field.component.css',
