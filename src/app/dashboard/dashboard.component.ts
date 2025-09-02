@@ -3,11 +3,10 @@ import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
 import {
-    ToastComponent, SidebarComponent, NavbarComponent, NavbarHorizontalComponent,
+    SidebarComponent, NavbarComponent, NavbarHorizontalComponent,
     MenuCanvasComponent, ShoppingCartComponent, CustomerSettingsComponent,
     ExampleComponent, SearchComponent, ContainerComponent
 } from '@/components/components';
-import { ContactsTableComponent } from "./contacts-table/contacts-table.component";
 
 declare const AppMin: (() => void) | undefined;
 declare const Theme: (() => void) | undefined;
@@ -25,11 +24,7 @@ declare global {
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.css'], // ← plural
     encapsulation: ViewEncapsulation.None,
-    imports: [
-    SidebarComponent, NavbarComponent,
-    MenuCanvasComponent, ShoppingCartComponent, CustomerSettingsComponent,
-    ExampleComponent, SearchComponent, ContainerComponent,
-    ContactsTableComponent
+    imports: [SidebarComponent, NavbarComponent, MenuCanvasComponent, ShoppingCartComponent, CustomerSettingsComponent, ExampleComponent, SearchComponent,ContainerComponent
 ],
 })
 export class DashboardComponent implements AfterViewInit {
