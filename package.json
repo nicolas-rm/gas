@@ -38,6 +38,7 @@
         "@ngxpert/hot-toast": "^5.1.1",
         "@tabler/icons-webfont": "^3.34.1",
         "@tailwindcss/postcss": "^4.1.12",
+        "@tanstack/angular-table": "^8.21.3",
         "iconify-icon": "^3.0.0",
         "ngrx-store-localstorage": "^20.0.0",
         "ngx-mask": "^20.0.3",

@@ -1,3 +1,283 @@
-<div class="grid grid-cols-12 gap-6">
+<div class="container full-container py-5">
+
+    <!-- Toolbar -->
+    <div class="card mb-6">
+        <div class="card-body">
+            <div class="grid grid-cols-12 gap-6">
+                <!-- Buscador global -->
+                <div class="lg:col-span-4 md:col-span-12 col-span-12">
+                    <form class="relative max-w-64">
+                        <input type="text" class="form-control product-search pl-11 py-2" id="input-search"
+                            placeholder="Search Contacts..." />
+                        <i
+                            class="ti ti-search absolute start-3 text-bodytext dark:text-darklink text-xl translate-y-1/2"></i>
+                    </form>
+                </div>
+
+                <!-- Acciones -->
+                <div class="lg:col-span-8 md:col-span-12 col-span-12">
+                    <div class="flex justify-end items-center gap-3">
+                        <!-- visible cuando haya selección -->
+                        <div class="action-btn show-btn" style="display:none">
+                            <a href="javascript:void(0)"
+                                class="delete-multiple btn flex gap-2 items-center btn-light-error">
+                                <i class="ti ti-trash text-lg leading-none"></i>
+                                Delete All Row
+                            </a>
+                        </div>
+
+                        <!-- Botón redondo: Mostrar/Ocultar columnas -->
+                        <button type="button" class="h-10 w-10 rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm
+                     hover:bg-slate-50 hover:text-slate-900
+                     dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                            title="Show/Hide Columns" aria-label="Show/Hide Columns">
+                            <i class="ti ti-layout-grid text-xl leading-none"></i>
+                        </button>
+
+                        <!-- Botón redondo: Exportar -->
+                        <button type="button" class="h-10 w-10 rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm
+                     hover:bg-slate-50 hover:text-slate-900
+                     dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                            title="Export" aria-label="Export">
+                            <i class="ti ti-download text-xl leading-none"></i>
+                        </button>
+
+                        <!-- Add Contact -->
+                        <a href="javascript:void(0)" id="btn-add-contact" data-hs-overlay="#addContactModal"
+                            class="btn flex gap-2 items-center">
+                            <i class="ti ti-users text-white text-lg leading-none"></i> Add Contact
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="card">
+        <div class="card-body">
+            <div class="flex flex-col">
+                <div class="-m-1.5 overflow-x-auto">
+                    <div class="p-1.5 min-w-full inline-block align-middle">
+                        <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800">
+                            <table class="table search-table min-w-full divide-y divide-border dark:divide-darkborder">
+                                <thead class="bg-slate-50/70 dark:bg-slate-900/40">
+                                    <!-- Encabezados -->
+                                    <tr>
+                                        <th class="p-4 ps-0 w-12">
+                                            <div class="n-chk align-self-center text-center">
+                                                <div class="form-check">
+                                                    <input type="checkbox" class="form-check-input rounded-sm"
+                                                        id="contact-check-all" />
+                                                    <label class="form-check-label" for="contact-check-all"></label>
+                                                    <span class="new-control-indicator"></span>
+                                                </div>
+                                            </div>
+                                        </th>
+                                        <th scope="col"
+                                            class="text-left rtl:text-right p-4 font-semibold text-slate-800 dark:text-white text-sm">
+                                            Name</th>
+                                        <th scope="col"
+                                            class="text-left rtl:text-right p-4 font-semibold text-slate-800 dark:text-white text-sm">
+                                            Email</th>
+                                        <th scope="col"
+                                            class="text-left rtl:text-right p-4 font-semibold text-slate-800 dark:text-white text-sm">
+                                            Location</th>
+                                        <th scope="col"
+                                            class="text-left rtl:text-right p-4 font-semibold text-slate-800 dark:text-white text-sm">
+                                            Phone</th>
+                                        <th scope="col"
+                                            class="text-right p-4 font-semibold text-slate-800 dark:text-white text-sm">
+                                            Action</th>
+                                    </tr>
+
+                                    <!-- Filtros por columna -->
+                                    <tr class="border-t border-slate-200 dark:border-slate-800">
+                                        <th class="p-3 ps-0"></th>
+                                        <th class="p-3">
+                                            <input type="text" placeholder="Search name" class="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-400
+                               focus:outline-none focus:ring-2 focus:ring-indigo-500
+                               dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:placeholder-slate-500">
+                                        </th>
+                                        <th class="p-3">
+                                            <input type="text" placeholder="Search email" class="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-400
+                               focus:outline-none focus:ring-2 focus:ring-indigo-500
+                               dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:placeholder-slate-500">
+                                        </th>
+                                        <th class="p-3">
+                                            <input type="text" placeholder="Search location" class="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-400
+                               focus:outline-none focus:ring-2 focus:ring-indigo-500
+                               dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:placeholder-slate-500">
+                                        </th>
+                                        <th class="p-3">
+                                            <input type="text" placeholder="Search phone" class="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-400
+                               focus:outline-none focus:ring-2 focus:ring-indigo-500
+                               dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:placeholder-slate-500">
+                                        </th>
+                                        <th class="p-3 text-right">
+                                            <!-- placeholder para alinear -->
+                                            <div class="opacity-0 select-none">—</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody class="divide-y divide-border dark:divide-darkborder">
+                                    <!-- Row 1 -->
+                                    <tr class="search-items hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                                        <td class="p-4 ps-0 whitespace-nowrap">
+                                            <div class="n-chk align-self-center text-center">
+                                                <div class="form-check">
+                                                    <input type="checkbox"
+                                                        class="form-check-input rounded-sm contact-chkbox"
+                                                        id="checkbox1" />
+                                                    <label class="form-check-label" for="checkbox1"></label>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="p-4 ps-0 whitespace-nowrap">
+                                            <div class="flex gap-3 items-center">
+                                                <img src="../assets/images/profile/user-9.jpg"
+                                                    class="h-9 w-9 rounded-full" alt="user" />
+                                                <div>
+                                                    <h6 class="user-name mb-1" data-name="Emma Adams">Emma Adams</h6>
+                                                    <p class="user-work text-xs text-bodytext dark:text-darklink"
+                                                        data-occupation="Web Developer">
+                                                        Web Developer
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="usr-email-addr text-sm whitespace-nowrap text-bodytext dark:text-darklink p-4"
+                                            data-email="adams@mail.com">
+                                            adams@mail.com
+                                        </td>
+                                        <td class="usr-location text-sm whitespace-nowrap text-bodytext dark:text-darklink p-4"
+                                            data-location="Boston, USA">
+                                            Boston, USA
+                                        </td>
+                                        <td class="usr-ph-no text-sm whitespace-nowrap text-bodytext dark:text-darklink p-4"
+                                            data-phone="+1 (070) 123-4567">
+                                            +91 (070) 123-4567
+                                        </td>
+                                        <td class="text-sm whitespace-nowrap p-4">
+                                            <div class="flex items-center justify-end gap-3">
+                                                <a href="javascript:void(0)"
+                                                    class="rounded-md p-2 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                                    aria-label="View">
+                                                    <i class="ti ti-eye text-lg text-slate-500 dark:text-slate-400"></i>
+                                                </a>
+                                                <a href="javascript:void(0)"
+                                                    class="rounded-md p-2 hover:bg-rose-50 dark:hover:bg-rose-900/30"
+                                                    aria-label="Delete">
+                                                    <i class="ti ti-trash text-lg text-rose-500"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Row 2 -->
+                                    <tr class="search-items hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                                        <td class="p-4 ps-0 whitespace-nowrap">
+                                            <div class="n-chk align-self-center text-center">
+                                                <div class="form-check">
+                                                    <input type="checkbox"
+                                                        class="form-check-input rounded-sm contact-chkbox"
+                                                        id="checkbox2" />
+                                                    <label class="form-check-label" for="checkbox2"></label>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="p-4 ps-0 whitespace-nowrap">
+                                            <div class="flex gap-3 items-center">
+                                                <img src="../assets/images/profile/user-6.jpg"
+                                                    class="h-9 w-9 rounded-full" alt="user" />
+                                                <div>
+                                                    <h6 class="user-name mb-1" data-name="Olivia Allen">Olivia Allen
+                                                    </h6>
+                                                    <p class="user-work text-xs text-bodytext dark:text-darklink"
+                                                        data-occupation="Web Designer">
+                                                        Web Designer
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="usr-email-addr text-sm whitespace-nowrap text-bodytext dark:text-darklink p-4"
+                                            data-email="allen@mail.com">
+                                            allen@mail.com
+                                        </td>
+                                        <td class="usr-location text-sm whitespace-nowrap text-bodytext dark:text-darklink p-4"
+                                            data-location="Sydney, Australia">
+                                            Sydney, Australia
+                                        </td>
+                                        <td class="usr-ph-no text-sm whitespace-nowrap text-bodytext dark:text-darklink p-4"
+                                            data-phone="+91 (125) 450-1500">
+                                            +91 (125) 450-1500
+                                        </td>
+                                        <td class="text-sm whitespace-nowrap p-4">
+                                            <div class="flex items-center justify-end gap-3">
+                                                <a href="javascript:void(0)"
+                                                    class="rounded-md p-2 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                                    aria-label="View">
+                                                    <i class="ti ti-eye text-lg text-slate-500 dark:text-slate-400"></i>
+                                                </a>
+                                                <a href="javascript:void(0)"
+                                                    class="rounded-md p-2 hover:bg-rose-50 dark:hover:bg-rose-900/30"
+                                                    aria-label="Delete">
+                                                    <i class="ti ti-trash text-lg text-rose-500"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- ...duplica filas según necesites -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Footer: filas por página + paginación -->
+                        <div class="mt-4 flex flex-col items-center justify-between gap-3 text-sm md:flex-row">
+                            <div class="text-slate-500 dark:text-slate-400">
+                                Showing <span class="font-medium text-slate-900 dark:text-white">1–10</span> of 128
+                            </div>
+
+                            <div class="flex items-center gap-4">
+                                <!-- Filas por página -->
+                                <div class="flex items-center gap-2">
+                                    <span class="text-slate-500 dark:text-slate-400">Rows per page</span>
+                                    <select class="rounded-md border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-700 shadow-sm
+                           focus:outline-none focus:ring-2 focus:ring-indigo-500
+                           dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+                                        <option>10</option>
+                                        <option>25</option>
+                                        <option>50</option>
+                                    </select>
+                                </div>
+
+                                <!-- Paginación -->
+                                <nav class="inline-flex items-center gap-1" aria-label="Pagination">
+                                    <button class="rounded-md p-2 text-slate-600 hover:bg-slate-100 disabled:opacity-40
+                           dark:text-slate-300 dark:hover:bg-slate-800" aria-label="Previous">
+                                        <i class="ti ti-chevron-left text-[18px] leading-none"></i>
+                                    </button>
+
+                                    <button
+                                        class="rounded-md px-3 py-1.5 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800">1</button>
+                                    <button class="rounded-md px-3 py-1.5 bg-indigo-600 text-white shadow-sm">2</button>
+                                    <button
+                                        class="rounded-md px-3 py-1.5 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800">3</button>
+
+                                    <button class="rounded-md p-2 text-slate-600 hover:bg-slate-100 disabled:opacity-40
+                           dark:text-slate-300 dark:hover:bg-slate-800" aria-label="Next">
+                                        <i class="ti ti-chevron-right text-[18px] leading-none"></i>
+                                    </button>
+                                </nav>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>

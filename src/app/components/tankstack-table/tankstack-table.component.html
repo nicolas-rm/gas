@@ -1,0 +1,378 @@
+<div class="rounded-2xl bg-white shadow-sm overflow-hidden dark:bg-slate-900 dark:border dark:border-slate-800">
+    <!-- Header -->
+    <div class="p-6 border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <!-- Título -->
+            <div class="min-w-0 flex-1">
+                <h5 class="m-0 text-xl font-semibold text-slate-900 truncate dark:text-white">{{ title }}</h5>
+                <p *ngIf="subtitle" class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ subtitle }}</p>
+            </div>
+
+            <!-- Controles -->
+            <div class="flex flex-wrap items-center gap-2">
+                <!-- Búsqueda global -->
+                <div *ngIf="enableGlobalFilter" class="relative min-w-[260px] lg:min-w-[400px]">
+                    <input #searchInput type="text" class="w-full rounded-md border border-slate-300 bg-white pl-10 pr-3 py-2 text-sm text-slate-700 placeholder-slate-400 shadow-sm
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                   dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:placeholder-slate-500"
+                        [placeholder]="filterPlaceholder" [ngModel]="globalFilter()"
+                        (input)="onGlobalFilterChange($event)" />
+                    <svg class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.3-4.3"></path>
+                    </svg>
+                </div>
+
+                <!-- Botones personalizados -->
+                <ng-container *ngFor="let button of headerButtons">
+                    <!-- Dropdown -->
+                    <div *ngIf="button.type === 'dropdown' && isHeaderButtonVisible(button)" class="relative">
+                        <button class="h-10 w-10 inline-flex items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm
+                     hover:bg-slate-50 hover:text-slate-900 active:scale-[0.98]
+                     dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                            [class]="button.cssClass" [title]="button.tooltip" [disabled]="button.disabled"
+                            (click)="handleHeaderButtonClick(button, $event)">
+                            <i *ngIf="button.icon" [class]="button.icon"></i>
+                            <span *ngIf="button.label && !button.icon" class="text-sm">{{ button.label }}</span>
+                        </button>
+
+                        <div class="absolute right-0 mt-2 w-56 rounded-md border border-slate-200 bg-white p-1 shadow-lg ring-1 ring-black/5
+                     dark:border-slate-700 dark:bg-slate-900" [class.hidden]="!button.dropdownOpen">
+                            <div *ngIf="button.dropdownHeader"
+                                class="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+                                {{ button.dropdownHeader }}
+                            </div>
+                            <ng-container *ngFor="let item of button.dropdownItems">
+                                <button *ngIf="isDropdownItemVisible(item)"
+                                    class="w-full px-3 py-2 text-left text-sm text-slate-700 rounded-md hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                                    [class.opacity-40]="item.disabled"
+                                    (click)="handleDropdownItemClick(button, item, $event)">
+                                    <span class="inline-flex items-center gap-2">
+                                        <i *ngIf="item.icon" [class]="item.icon"></i>
+                                        {{ item.label }}
+                                    </span>
+                                </button>
+                            </ng-container>
+                        </div>
+                    </div>
+
+                    <!-- Button simple -->
+                    <button *ngIf="button.type === 'button' && isHeaderButtonVisible(button)" class="h-10 w-10 inline-flex items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm
+                   hover:bg-slate-50 hover:text-slate-900 active:scale-[0.98]
+                   dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                        [class]="button.cssClass" [title]="button.tooltip" [disabled]="button.disabled"
+                        (click)="handleHeaderButtonClick(button, $event)">
+                        <i *ngIf="button.icon" [class]="button.icon"></i>
+                        <span *ngIf="button.label && !button.icon" class="text-sm">{{ button.label }}</span>
+                    </button>
+                </ng-container>
+
+                <!-- Exportar -->
+                <div class="relative">
+                    <button class="h-10 w-10 inline-flex items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm
+                   hover:bg-slate-50 hover:text-slate-900 active:scale-[0.98]
+                   dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                        title="Exportar datos" (click)="toggleDropdown('export', $event)">
+                        <i class="ti ti-download text-lg leading-none"></i>
+                    </button>
+                    <div class="absolute right-0 mt-2 w-56 rounded-md border border-slate-200 bg-white p-1 shadow-lg ring-1 ring-black/5
+                   dark:border-slate-700 dark:bg-slate-900" [class.hidden]="!showExportMenu">
+                        <div
+                            class="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+                            Exportar datos
+                        </div>
+                        <button
+                            class="w-full px-3 py-2 text-left text-sm text-slate-700 rounded-md hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                            (click)="exportData('csv', $event)">
+                            <span class="inline-flex items-center gap-2">
+                                <i class="ti ti-file-type-csv"></i> Exportar a CSV
+                            </span>
+                        </button>
+                        <button
+                            class="w-full px-3 py-2 text-left text-sm text-slate-700 rounded-md hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                            (click)="exportData('excel', $event)">
+                            <span class="inline-flex items-center gap-2">
+                                <i class="ti ti-file-spreadsheet"></i> Exportar a Excel
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mostrar/Ocultar columnas -->
+                <div class="relative">
+                    <button class="h-10 w-10 inline-flex items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm
+                   hover:bg-slate-50 hover:text-slate-900 active:scale-[0.98]
+                   dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                        title="Mostrar/Ocultar Columnas" (click)="toggleDropdown('columns', $event)">
+                        <i class="ti ti-filter-cog text-lg leading-none"></i>
+                    </button>
+
+                    <div class="absolute right-0 mt-2 w-64 rounded-md border border-slate-200 bg-white p-1 shadow-lg ring-1 ring-black/5
+                   dark:border-slate-700 dark:bg-slate-900" [class.hidden]="!showColumnsMenu">
+                        <div
+                            class="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+                            Mostrar / Ocultar Columnas
+                        </div>
+                        <button *ngFor="let column of columns"
+                            class="w-full px-3 py-2 text-left text-sm text-slate-700 rounded-md hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                            (click)="toggleColumnVisibility(column, $event)">
+                            <label class="inline-flex items-center gap-2">
+                                <input type="checkbox"
+                                    class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-900"
+                                    [checked]="isColumnVisible(column.id)" (click)="$event.stopPropagation()" />
+                                <span>{{ column.header }}</span>
+                            </label>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Add -->
+                <div *ngIf="isAddButtonVisible()">
+                    <button class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-3.5 py-2.5 text-sm font-medium text-white shadow-sm
+                   hover:bg-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600
+                   disabled:opacity-50 dark:bg-indigo-500 dark:hover:bg-indigo-400" [class]="addButton?.cssClass"
+                        [title]="getAddButtonTooltip()" [disabled]="isAddButtonDisabled()" (click)="executeAddAction()">
+                        <i *ngIf="addButton?.icon" [class]="addButton?.icon || ''"></i>
+                        <i *ngIf="!addButton?.icon" class="ti ti-plus"></i>
+                        <span *ngIf="addButton?.label">{{ addButton?.label }}</span>
+                    </button>
+                </div>
+
+                <!-- Key -->
+                <div *ngIf="isKeyButtonVisible()">
+                    <button
+                        class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-700 shadow-sm
+                   hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600
+                   disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                        [class]="keyButton?.cssClass" [title]="getKeyButtonTooltip()" [disabled]="isKeyButtonDisabled()"
+                        (click)="handleKeyButton()">
+                        <i *ngIf="keyButton?.icon" [class]="keyButton?.icon || ''"></i>
+                        <i *ngIf="!keyButton?.icon" class="ti ti-key"></i>
+                        <span *ngIf="keyButton?.label">{{ keyButton?.label }}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="overflow-x-auto" (scroll)="onTableScroll($event)">
+        <table class="min-w-full text-sm text-slate-700 dark:text-slate-300">
+            <thead>
+                @if (getVisibleColumnDefinitions() && getVisibleColumnDefinitions().length > 0) {
+                <!-- Encabezados -->
+                <tr class="bg-slate-50 text-slate-600 dark:bg-slate-900/40 dark:text-slate-400">
+                    @for (column of getVisibleColumnDefinitions(); track column.id) {
+                    <th class="px-4 py-3 font-semibold whitespace-nowrap border-b-2 border-slate-200 dark:border-slate-800
+                       transition-colors"
+                        [ngClass]="column.enableSorting !== false ? 'cursor-pointer select-none hover:bg-slate-100 dark:hover:bg-slate-800' : ''"
+                        [class.relative]="true" [class.sort-asc]="getSortDirection(column.id) === 'asc'"
+                        [class.sort-desc]="getSortDirection(column.id) === 'desc'"
+                        (click)="column.enableSorting !== false ? handleSort(column.id) : null">
+                        <span class="inline-flex items-center">
+                            {{ column.header }}
+                            <span class="ml-2 text-slate-400"
+                                [class.text-indigo-600]="getSortDirection(column.id) !== null">
+                                @if (getSortDirection(column.id) === 'asc') { ↑ }
+                                @else if (getSortDirection(column.id) === 'desc') { ↓ }
+                                @else { ↕ }
+                            </span>
+                        </span>
+                    </th>
+                    }
+                </tr>
+
+                <!-- Filtros por columna -->
+                @if (enableColumnFilters) {
+                <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                    @for (column of getVisibleColumnDefinitions(); track column.id) {
+                    <th class="px-4 py-2">
+                        @if (column.enableFiltering) {
+                        <input type="text" class="w-full rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-700 placeholder-slate-400
+                             focus:outline-none focus:ring-2 focus:ring-indigo-500
+                             dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:placeholder-slate-500"
+                            [placeholder]="column.header" [value]="getColumnFilterValue(column.id)"
+                            (input)="onColumnFilterChange(column.id, $event)" />
+                        }
+                    </th>
+                    }
+                </tr>
+                }
+                } @else {
+                <tr>
+                    <th class="px-4 py-3 text-left">No hay columnas disponibles</th>
+                </tr>
+                }
+            </thead>
+
+            <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                @if (data && data.length > 0) {
+                @if (getPaginatedData().length > 0) {
+                @for (item of getPaginatedData(); track $index) {
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                    @for (column of getVisibleColumnDefinitions(); track column.id) {
+                    <td class="px-4 py-3 align-middle">
+                        @if (hasActions(column)) {
+                        <div class="inline-flex items-center gap-1">
+                            @for (action of column.actions; track action.label) {
+                            @if (isActionVisible(action, item)) {
+                            <button type="button"
+                                [class]="'inline-flex items-center justify-center h-8 w-8 rounded-md text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-slate-800 ' + (action.cssClass || '')"
+                                [title]="getActionTooltip(action, item)" [disabled]="isActionDisabled(action, item)"
+                                (click)="executeAction(action, item)">
+                                <i *ngIf="action.icon" [class]="action.icon"></i>
+                                <span *ngIf="action.label && !action.icon" class="text-xs">{{ action.label }}</span>
+                                <span *ngIf="action.label && action.icon" class="ml-1 text-xs">{{ action.label }}</span>
+                            </button>
+                            }
+                            }
+                        </div>
+                        } @else {
+                        @if (shouldShowAsBadge(getColumnValue(item, column))) {
+                        <span
+                            class="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide"
+                            [ngClass]="{
+                            'text-emerald-700 bg-emerald-100/60 dark:text-emerald-300 dark:bg-emerald-900/30': getBadgeClass(getColumnValue(item, column))==='success',
+                            'text-rose-700 bg-rose-100/60 dark:text-rose-300 dark:bg-rose-900/30': getBadgeClass(getColumnValue(item, column))==='danger',
+                            'text-amber-700 bg-amber-100/60 dark:text-amber-300 dark:bg-amber-900/30': getBadgeClass(getColumnValue(item, column))==='warning',
+                            'text-sky-700 bg-sky-100/60 dark:text-sky-300 dark:bg-sky-900/30': getBadgeClass(getColumnValue(item, column))==='info',
+                            'text-indigo-700 bg-indigo-100/60 dark:text-indigo-300 dark:bg-indigo-900/30': getBadgeClass(getColumnValue(item, column))==='primary',
+                            'text-slate-700 bg-slate-100/60 dark:text-slate-300 dark:bg-slate-800/40': getBadgeClass(getColumnValue(item, column))==='secondary'
+                          }">
+                            {{ formatColumnValue(item, column) }}
+                        </span>
+                        } @else {
+                        {{ formatColumnValue(item, column) }}
+                        }
+                        }
+                    </td>
+                    }
+                </tr>
+                }
+                } @else {
+                <tr>
+                    <td [attr.colspan]="getMaxColumns()" class="px-4 py-8 text-center">
+                        <div class="space-y-1">
+                            <div class="text-base font-semibold text-slate-700 dark:text-slate-200">No se encontraron
+                                resultados</div>
+                            <div class="text-sm text-slate-500 dark:text-slate-400">No se encontraron resultados que
+                                coincidan con los filtros aplicados</div>
+                        </div>
+                    </td>
+                </tr>
+                }
+                } @else {
+                <tr>
+                    <td [attr.colspan]="getMaxColumns()" class="px-4 py-8 text-center">
+                        <div class="space-y-1">
+                            <div class="text-base font-semibold text-slate-700 dark:text-slate-200">No hay datos
+                                disponibles</div>
+                            <div class="text-sm text-slate-500 dark:text-slate-400">No hay información para mostrar en
+                                este momento</div>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Footer / Paginación -->
+    <div *ngIf="enablePagination"
+        class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 bg-slate-50 px-6 py-4 text-sm dark:border-slate-800 dark:bg-slate-900">
+        <p class="m-0 text-slate-600 dark:text-slate-400">
+            Mostrando <span class="font-medium text-slate-900 dark:text-white">{{ paginationStart }}</span> a
+            <span class="font-medium text-slate-900 dark:text-white">{{ paginationEnd }}</span> de
+            <span class="font-medium text-slate-900 dark:text-white">{{ totalItems }}</span> registros
+        </p>
+
+        <div class="flex items-center gap-3">
+            <!-- Filas por página -->
+            <div class="inline-flex items-center gap-2">
+                <span class="text-slate-600 dark:text-slate-400">Rows per page</span>
+                <select class="rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-700 shadow-sm
+                 focus:outline-none focus:ring-2 focus:ring-indigo-500
+                 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200" [ngModel]="pagination().pageSize"
+                    (change)="changePageSize($event)">
+                    @for (size of pageSizeOptions; track size) {
+                    <option [value]="size">{{ size }}</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Controles -->
+            <div class="inline-flex items-center gap-1">
+                <button
+                    class="rounded-md border border-slate-300 bg-white p-2 text-slate-600 hover:bg-slate-100 disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                    [disabled]="isFirstPage" (click)="goToFirstPage()">
+                    <i class="ti ti-chevrons-left text-[18px] leading-none"></i>
+                </button>
+                <button
+                    class="rounded-md border border-slate-300 bg-white p-2 text-slate-600 hover:bg-slate-100 disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                    [disabled]="isFirstPage" (click)="goToPreviousPage()">
+                    <i class="ti ti-chevron-left text-[18px] leading-none"></i>
+                </button>
+
+                @for (page of getVisiblePages(); track page) {
+                <button class="rounded-md border px-3 py-1.5 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800
+                   border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-900"
+                    [ngClass]="{'!bg-indigo-600 !text-white !border-indigo-600 shadow-sm': pagination().pageIndex === page}"
+                    (click)="handlePageChange(page)">
+                    {{ page + 1 }}
+                </button>
+                }
+
+                <button
+                    class="rounded-md border border-slate-300 bg-white p-2 text-slate-600 hover:bg-slate-100 disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                    [disabled]="isLastPage" (click)="goToNextPage()">
+                    <i class="ti ti-chevron-right text-[18px] leading-none"></i>
+                </button>
+                <button
+                    class="rounded-md border border-slate-300 bg-white p-2 text-slate-600 hover:bg-slate-100 disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                    [disabled]="isLastPage" (click)="goToLastPage()">
+                    <i class="ti ti-chevrons-right text-[18px] leading-none"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal eliminar -->
+    <div *ngIf="showDeleteModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-[2px] px-4">
+        <div
+            class="relative w-full max-w-md rounded-lg border border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900">
+            <button type="button" aria-label="Cerrar"
+                class="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-300"
+                (click)="cancelDelete()">
+                <i class="ti ti-x text-lg"></i>
+            </button>
+
+            <div class="px-6 pt-10 pb-6 text-center">
+                <div
+                    class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+                    <i class="ti ti-alert-triangle text-4xl"></i>
+                </div>
+                <h4 class="mb-2 text-xl font-bold text-slate-900 dark:text-white">¿Confirmar eliminación?</h4>
+                <p class="mb-4 text-sm text-slate-600 dark:text-slate-400">
+                    ¿Estás seguro de que deseas eliminar el registro?<br />
+                    <strong *ngIf="deleteItemToConfirm">{{ getItemReference(deleteItemToConfirm) }}</strong><br />
+                    <small class="text-rose-600">Esta acción no se puede deshacer.</small>
+                </p>
+                <div class="flex items-center justify-center gap-2">
+                    <button type="button"
+                        class="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700
+                         hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                        (click)="cancelDelete()">
+                        <i class="ti ti-x"></i> Cancelar
+                    </button>
+                    <button type="button"
+                        class="inline-flex items-center gap-2 rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-rose-500"
+                        (click)="confirmDelete()">
+                        <i class="ti ti-trash"></i> Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
