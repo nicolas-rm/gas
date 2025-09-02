@@ -1,8 +1,5 @@
-<aside id="application-sidebar-brand" class="hs-overlay hs-overlay-open:translate-x-0 -translate-x-full xl:rtl:-translate-x-0 rtl:translate-x-full
-    left-0 rtl:left-auto rtl:right-0 transform hidden xl:block xl:translate-x-0 xl:end-auto xl:bottom-0
-    fixed top-0 with-vertical left-sidebar transition-all duration-300 h-screen xl:z-[2] z-[60]
-    flex-shrink-0 border-r rtl:border-l rtl:border-r-0 w-[270px] border-border dark:border-darkborder
-    bg-white dark:bg-dark">
+<aside id="application-sidebar-brand"
+    class="hs-overlay hs-overlay-open:translate-x-0 -translate-x-full xl:rtl:-translate-x-0 rtl:translate-x-full left-0 rtl:left-auto rtl:right-0 transform hidden xl:block xl:translate-x-0 xl:end-auto xl:bottom-0 fixed top-0 with-vertical left-sidebar transition-all duration-300 h-screen xl:z-[2] z-[60] flex-shrink-0 border-r rtl:border-l rtl:border-r-0 w-[270px] border-border dark:border-darkborder bg-white dark:bg-dark">
 
     <!-- Brand -->
     <div class="py-5 px-5 flex justify-between">
@@ -12,73 +9,104 @@
                     alt="Logo-Dark" />
                 <img src="assets/images/logos/light-logo.svg"
                     class="dark:block hidden rtl:hidden rtl:dark:hidden !w-fit" alt="Logo-light" />
+                <img src="assets/images/logos/dark-logo-rtl.svg"
+                    class="dark:hidden hidden rtl:block rtl:dark:hidden !w-fit" alt="Logo-Dark" />
+                <img src="assets/images/logos/light-logo-rtl.svg"
+                    class="dark:hidden hidden rtl:hidden rtl:dark:block !w-fit" alt="Logo-light" />
             </a>
         </div>
     </div>
 
     <div class="overflow-hidden">
         <div class="scroll-sidebar" data-simplebar>
-            <div class="px-6 mt-8 mini-layout">
+            <div class="px-6 mt-8 mini-layout" data-te-sidenav-menu-ref>
                 <nav class="hs-accordion-group w-full flex flex-col">
-                    <ul id="sidebarnav" class="">
+                    <ul data-te-sidenav-menu-ref id="sidebarnav" class="space-y-1">
 
-                        <!-- Iteramos sobre cada elemento principal -->
-                        <ng-container *ngFor="let menuItem of sidebarService.sidebarMenu; let i = index" class="gap-4">
+                        <ng-container *ngFor="let menuItem of sidebarService.sidebarMenu; let i = index">
 
-                            <div class="gap-5 space-y-2 mb-8">
-                                <!-- Caption / Categoría (usa icon del padre si existe) -->
-                                <div class="caption">
-                                    <i class="{{ 'ti ti-dots' }} nav-small-cap-icon"></i>
-                                    <span class="hide-menu">{{ menuItem.title }}</span>
-                                </div>
-
-                                <!-- Hijos del caption -->
-                                <ng-container *ngIf="menuItem.children && menuItem.children.length > 0">
-                                    <ng-container *ngFor="let sub of menuItem.children; let j = index">
-
-                                        <!-- Link directo (sin hijos) -->
-                                        <li class="sidebar-item" *ngIf="!sub.children || sub.children.length === 0">
-                                            <a class="sidebar-link dark-sidebar-link dark:text-white"
-                                                [routerLink]="sub.route" routerLinkActive="active activemenu"
-                                                [routerLinkActiveOptions]="{ exact: true }">
-                                                <i class="{{ sub.icon || 'ti ti-circle' }} text-xl flex-shrink-0"></i>
-                                                <span class="hide-menu text-wrap flex-shrink-0">{{ sub.title }}</span>
-                                            </a>
-                                        </li>
-
-                                        <!-- Acordeón (tiene hijos) -->
-                                        <li class="hs-accordion sidebar-item"
-                                            *ngIf="sub.children && sub.children.length > 0" [attr.id]="'acc-'+i+'-'+j">
-                                            <a class="hs-accordion-toggle sidebar-link dropdown-menu-link">
-                                                <i
-                                                    class="{{ sub.icon || 'ti ti-app-window' }} text-xl flex-shrink-0"></i>
-                                                <span class="hide-menu text-wrap">{{ sub.title }}</span>
-                                                <span class="hide-menu ms-auto">
-                                                    <i class="ti ti-chevron-down text-lg ms-auto hs-accordion-active:hidden"></i>
-                                                    <i class="ti ti-chevron-up text-lg ms-auto hs-accordion-active:block ml-auto hidden z-10 relative"></i>
-                                                </span>
-                                            </a>
-
-                                            <!-- Contenido del acordeón -->
-                                            <div class="hs-accordion-content">
-                                                <ul>
-                                                    <li class="pl-4 pr-3" *ngFor="let child of sub.children">
-                                                        <a class="dropdown-submenu-link" [routerLink]="child.route"
-                                                            routerLinkActive="active"
-                                                            [routerLinkActiveOptions]="{ exact: true }">
-                                                            <i
-                                                                class="{{ child.icon || 'ti ti-circle' }} flex-shrink-0 text-xs me-3"></i>
-                                                            <span class="hide-menu text-wrap">{{ child.title }}</span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </li>
-
-                                    </ng-container>
-                                </ng-container>
+                            <div class="caption mt-8 first:mt-0 mb-2" *ngIf="menuItem.title">
+                                <i class="ti ti-dots nav-small-cap-icon"></i>
+                                <span class="hide-menu">{{ menuItem.title }}</span>
                             </div>
 
+                            <ng-container *ngIf="menuItem.children?.length">
+                                <ng-container *ngFor="let sub of menuItem.children; let j = index">
+
+                                    <!-- Top-level sin hijos -->
+                                    <li class="sidebar-item" *ngIf="!sub.children?.length">
+                                        <a class="sidebar-link dark-sidebar-link group transition-colors
+                             !text-slate-800 dark:!text-gray-300
+                             hover:!text-slate-900 dark:hover:!text-white" [routerLink]="sub.route"
+                                            [routerLinkActive]="'active activemenu !bg-transparent !text-slate-900 dark:!text-white'"
+                                            #rla="routerLinkActive" [routerLinkActiveOptions]="{ exact: true }">
+                                            <i [ngClass]="[sub.icon, rla.isActive ? 'text-2xl' : 'text-xl']"
+                                                class="flex-shrink-0 group-hover:text-xl"></i>
+
+                                            <span class="hide-menu flex-1 min-w-0">
+                                                <span class="block !whitespace-normal break-words text-pretty hyphens-auto
+                                 group-hover:text-lg group-hover:font-normal" [class.text-lg]="rla.isActive"
+                                                    [class.font-medium]="rla.isActive">
+                                                    {{ sub.title }}
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </li>
+
+                                    <!-- Padre con acordeón -->
+                                    <li class="hs-accordion sidebar-item" *ngIf="sub.children?.length"
+                                        [attr.id]="'acc-'+i+'-'+j">
+                                        <a class="hs-accordion-toggle sidebar-link dropdown-menu-link group transition-colors
+                              !text-slate-800 dark:!text-gray-300
+                              hover:!text-slate-900 dark:hover:!text-white
+                              hs-accordion-active:!text-slate-900 dark:hs-accordion-active:!text-white">
+                                            <i [ngClass]="sub.icon"
+                                                class="text-xl flex-shrink-0 group-hover:text-xl hs-accordion-active:text-2xl"></i>
+
+                                            <span class="hide-menu flex-1 min-w-0">
+                                                <span class="block !whitespace-normal break-words text-pretty hyphens-auto
+                                       group-hover:text-lg group-hover:font-normal
+                                       hs-accordion-active:text-lg hs-accordion-active:font-medium">
+                                                    {{ sub.title }}
+                                                </span>
+                                            </span>
+                                            <span class="hide-menu ms-auto">
+                                                <i
+                                                    class="ti ti-chevron-down text-lg ms-auto hs-accordion-active:hidden"></i>
+                                                <i
+                                                    class="ti ti-chevron-up text-lg ms-auto hs-accordion-active:block ml-auto hidden z-10 relative"></i>
+                                            </span>
+                                        </a>
+
+                                        <!-- Contenido del acordeón -->
+                                        <div class="hs-accordion-content">
+                                            <ul class="space-y-1">
+                                                <li class="pl-4 pr-3" *ngFor="let child of sub.children">
+                                                    <a class="dropdown-submenu-link group transition-colors
+                                   !text-slate-700 dark:!text-gray-400
+                                   hover:!text-slate-900 dark:hover:!text-white" [routerLink]="child.route"
+                                                        [routerLinkActive]="'active !bg-transparent !text-slate-900 dark:!text-white'"
+                                                        #crla="routerLinkActive"
+                                                        [routerLinkActiveOptions]="{ exact: true }">
+                                                        <i class="flex-shrink-0 me-3 group-hover:text-sm"
+                                                            [ngClass]="crla.isActive ? 'text-sm' : 'text-xs'"></i>
+
+                                                        <span class="hide-menu flex-1 min-w-0">
+                                                            <span class="block !whitespace-normal break-words text-pretty hyphens-auto
+                                       group-hover:text-base group-hover:font-normal" [class.text-base]="crla.isActive"
+                                                                [class.text-sm]="!crla.isActive"
+                                                                [class.font-medium]="crla.isActive">
+                                                                {{ child.title }}
+                                                            </span>
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+
+                                </ng-container>
+                            </ng-container>
                         </ng-container>
                     </ul>
                 </nav>
@@ -86,8 +114,8 @@
         </div>
     </div>
 
-    <!-- Bottom User Profile (igual al tuyo) -->
-    <div class="px-6 pt-6 bg-surface dark:bg-dark-surface relative">
+    <!-- Bottom User Profile -->
+    <div class="px-6 pt-6 bg-surface dark:bg-dark-surface relative mt-6">
         <div class="bg-lightsecondary dark:bg-darksecondary p-4 rounded-md">
             <div class="hide-menu">
                 <div class="flex items-center">
@@ -98,8 +126,7 @@
                         <p class="text-xs font-normal text-link dark:text-darklink">Designer</p>
                     </div>
                     <div class="ms-auto hs-tooltip hs-tooltip-toggle">
-                        <a href="#">
-                            <i class="ti ti-power text-primary me-3 text-2xl"></i>
+                        <a href="#"><i class="ti ti-power text-primary me-3 text-2xl"></i>
                             <span
                                 class="tooltip hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible"
                                 role="tooltip">
