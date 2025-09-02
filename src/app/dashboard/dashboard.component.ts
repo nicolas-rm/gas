@@ -7,6 +7,7 @@ import {
     MenuCanvasComponent, ShoppingCartComponent, CustomerSettingsComponent,
     ExampleComponent, SearchComponent, ContainerComponent
 } from '@/components/components';
+import { BreadcrumbComponent } from "../components/breadcrumb/breadcrumb.component";
 
 declare const AppMin: (() => void) | undefined;
 declare const Theme: (() => void) | undefined;
@@ -24,8 +25,7 @@ declare global {
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.css'], // ← plural
     encapsulation: ViewEncapsulation.None,
-    imports: [SidebarComponent, NavbarComponent, MenuCanvasComponent, ShoppingCartComponent, CustomerSettingsComponent, ExampleComponent, SearchComponent,ContainerComponent
-],
+    imports: [SidebarComponent, NavbarComponent, MenuCanvasComponent, ShoppingCartComponent, CustomerSettingsComponent, ExampleComponent, SearchComponent, ContainerComponent, BreadcrumbComponent],
 })
 export class DashboardComponent implements AfterViewInit {
     private router = inject(Router);

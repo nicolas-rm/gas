@@ -1,0 +1,10 @@
+.breadcrumb-item + .breadcrumb-item {
+    padding-left: 0rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    float: left;
+    padding-right: 0rem;
+    color: var(--bs-breadcrumb-divider-color);
+    /* content: var(--bs-breadcrumb-divider, "\2022"); */
+}
