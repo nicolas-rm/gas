@@ -17,8 +17,6 @@ declare global {
     selector: 'app-root',
     standalone: true,
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css'],
-    encapsulation: ViewEncapsulation.None,
     imports: [RouterOutlet],
 })
 export class AppComponent implements AfterViewInit {

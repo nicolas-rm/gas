@@ -1,6 +1,7 @@
 // authentication.routes.ts
 import { Route } from '@angular/router';
 import { AuthenticationGuard } from '@/utils/guards/authentication.guard';
+import { customerRoutes } from '@/dashboard/customer/customer.routes';
 
 // dashboard.routes.ts
 export const dashboardRoutes: Route[] = [
@@ -15,6 +16,7 @@ export const dashboardRoutes: Route[] = [
                 loadComponent: () => import('../components/example/example.component').then((mod) => mod.ExampleComponent  ),
                 data: { breadcrumb: 'Inicio' },
             },
+            ...customerRoutes
         ]
     },
 ];

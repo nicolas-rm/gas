@@ -45,7 +45,7 @@ export class SidebarService {
                         {
                             title: 'Alta de Clientes',
                             icon: 'ti ti-user-star',
-                            route: '/panel/alta-clientes'
+                            route: '/panel/clientes'
                         },
                         {
                             title: 'Alta de Usuarios',

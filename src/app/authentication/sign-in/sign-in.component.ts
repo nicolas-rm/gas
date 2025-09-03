@@ -31,8 +31,7 @@ export type SignInFormControl = {
 @Component({
     selector: 'app-sign-in',
     imports: [TextFieldComponent, ReactiveFormsModule, CommonModule],
-    templateUrl: './sign-in.component.html',
-    styleUrl: './sign-in.component.css',
+    templateUrl: './sign-in.component.html'
 })
 export class SignInComponent {
     // Inyecciones de dependencias

@@ -1,13 +1,12 @@
-import { AfterViewInit, Component, ViewEncapsulation, inject } from '@angular/core';
+import { AfterViewInit, Component, inject } from '@angular/core';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
 import {
-    SidebarComponent, NavbarComponent, NavbarHorizontalComponent,
+    SidebarComponent, NavbarComponent,
     MenuCanvasComponent, ShoppingCartComponent, CustomerSettingsComponent,
-    ExampleComponent, SearchComponent, ContainerComponent
+    ExampleComponent, SearchComponent, ContainerComponent, BreadcrumbComponent
 } from '@/components/components';
-import { BreadcrumbComponent } from "../components/breadcrumb/breadcrumb.component";
 
 declare const AppMin: (() => void) | undefined;
 declare const Theme: (() => void) | undefined;
@@ -21,10 +20,9 @@ declare global {
 
 @Component({
     selector: 'app-dashboard',
-    standalone: true, // ← si tu app es standalone
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.css'], // ← plural
-    imports: [SidebarComponent, NavbarComponent, MenuCanvasComponent, ShoppingCartComponent, CustomerSettingsComponent, SearchComponent, ContainerComponent, BreadcrumbComponent],
+    imports: [SidebarComponent, NavbarComponent, CustomerSettingsComponent, ContainerComponent, BreadcrumbComponent, RouterOutlet],
 })
 export class DashboardComponent implements AfterViewInit {
     private router = inject(Router);

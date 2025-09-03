@@ -1,5 +1,4 @@
-<div
-    class="bg-white dark:bg-[#202A35] px-6 py-4 shadow-sm relative before:content-[''] before:absolute before:left-0 before:top-4 before:bottom-4 before:w-0.5 before:bg-blue-500 rounded-lg border border-gray-200 dark:border-gray-700">
+<div class="bg-white dark:bg-dark px-6 py-5 mb-5 relative before:content-[''] before:absolute before:left-0 before:top-4 before:bottom-4 before:w-0.5 before:bg-blue-500 rounded-lg">
     <div class="flex items-center justify-between">
         <!-- Título con stick a la izquierda -->
         <h1 class="text-xl font-medium text-gray-900 dark:text-white">
@@ -13,8 +12,8 @@
                     class="text-primary-600 hover:text-primary-800 transition-colors dark:text-primary-400 dark:hover:text-primary-300">
                     {{ breadcrumb.label }}
                 </a>
-                <span *ngIf="!last" class="text-gray-400 dark:text-gray-500">
-                    >
+                <span *ngIf="!last" class="text-gray-400 dark:text-gray-500 mt-1 font-bold">
+                    <i class="ti ti-chevron-right text-lg"></i>
                 </span>
                 <span *ngIf="last" class="text-gray-500 dark:text-gray-400">
                     {{ breadcrumb.label }}

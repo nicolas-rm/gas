@@ -28,7 +28,7 @@
         "src/app/utils/validators/*"
       ],
       "@/dashboard/*": [
-        "src/app/features/dashboard/*",
+        "src/app/dashboard/*",
         "src/app/dashboard/*"
       ],
       "@/shared/*": [

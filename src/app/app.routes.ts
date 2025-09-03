@@ -1,7 +1,7 @@
 // app.routes.ts
 import { Routes } from '@angular/router';
 import { authenticationRoutes } from '@/authentication/authentication.routes';
-import { dashboardRoutes } from '@/dashboard/dashboard.routes';
+import { dashboardRoutes } from '@/app/dashboard/dashboard.routes';
 
 
 // app.routes.ts
