@@ -5,9 +5,9 @@ import localeEs from '@angular/common/locales/es';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi, withFetch } from '@angular/common/http';
 import { provideHotToastConfig } from '@ngxpert/hot-toast';
 import { NgxMaskConfig, provideEnvironmentNgxMask } from 'ngx-mask';
-import { routes } from './app.routes';
-import { ngrxProviders } from './ngrx.config';
-import { TokenInterceptor } from './utils/interceptors/token.interceptor';
+import { routes } from '@/app/app.routes';
+import { ngrxProviders } from '@/app/ngrx.config';
+import { TokenInterceptor } from '@/utils/interceptors/token.interceptor';
 
 registerLocaleData(localeEs);
 

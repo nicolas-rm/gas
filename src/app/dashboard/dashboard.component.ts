@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ViewEncapsulation, inject } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
 import {
@@ -24,8 +24,7 @@ declare global {
     standalone: true, // ← si tu app es standalone
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.css'], // ← plural
-    encapsulation: ViewEncapsulation.None,
-    imports: [SidebarComponent, NavbarComponent, MenuCanvasComponent, ShoppingCartComponent, CustomerSettingsComponent, ExampleComponent, SearchComponent, ContainerComponent, BreadcrumbComponent],
+    imports: [SidebarComponent, NavbarComponent, MenuCanvasComponent, ShoppingCartComponent, CustomerSettingsComponent, SearchComponent, ContainerComponent, BreadcrumbComponent],
 })
 export class DashboardComponent implements AfterViewInit {
     private router = inject(Router);

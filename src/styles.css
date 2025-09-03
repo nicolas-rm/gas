@@ -4433,6 +4433,10 @@
         padding: 1px
     }
 
+    .px-auto {
+        padding-inline: auto
+    }
+
     .px-0 {
         padding-inline: calc(var(--spacing)*0)
     }
@@ -16188,16 +16192,6 @@ html[dir=rtl] .toast-onload {
         width: calc(100% - 270px)
     }
 }
-
-
-/* Padding auto x */
-@layer utilities {
-    .px-auto {
-        padding-left: auto;
-        padding-right: auto;
-    }
-}
-
 
 /* Animations */
 @plugin "@midudev/tailwind-animations";

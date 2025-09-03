@@ -1,18 +1,16 @@
 <aside id="application-sidebar-brand"
-    class="hs-overlay hs-overlay-open:translate-x-0 -translate-x-full xl:rtl:-translate-x-0 rtl:translate-x-full left-0 rtl:left-auto rtl:right-0 transform hidden xl:block xl:translate-x-0 xl:end-auto xl:bottom-0 fixed top-0 with-vertical left-sidebar transition-all duration-300 h-screen xl:z-[2] z-[60] flex-shrink-0 border-r rtl:border-l rtl:border-r-0 w-[270px] border-border dark:border-darkborder bg-white dark:bg-dark">
+    class="hs-overlay hs-overlay-open:translate-x-0 -translate-x-full xl:rtl:-translate-x-0 rtl:translate-x-full left-0 rtl:left-auto rtl:right-0 transform hidden xl:block xl:translate-x-0 xl:end-auto xl:bottom-0 fixed top-0 with-vertical left-sidebar transition-all duration-300 h-screen xl:z-[2] z-[60] flex-shrink-0  rtl:border-l w-[270px] border-white/10 dark:border-darkborder bg-dark text-slate-200">
 
-    <!-- Brand -->
-    <div class="py-5 px-5 flex justify-between">
+    <!-- Brand (único bloque claro) -->
+    <div class="py-1 px-10 flex items-center justify-between bg-white dark:bg-dark">
         <div class="brand-logo flex items-center">
-            <a routerLink="/" class="text-nowrap logo-img">
-                <img src="assets/images/logos/dark-logo.svg" class="dark:hidden block rtl:hidden !w-fit"
-                    alt="Logo-Dark" />
-                <img src="assets/images/logos/light-logo.svg"
-                    class="dark:block hidden rtl:hidden rtl:dark:hidden !w-fit" alt="Logo-light" />
-                <img src="assets/images/logos/dark-logo-rtl.svg"
-                    class="dark:hidden hidden rtl:block rtl:dark:hidden !w-fit" alt="Logo-Dark" />
-                <img src="assets/images/logos/light-logo-rtl.svg"
-                    class="dark:hidden hidden rtl:hidden rtl:dark:block !w-fit" alt="Logo-light" />
+            <a routerLink="/" class="block shrink-0">
+                <!-- Claro -->
+                <img src="assets/images/logos/proxgas.svg" class="dark:hidden block !h-8 md:!h-14 !w-auto"
+                    style="height:50px;width:auto" alt="Logo-Dark" />
+                <!-- Oscuro -->
+                <img src="assets/images/logos/proxgas-light.svg" class="hidden dark:block !h-8 md:!h-14 !w-auto"
+                    style="height:50px;width:auto" alt="Logo-light" />
             </a>
         </div>
     </div>
@@ -25,9 +23,12 @@
 
                         <ng-container *ngFor="let menuItem of sidebarService.sidebarMenu; let i = index">
 
+                            <!-- Caption -->
                             <div class="caption mt-8 first:mt-0 mb-2" *ngIf="menuItem.title">
-                                <i class="ti ti-dots nav-small-cap-icon"></i>
-                                <span class="hide-menu">{{ menuItem.title }}</span>
+                                <div class="gap-2 text-xs uppercase tracking-wide text-slate-400/80">
+                                    <i class="ti ti-dots nav-small-cap-icon text-slate-500"></i>
+                                    <span class="hide-menu">{{ menuItem.title }}</span>
+                                </div>
                             </div>
 
                             <ng-container *ngIf="menuItem.children?.length">
@@ -35,16 +36,18 @@
 
                                     <!-- Top-level sin hijos -->
                                     <li class="sidebar-item" *ngIf="!sub.children?.length">
-                                        <a class="sidebar-link dark-sidebar-link group transition-colors
-                             !text-slate-800 dark:!text-gray-300
-                             hover:!text-slate-900 dark:hover:!text-white" [routerLink]="sub.route"
-                                            [routerLinkActive]="'active activemenu !bg-transparent !text-slate-900 dark:!text-white'"
+                                        <a class="sidebar-link group flex items-center gap-3 rounded-md px-3 py-2 transition-colors
+                             text-slate-300 hover:text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20"
+                                            [routerLink]="sub.route"
+                                            [routerLinkActive]="'active activemenu !bg-white/10 !text-white'"
                                             #rla="routerLinkActive" [routerLinkActiveOptions]="{ exact: true }">
+
                                             <i [ngClass]="[sub.icon, rla.isActive ? 'text-2xl' : 'text-xl']"
-                                                class="flex-shrink-0 group-hover:text-xl"></i>
+                                                class="flex-shrink-0 transition-[font-size,color] text-slate-400 group-hover:text-slate-200"></i>
 
                                             <span class="hide-menu flex-1 min-w-0">
-                                                <span class="block !whitespace-normal break-words text-pretty hyphens-auto group-hover:font-normal" [class.text-lg]="rla.isActive"
+                                                <span class="block !whitespace-normal break-words text-pretty hyphens-auto transition-[font-size,opacity] 
+                                 text-slate-300 group-hover:text-slate-100" [class.text-lg]="rla.isActive"
                                                     [class.font-medium]="rla.isActive">
                                                     {{ sub.title }}
                                                 </span>
@@ -55,44 +58,48 @@
                                     <!-- Padre con acordeón -->
                                     <li class="hs-accordion sidebar-item" *ngIf="sub.children?.length"
                                         [attr.id]="'acc-'+i+'-'+j">
-                                        <a class="hs-accordion-toggle sidebar-link dropdown-menu-link group transition-colors
-                              !text-slate-800 dark:!text-gray-300
-                              hover:!text-slate-900 dark:hover:!text-white
-                              hs-accordion-active:!text-slate-900 dark:hs-accordion-active:!text-white">
+                                        <a
+                                            class="hs-accordion-toggle sidebar-link dropdown-menu-link group flex items-center gap-3 rounded-md px-3 py-2 transition-colors
+                             text-slate-300 hover:text-white hover:bg-white/5
+                             hs-accordion-active:bg-white/10 hs-accordion-active:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20">
+
                                             <i [ngClass]="sub.icon"
-                                                class="text-xl flex-shrink-0 group-hover:text-xl hs-accordion-active:text-2xl"></i>
+                                                class="text-xl flex-shrink-0 transition-[font-size,color] text-slate-400 group-hover:text-slate-200 hs-accordion-active:text-2xl"></i>
 
                                             <span class="hide-menu flex-1 min-w-0">
-                                                <span class="block !whitespace-normal break-words text-pretty hyphens-auto group-hover:font-normal
-                                       hs-accordion-active:text-lg hs-accordion-active:font-medium">
+                                                <span class="block !whitespace-normal break-words text-pretty hyphens-auto transition-[font-size,color]
+                                 text-slate-300 group-hover:text-slate-100
+                                 hs-accordion-active:text-lg hs-accordion-active:font-medium">
                                                     {{ sub.title }}
                                                 </span>
                                             </span>
-                                            <span class="hide-menu ms-auto">
+
+                                            <span class="hide-menu ms-auto flex items-center">
                                                 <i
-                                                    class="ti ti-chevron-down text-lg ms-auto hs-accordion-active:hidden"></i>
+                                                    class="ti ti-chevron-down text-lg ms-auto hs-accordion-active:hidden text-slate-400 group-hover:text-slate-200"></i>
                                                 <i
-                                                    class="ti ti-chevron-up text-lg ms-auto hs-accordion-active:block ml-auto hidden z-10 relative"></i>
+                                                    class="ti ti-chevron-up text-lg ms-auto hs-accordion-active:block ml-auto hidden z-10 relative text-slate-400 group-hover:text-slate-200"></i>
                                             </span>
                                         </a>
 
                                         <!-- Contenido del acordeón -->
                                         <div class="hs-accordion-content">
-                                            <ul class="space-y-1">
+                                            <ul class="space-y-1 pt-1">
                                                 <li class="pl-4 pr-3" *ngFor="let child of sub.children">
-                                                    <a class="dropdown-submenu-link group transition-colors
-                                   !text-slate-700 dark:!text-gray-400
-                                   hover:!text-slate-900 dark:hover:!text-white" [routerLink]="child.route"
-                                                        [routerLinkActive]="'active !bg-transparent !text-slate-900 dark:!text-white'"
+                                                    <a class="dropdown-submenu-link group flex items-center gap-3 rounded-md px-3 py-2 transition-colors
+                                   text-slate-400 hover:text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20"
+                                                        [routerLink]="child.route"
+                                                        [routerLinkActive]="'active !bg-white/10 !text-white'"
                                                         #crla="routerLinkActive"
                                                         [routerLinkActiveOptions]="{ exact: true }">
-                                                        <i class="flex-shrink-0 me-3 group-hover:text-sm"
+
+                                                        <i class="flex-shrink-0 me-1 transition-[font-size,color] text-slate-500 group-hover:text-slate-300"
                                                             [ngClass]="crla.isActive ? 'text-sm' : 'text-xs'"></i>
 
                                                         <span class="hide-menu flex-1 min-w-0">
-                                                            <span class="block !whitespace-normal break-words text-pretty hyphens-auto
-                                       group-hover:text-base group-hover:font-normal" [class.text-base]="crla.isActive"
-                                                                [class.text-sm]="!crla.isActive"
+                                                            <span class="block !whitespace-normal break-words text-pretty hyphens-auto transition-[font-size,color]
+                                       text-sm text-slate-400 group-hover:text-slate-100"
+                                                                [class.text-base]="crla.isActive"
                                                                 [class.font-medium]="crla.isActive">
                                                                 {{ child.title }}
                                                             </span>
@@ -106,6 +113,7 @@
                                 </ng-container>
                             </ng-container>
                         </ng-container>
+
                     </ul>
                 </nav>
             </div>
@@ -113,24 +121,26 @@
     </div>
 
     <!-- Bottom User Profile -->
-    <div class="px-6 pt-6 bg-surface dark:bg-dark-surface relative">
-        <div class="bg-lightsecondary dark:bg-darksecondary p-4 rounded-md">
+    <div class="px-6 pt-6 bg-transparent relative">
+        <div class="bg-white/5 border border-white/10 p-4 rounded-md">
             <div class="hide-menu">
                 <div class="flex items-center">
                     <img src="assets/images/profile/user-1.jpg" class="h-9 w-9 rounded-full object-cover"
                         alt="profile" />
                     <div class="ml-4 rtl:mr-4 rtl:ml-0">
-                        <h5 class="text-base font-semibold text-dark dark:text-white">Mathew</h5>
-                        <p class="text-xs font-normal text-link dark:text-darklink">Designer</p>
+                        <h5 class="text-base font-semibold text-slate-100">Mathew</h5>
+                        <p class="text-xs font-normal text-slate-400">Designer</p>
                     </div>
                     <div class="ms-auto hs-tooltip hs-tooltip-toggle">
-                        <a href="#"><i class="ti ti-power text-primary me-3 text-2xl"></i>
+                        <button type="button" (click)="onLogout()"
+                            class="inline-flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20">
+                            <i class="ti ti-power text-primary text-2xl"></i>
                             <span
                                 class="tooltip hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible"
                                 role="tooltip">
                                 Logout
                             </span>
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>

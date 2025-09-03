@@ -3,14 +3,11 @@ import { provideEffects } from '@ngrx/effects';
 // import { provideStore } from '@ngrx/store';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { provideRouterStore, RouterStateSerializer } from '@ngrx/router-store';
-import { CustomRouterSerializer } from './utils/ngrx/custom-router.serializer';
-import { metaReducers } from './utils/ngrx/ngrx-store-localstorage';
+import { CustomRouterSerializer } from '@/utils/ngrx/custom-router.serializer';
+import { metaReducers } from '@/utils/ngrx/ngrx-store-localstorage';
 import { provideState, provideStore } from '@ngrx/store';
 import * as authenticationEffects from '@/authentication/ngrx/authentication.effects';
 import { authenticationReducer } from '@/authentication/ngrx/authentication.reducer';
-// import { store, storeLocal } from './ngrx/store';
-
-// import { ngrxEffects, toastConfig } from './app.main.config';
 
 export const ngrxProviders = [
     provideEffects(authenticationEffects),

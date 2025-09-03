@@ -58,7 +58,7 @@ export type {
   IRegisterRequest,
   IRefreshTokenResponse,
   ApiError,
-} from './authentication.models';
+} from '@/authentication/ngrx/authentication.models';
 
 // Re-exportar enums (no son tipos puros)
-export { UserRole } from './authentication.models';
+export { UserRole } from '@/authentication/ngrx/authentication.models';

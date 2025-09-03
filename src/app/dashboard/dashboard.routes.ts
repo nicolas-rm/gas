@@ -8,6 +8,13 @@ export const dashboardRoutes: Route[] = [
         path: 'panel',
         loadComponent: () => import('./dashboard.component').then((mod) => mod.DashboardComponent),
         data: { breadcrumb: 'Panel' },
-        canActivate: [AuthenticationGuard], // Protege con autenticación
+        canActivate: [AuthenticationGuard],
+        children: [
+            {
+                path: '',
+                loadComponent: () => import('../components/example/example.component').then((mod) => mod.ExampleComponent  ),
+                data: { breadcrumb: 'Inicio' },
+            },
+        ]
     },
 ];
