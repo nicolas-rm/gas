@@ -1,0 +1,117 @@
+// NgRx
+import { createReducer, on } from '@ngrx/store';
+import { EntityAdapter, createEntityAdapter } from '@ngrx/entity';
+
+import { CommissionDataState, initialCommissionDataState } from './commission.state';
+import { CommissionDataPageActions, CommissionDataApiActions } from './commission.actions';
+import { CommissionData } from './commission.models';
+
+// Entity Adapter
+export const commissionDataAdapter: EntityAdapter<CommissionData> = createEntityAdapter<CommissionData>({
+    selectId: (data: CommissionData) => data.commissionClassification || 'temp-id',
+    sortComparer: false,
+});
+
+export const commissionDataReducer = createReducer(
+    initialCommissionDataState,
+
+    // === LOAD DATA ===
+    on(CommissionDataPageActions.loadData, (state) => ({
+        ...state,
+        status: 'loading' as const,
+        loading: true,
+        error: null,
+    })),
+
+    on(CommissionDataApiActions.loadDataSuccess, (state, { data }) => ({
+        ...state,
+        data,
+        status: 'idle' as const,
+        loading: false,
+        error: null,
+        hasUnsavedChanges: false,
+        isDirty: false,
+        lastSaved: Date.now(),
+    })),
+
+    on(CommissionDataApiActions.loadDataFailure, (state, { error }) => ({
+        ...state,
+        status: 'error' as const,
+        loading: false,
+        error: error.message,
+    })),
+
+    // === UPDATE FIELDS ===
+    on(CommissionDataPageActions.updateField, (state, { field, value }) => ({
+        ...state,
+        data: {
+            ...state.data,
+            [field]: value,
+        },
+        hasUnsavedChanges: true,
+        isDirty: true,
+    })),
+
+    on(CommissionDataPageActions.updateMultipleFields, (state, { updates }) => ({
+        ...state,
+        data: {
+            ...state.data,
+            ...updates,
+        },
+        hasUnsavedChanges: true,
+        isDirty: true,
+    })),
+
+    on(CommissionDataPageActions.setData, (state, { data }) => ({
+        ...state,
+        data,
+        hasUnsavedChanges: false,
+        isDirty: false,
+    })),
+
+    // === SAVE DATA ===
+    on(CommissionDataPageActions.saveData, (state) => ({
+        ...state,
+        status: 'saving' as const,
+        saving: true,
+        error: null,
+    })),
+
+    on(CommissionDataApiActions.saveDataSuccess, (state, { data }) => ({
+        ...state,
+        data,
+        status: 'saved' as const,
+        saving: false,
+        error: null,
+        hasUnsavedChanges: false,
+        isDirty: false,
+        lastSaved: Date.now(),
+    })),
+
+    on(CommissionDataApiActions.saveDataFailure, (state, { error }) => ({
+        ...state,
+        status: 'error' as const,
+        saving: false,
+        error: error.message,
+    })),
+
+    // === RESET & CLEANUP ===
+    on(CommissionDataPageActions.resetForm, () => initialCommissionDataState),
+
+    on(CommissionDataPageActions.clearErrors, (state) => ({
+        ...state,
+        error: null,
+    })),
+
+    on(CommissionDataPageActions.markAsPristine, (state) => ({
+        ...state,
+        hasUnsavedChanges: false,
+        isDirty: false,
+    })),
+
+    on(CommissionDataPageActions.markAsDirty, (state) => ({
+        ...state,
+        hasUnsavedChanges: true,
+        isDirty: true,
+    }))
+);
