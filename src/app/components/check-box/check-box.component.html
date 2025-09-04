@@ -1,0 +1,22 @@
+<div class="form-field">
+    <div class="flex items-start">
+        <input 
+            [id]="id" 
+            type="checkbox" 
+            class="w-4 h-4 text-blue-600 bg-gray-50 border border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 transition-colors duration-200"
+            [ngClass]="inputClass + (getErrors().length > 0 ? ' border-red-500 focus:ring-red-500' : '')" 
+            [checked]="currentValue" 
+            (change)="onCheckboxChange($event)" 
+            [name]="name || id" 
+            [disabled]="disabled" 
+        />
+        <label class="ml-2 text-sm font-medium text-gray-900 dark:text-white" [for]="id">
+            {{ label }}
+            <span *ngIf="isRequired" class="text-red-500 ml-1">*</span>
+        </label>
+    </div>
+
+    <div *ngIf="getErrors().length > 0" class="text-red-500 text-sm mt-1" role="alert">
+        <span>{{ getErrors()[0].message }}</span>
+    </div>
+</div>

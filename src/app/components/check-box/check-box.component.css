@@ -1,0 +1,15 @@
+/* Hover normal: primario (solo si NO hay error) */
+.form-check-input:hover {
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
+}
+/* Borde rojo siempre que hay error */
+.form-check-input.input-error {
+    border-color: #dc3545 !important;
+}
+/* Ring rojo solo en hover/focus con error */
+.form-check-input.input-error:focus,
+.form-check-input.input-error:hover {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}

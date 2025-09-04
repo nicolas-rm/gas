@@ -1,1 +1,110 @@
-<p>contract works!</p>
+<div id="contract-data-tab" role="tabpanel" aria-labelledby="contract-data-tab">
+    <div class="card-body pt-0">
+        <div class="grid grid-cols-12 gap-6 items-stretch">
+            <!-- Sección: Información del Contrato -->
+            <div class="col-span-12">
+                <div class="">
+                    <div class="card-body">
+                        <h5 class="card-title">Información del Contrato</h5>
+                        <p class="card-subtitle">Datos principales del contrato del cliente</p>
+
+                        <form [formGroup]="contractDataForm" class="mt-6">
+                            <div class="grid grid-cols-12 gap-x-4 gap-y-4">
+                                <!-- Primera fila: Nombre a Imprimir -->
+                                <div class="col-span-12">
+                                    <TextField [id]="contractData.printName.id" [label]="contractData.printName.label"
+                                        [formControlName]="contractData.printName.formControlName"
+                                        [placeholder]="contractData.printName.placeholder"
+                                        [control]="contractDataForm.get(contractData.printName.formControlName)" />
+                                </div>
+
+                                <!-- Segunda fila: Cuotas -->
+                                <div class="lg:col-span-4 col-span-12">
+                                    <TextField [id]="contractData.adminFee.id" [label]="contractData.adminFee.label"
+                                        [formControlName]="contractData.adminFee.formControlName"
+                                        [placeholder]="contractData.adminFee.placeholder"
+                                        [control]="contractDataForm.get(contractData.adminFee.formControlName)" />
+                                </div>
+                                <div class="lg:col-span-4 col-span-12">
+                                    <TextField [id]="contractData.cardIssueFee.id"
+                                        [label]="contractData.cardIssueFee.label"
+                                        [formControlName]="contractData.cardIssueFee.formControlName"
+                                        [placeholder]="contractData.cardIssueFee.placeholder"
+                                        [control]="contractDataForm.get(contractData.cardIssueFee.formControlName)" />
+                                </div>
+                                <div class="lg:col-span-4 col-span-12">
+                                    <TextField [id]="contractData.reportsFee.id" [label]="contractData.reportsFee.label"
+                                        [formControlName]="contractData.reportsFee.formControlName"
+                                        [placeholder]="contractData.reportsFee.placeholder"
+                                        [control]="contractDataForm.get(contractData.reportsFee.formControlName)" />
+                                </div>
+
+                                <!-- Tercera fila: Cuenta Contable y Uso de CFDI -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="contractData.accountingAccount.id"
+                                        [label]="contractData.accountingAccount.label"
+                                        [formControlName]="contractData.accountingAccount.formControlName"
+                                        [placeholder]="contractData.accountingAccount.placeholder"
+                                        [control]="contractDataForm.get(contractData.accountingAccount.formControlName)" />
+                                </div>
+                                <div class="lg:col-span-6 col-span-12">
+                                    <SelectField [id]="contractData.cfdiUsage.id" [label]="contractData.cfdiUsage.label"
+                                        [formControlName]="contractData.cfdiUsage.formControlName"
+                                        [control]="contractDataForm.get(contractData.cfdiUsage.formControlName)"
+                                        [options]="cfdiUsageOptions" [placeholder]="contractData.cfdiUsage.placeholder">
+                                    </SelectField>
+                                </div>
+
+                                <!-- Cuarta fila: Tipo y Lealtad -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <SelectField [id]="contractData.type.id" [label]="contractData.type.label"
+                                        [formControlName]="contractData.type.formControlName"
+                                        [control]="contractDataForm.get(contractData.type.formControlName)"
+                                        [options]="typeOptions" [placeholder]="contractData.type.placeholder">
+                                    </SelectField>
+                                </div>
+                                <div class="lg:col-span-6 col-span-12">
+                                    <SelectField [id]="contractData.loyalty.id" [label]="contractData.loyalty.label"
+                                        [formControlName]="contractData.loyalty.formControlName"
+                                        [control]="contractDataForm.get(contractData.loyalty.formControlName)"
+                                        [options]="loyaltyOptions" [placeholder]="contractData.loyalty.placeholder">
+                                    </SelectField>
+                                </div>
+
+                                <!-- Quinta fila: Porcentaje -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="contractData.percentage.id" [label]="contractData.percentage.label"
+                                        [formControlName]="contractData.percentage.formControlName"
+                                        [placeholder]="contractData.percentage.placeholder"
+                                        [control]="contractDataForm.get(contractData.percentage.formControlName)" />
+                                </div>
+
+                                <!-- Sexta fila: RFC Emisor y Banco -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="contractData.rfcOrderingAccount.id"
+                                        [label]="contractData.rfcOrderingAccount.label"
+                                        [formControlName]="contractData.rfcOrderingAccount.formControlName"
+                                        [placeholder]="contractData.rfcOrderingAccount.placeholder"
+                                        [control]="contractDataForm.get(contractData.rfcOrderingAccount.formControlName)" />
+                                </div>
+                                <div class="lg:col-span-6 col-span-12">
+                                    <SelectField [id]="contractData.bank.id" [label]="contractData.bank.label"
+                                        [formControlName]="contractData.bank.formControlName"
+                                        [control]="contractDataForm.get(contractData.bank.formControlName)"
+                                        [options]="bankOptions" [placeholder]="contractData.bank.placeholder">
+                                    </SelectField>
+                                </div>
+                            </div>
+
+                            <!-- Botones de acción -->
+                            <div class="flex gap-3 justify-end mt-6">
+                                <button type="button" class="btn btn-light-error">Cancelar</button>
+                                <button type="submit" class="btn">Guardar Contrato</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

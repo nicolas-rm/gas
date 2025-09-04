@@ -1,1 +1,196 @@
-<p>general-data works!</p>
+<div id="general-data-tab" role="tabpanel" aria-labelledby="general-data-tab">
+    <div class="card-body">
+        <div class="grid grid-cols-12 gap-6 items-stretch">
+            <!-- Col 1: Foto de perfil -->
+            <div class="lg:col-span-4 col-span-12">
+                <div class="card h-full flex flex-col">
+                    <div class="card-body flex-1 flex flex-col">
+                        <h5 class="card-title">Foto de Perfil</h5>
+                        <p class="card-subtitle">Cambia tu foto de perfil desde aquí</p>
+
+                        <div class="text-center mt-2">
+                            <img src="../assets/images/profile/user-1.jpg"
+                                class="rounded-full h-[120px] mx-auto mt-6" />
+                            <div class="flex gap-3 justify-center my-6">
+                                <button class="btn">Subir</button>
+                                <button class="btn btn-light-error">Restablecer</button>
+                            </div>
+                            <p class="card-subtitle">Permitido JPG, GIF o PNG. Tamaño máximo 800K</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Col 2: Información Principal -->
+            <div class="lg:col-span-8 col-span-12">
+                <div class="h-full flex flex-col">
+                    <div class="card-body flex-1 flex flex-col">
+                        <h5 class="card-title">Información Principal</h5>
+                        <p class="card-subtitle pb-4">Datos principales del cliente</p>
+
+                        <form [formGroup]="generalDataForm" class="mt-1">
+                            <div class="grid grid-cols-12 gap-x-4 gap-y-3">
+                                <!-- Primera fila: Tipo de Grupo y Tipo de Persona -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <SelectField [id]="generalData.groupType.id" [label]="generalData.groupType.label"
+                                        [formControlName]="generalData.groupType.formControlName"
+                                        [control]="generalDataForm.get(generalData.groupType.formControlName)"
+                                        [options]="[]" [placeholder]="generalData.groupType.placeholder">
+                                    </SelectField>
+                                </div>
+                                <div class="lg:col-span-6 col-span-12">
+                                    <SelectField [id]="generalData.personType.id" [label]="generalData.personType.label"
+                                        [formControlName]="generalData.personType.formControlName"
+                                        [control]="generalDataForm.get(generalData.personType.formControlName)"
+                                        [options]="personTypeOptions"
+                                        [placeholder]="generalData.personType.placeholder">
+                                    </SelectField>
+                                </div>
+
+                                <!-- Segunda fila: RFC -->
+                                <div class="col-span-12">
+                                    <TextField [id]="generalData.rfc.id" [label]="generalData.rfc.label"
+                                        [formControlName]="generalData.rfc.formControlName"
+                                        [placeholder]="generalData.rfc.placeholder"
+                                        [control]="generalDataForm.get(generalData.rfc.formControlName)" />
+                                </div>
+
+                                <!-- Tercera fila: Razón Social -->
+                                <div class="col-span-12">
+                                    <TextField [id]="generalData.businessName.id"
+                                        [label]="generalData.businessName.label"
+                                        [formControlName]="generalData.businessName.formControlName"
+                                        [placeholder]="generalData.businessName.placeholder"
+                                        [control]="generalDataForm.get(generalData.businessName.formControlName)" />
+                                </div>
+
+                                <!-- Cuarta fila: Nombre Comercial -->
+                                <div class="col-span-12">
+                                    <TextField [id]="generalData.tradeName.id" [label]="generalData.tradeName.label"
+                                        [formControlName]="generalData.tradeName.formControlName"
+                                        [placeholder]="generalData.tradeName.placeholder"
+                                        [control]="generalDataForm.get(generalData.tradeName.formControlName)" />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección: Dirección Fiscal -->
+            <div class="col-span-12">
+                <div class="">
+                    <div class="card-body">
+                        <h5 class="card-title">Dirección Fiscal</h5>
+                        <p class="card-subtitle">Información completa del domicilio fiscal (opcional)</p>
+
+                        <form [formGroup]="generalDataForm" class="mt-6">
+                            <div class="grid grid-cols-12 gap-x-4 gap-y-4">
+                                <!-- Primera fila: Calle -->
+                                <div class="col-span-12">
+                                    <TextField [id]="generalData.street.id" [label]="generalData.street.label"
+                                        [formControlName]="generalData.street.formControlName"
+                                        [placeholder]="generalData.street.placeholder"
+                                        [control]="generalDataForm.get(generalData.street.formControlName)" />
+                                </div>
+
+                                <!-- Segunda fila: Números -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="generalData.exteriorNumber.id"
+                                        [label]="generalData.exteriorNumber.label"
+                                        [formControlName]="generalData.exteriorNumber.formControlName"
+                                        [placeholder]="generalData.exteriorNumber.placeholder"
+                                        [control]="generalDataForm.get(generalData.exteriorNumber.formControlName)" />
+                                </div>
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="generalData.interiorNumber.id"
+                                        [label]="generalData.interiorNumber.label"
+                                        [formControlName]="generalData.interiorNumber.formControlName"
+                                        [placeholder]="generalData.interiorNumber.placeholder"
+                                        [control]="generalDataForm.get(generalData.interiorNumber.formControlName)" />
+                                </div>
+
+                                <!-- Tercera fila: Colonia y Código Postal -->
+                                <div class="lg:col-span-8 col-span-12">
+                                    <TextField [id]="generalData.colony.id" [label]="generalData.colony.label"
+                                        [formControlName]="generalData.colony.formControlName"
+                                        [placeholder]="generalData.colony.placeholder"
+                                        [control]="generalDataForm.get(generalData.colony.formControlName)" />
+                                </div>
+                                <div class="lg:col-span-4 col-span-12">
+                                    <TextField [id]="generalData.postalCode.id" [label]="generalData.postalCode.label"
+                                        [formControlName]="generalData.postalCode.formControlName"
+                                        [placeholder]="generalData.postalCode.placeholder"
+                                        [control]="generalDataForm.get(generalData.postalCode.formControlName)" />
+                                </div>
+
+                                <!-- Cuarta fila: Ciudad y Municipio -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="generalData.city.id" [label]="generalData.city.label"
+                                        [formControlName]="generalData.city.formControlName"
+                                        [placeholder]="generalData.city.placeholder"
+                                        [control]="generalDataForm.get(generalData.city.formControlName)" />
+                                </div>
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="generalData.municipality.id"
+                                        [label]="generalData.municipality.label"
+                                        [formControlName]="generalData.municipality.formControlName"
+                                        [placeholder]="generalData.municipality.placeholder"
+                                        [control]="generalDataForm.get(generalData.municipality.formControlName)" />
+                                </div>
+
+                                <!-- Quinta fila: Estado y País -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="generalData.state.id" [label]="generalData.state.label"
+                                        [formControlName]="generalData.state.formControlName"
+                                        [placeholder]="generalData.state.placeholder"
+                                        [control]="generalDataForm.get(generalData.state.formControlName)" />
+                                </div>
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="generalData.country.id" [label]="generalData.country.label"
+                                        [formControlName]="generalData.country.formControlName"
+                                        [placeholder]="generalData.country.placeholder"
+                                        [control]="generalDataForm.get(generalData.country.formControlName)" />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección: Información de Contacto -->
+            <div class="col-span-12">
+                <div class="">
+                    <div class="card-body">
+                        <h5 class="card-title">Información de Contacto</h5>
+                        <p class="card-subtitle">Datos de contacto del cliente</p>
+
+                        <form [formGroup]="generalDataForm" class="mt-6">
+                            <div class="grid grid-cols-12 gap-x-4 gap-y-4">
+                                <!-- Teléfono y Fax -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="generalData.phone.id" [label]="generalData.phone.label"
+                                        [formControlName]="generalData.phone.formControlName"
+                                        [placeholder]="generalData.phone.placeholder"
+                                        [control]="generalDataForm.get(generalData.phone.formControlName)" />
+                                </div>
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="generalData.fax.id" [label]="generalData.fax.label"
+                                        [formControlName]="generalData.fax.formControlName"
+                                        [placeholder]="generalData.fax.placeholder"
+                                        [control]="generalDataForm.get(generalData.fax.formControlName)" />
+                                </div>
+                            </div>
+
+                            <!-- Botones de acción -->
+                            <div class="flex gap-3 justify-end mt-6">
+                                <button type="button" class="btn btn-light-error">Cancelar</button>
+                                <button type="submit" class="btn">Guardar Información</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

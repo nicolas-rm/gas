@@ -1,0 +1,92 @@
+<div class="form-field" [id]="id + '-container'">
+    <!-- Label con indicador de requerido -->
+    <label *ngIf="label" [for]="id" class="block mb-1 text-sm font-semibold text-gray-900 dark:text-white">
+        {{ label }}
+        <span *ngIf="isRequired" class="text-red-500 text-lg">*</span>
+    </label>
+
+    <!-- Contenedor relativo para el select -->
+    <div class="relative">
+        <!-- Campo visible -->
+        <input
+            [id]="id"
+            type="text"
+            [value]="inputValue"
+            (focus)="onFocus(); toggleOptions()"
+            (input)="onInputChange($event)"
+            (blur)="onBlur()"
+            [placeholder]="placeholder"
+            [name]="name || id"
+            class="form-control mt-1 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:text-white transition-colors duration-200 focus:outline-none pr-10"
+            style="background-color: transparent; border: 1px solid #D1D5DB;"
+            [ngClass]="{
+                'input-error': getErrors().length > 0,
+                'pr-16': selectedOption
+            }"
+            [class]="inputClass"
+            [disabled]="disabled"
+            [attr.aria-label]="label"
+            [attr.aria-controls]="id + '-listbox'"
+            [attr.aria-expanded]="isOpen"
+            [required]="isRequired"
+            autocomplete="off"
+        />
+
+        <!-- Icono selector - siempre visible en el extremo derecho -->
+        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <i class="ti ti-selector text-gray-400 text-lg"></i>
+        </div>
+
+        <!-- Botón limpiar - visible al lado del icono selector cuando hay selección -->
+        <button 
+            *ngIf="selectedOption" 
+            type="button" 
+            (click)="clearSelection()" 
+            class="absolute inset-y-0 right-8 flex items-center pr-1 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+            [attr.aria-label]="'Limpiar selección de ' + label" 
+            [title]="'Limpiar selección'" 
+            tabindex="-1"
+        >
+            <i class="ti ti-x text-lg"></i>
+        </button>
+
+        <!-- Lista de opciones -->
+        <div 
+            *ngIf="isOpen" 
+            class="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto"
+            role="listbox" 
+            [id]="id + '-listbox'" 
+            [attr.aria-label]="label + ' opciones'"
+        >
+            <ng-container *ngIf="filteredOptions.length; else noOptions">
+                <div
+                    *ngFor="let option of filteredOptions; trackBy: trackByValue"
+                    role="option"
+                    [id]="id + '-option-' + option.value"
+                    [attr.aria-selected]="option.value === selectedOption"
+                    (click)="selectOption(option)"
+                    tabindex="0"
+                    class="px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center justify-between"
+                    [ngClass]="{
+                        'bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-300': option.value === selectedOption,
+                        'text-gray-900 dark:text-white': option.value !== selectedOption
+                    }"
+                >
+                    <span class="block truncate text-sm">{{ option.label }}</span>
+                    <i *ngIf="option.value === selectedOption" class="ti ti-check text-blue-600 dark:text-blue-300 text-sm"></i>
+                </div>
+            </ng-container>
+
+            <ng-template #noOptions>
+                <div class="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm">
+                    <span class="block truncate">No existen opciones disponibles</span>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+
+    <!-- Mensajes de error -->
+    <div *ngIf="getErrors().length > 0" class="text-red-500 text-sm mt-1" role="alert">
+        <span>{{ getErrors()[0].message }}</span>
+    </div>
+</div>

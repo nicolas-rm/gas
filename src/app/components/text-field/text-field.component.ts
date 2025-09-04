@@ -10,6 +10,16 @@ export type TextFieldType = 'text' | 'password' | 'email' | 'number' | 'search' 
 /** Tipos de máscaras predefinidas para el campo de texto */
 export type MaskType = 'none' | 'tel' | 'curp' | 'rfc' | 'date' | 'credit-card' | 'postal-code';
 
+export interface TextFieldInterface {
+    id: string | number,
+    label: string,
+    formControlName: string,
+    placeholder: string,
+    type: TextFieldType,
+    control: string,
+    mask?: MaskType,
+}
+
 /** Mapa de máscaras predefinidas con sus patrones correspondientes */
 const MASKS: Record<MaskType, string | null> = {
     none: null,
@@ -84,7 +94,7 @@ export class TextFieldComponent implements ControlValueAccessor, OnInit, OnChang
     @Input() name = '';
 
     /** Identificador único del input */
-    @Input() id = '';
+    @Input() id: string | number = '';
 
     /** Control de formulario reactivo asociado */
     @Input() control: AbstractControl | null = null;
@@ -295,7 +305,7 @@ export class TextFieldComponent implements ControlValueAccessor, OnInit, OnChang
 
     /** Funciones de callback para ControlValueAccessor */
     private onChange = (value: any) => (this.value = value);
-    private onTouched = () => {};
+    private onTouched = () => { };
 
     /**
      * Establece el valor del campo (implementación de ControlValueAccessor)

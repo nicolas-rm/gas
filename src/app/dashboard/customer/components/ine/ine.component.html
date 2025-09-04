@@ -1,1 +1,68 @@
-<p>ine works!</p>
+<div id="ine-data-tab" role="tabpanel" aria-labelledby="ine-data-tab">
+    <div class="card-body pt-0">
+        <div class="grid grid-cols-12 gap-6 items-stretch">
+            <!-- Sección: Información INE -->
+            <div class="col-span-12">
+                <div class="">
+                    <div class="card-body">
+                        <h5 class="card-title">Información INE</h5>
+                        <p class="card-subtitle">Configuración de datos INE del cliente</p>
+
+                        <form [formGroup]="ineDataForm" class="mt-6">
+                            <div class="grid grid-cols-12 gap-x-4 gap-y-4">
+                                <!-- Primera fila: Clave de Contabilidad y Tipo de Proceso -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="ineData.accountingKey.id" [label]="ineData.accountingKey.label"
+                                        [formControlName]="ineData.accountingKey.formControlName"
+                                        [placeholder]="ineData.accountingKey.placeholder"
+                                        [control]="ineDataForm.get(ineData.accountingKey.formControlName)" />
+                                </div>
+                                <div class="lg:col-span-6 col-span-12">
+                                    <SelectField [id]="ineData.processType.id" [label]="ineData.processType.label"
+                                        [formControlName]="ineData.processType.formControlName"
+                                        [control]="ineDataForm.get(ineData.processType.formControlName)"
+                                        [options]="processTypeOptions" [placeholder]="ineData.processType.placeholder">
+                                    </SelectField>
+                                </div>
+
+                                <!-- Segunda fila: Tipo de Comité y Ámbito -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <SelectField [id]="ineData.committeeType.id" [label]="ineData.committeeType.label"
+                                        [formControlName]="ineData.committeeType.formControlName"
+                                        [control]="ineDataForm.get(ineData.committeeType.formControlName)"
+                                        [options]="committeeTypeOptions"
+                                        [placeholder]="ineData.committeeType.placeholder">
+                                    </SelectField>
+                                </div>
+                                <div class="lg:col-span-6 col-span-12">
+                                    <SelectField [id]="ineData.scope.id" [label]="ineData.scope.label"
+                                        [formControlName]="ineData.scope.formControlName"
+                                        [control]="ineDataForm.get(ineData.scope.formControlName)"
+                                        [options]="scopeOptions" [placeholder]="ineData.scope.placeholder">
+                                    </SelectField>
+                                </div>
+
+                                <!-- Tercera fila: Campo para subir documento -->
+                                <div class="lg:col-span-12 col-span-12">
+                                    <FileInputField [id]="ineData.document.id" [label]="ineData.document.label"
+                                        [formControlName]="ineData.document.formControlName"
+                                        [control]="ineDataForm.get(ineData.document.formControlName)"
+                                        [accept]="ineData.document.accept ?? '.pdf,.jpg,.jpeg,.png,.doc,.docx'"
+                                        [maxSizeMB]="ineData.document.maxSizeMB ?? 5"
+                                        [multiple]="ineData.document.multiple ?? false">
+                                    </FileInputField>
+                                </div>
+                            </div>
+
+                            <!-- Botones de acción -->
+                            <div class="flex gap-3 justify-end mt-6">
+                                <button type="button" class="btn btn-light-error">Cancelar</button>
+                                <button type="submit" class="btn">Guardar INE</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

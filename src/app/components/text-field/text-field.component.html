@@ -1,7 +1,7 @@
 <!-- Input Component Template -->
 <div class="form-field">
     <!-- Label con indicador de requerido -->
-    <label *ngIf="label" [for]="id" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">
+    <label *ngIf="label" [for]="id" class="block mb-1 text-sm font-semibold text-gray-900 dark:text-white">
         {{ label }}
         <span *ngIf="isRequired" class="text-red-500 text-lg">*</span>
     </label>
@@ -18,7 +18,7 @@
                     'pr-12': type === 'password'
                 }" [class]="inputClass"
             class="form-control mt-1 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:text-white transition-colors duration-200 focus:outline-none"
-            style="background-color: #F9FAFB; border: 1px solid #D1D5DB;" [required]="isRequired" />
+            style="background-color: transparent; border: 1px solid #D1D5DB;" [required]="isRequired" />
         } @else {
         <!-- Input con máscara -->
         <input [id]="id" [attr.type]="type === 'password' ? (showPassword ? 'text' : 'password') : type"
@@ -29,7 +29,7 @@
                     'pr-12': type === 'password'
                 }" [class]="inputClass"
             class="form-control mt-1 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:text-white transition-colors duration-200 focus:outline-none"
-            style="background-color: #F9FAFB; border: 1px solid #D1D5DB;" mask="{{ activeMask }}"
+            style="background-color: transparent; border: 1px solid #D1D5DB;" mask="{{ activeMask }}"
             [dropSpecialCharacters]="false" [showMaskTyped]="isFocused" [clearIfNotMatch]="false"
             [required]="isRequired" />
         }

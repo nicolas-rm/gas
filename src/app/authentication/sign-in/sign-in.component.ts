@@ -17,12 +17,6 @@ import { ReactiveValidators } from '@/utils/validators/ReactiveValidators';
 import { authentication } from '@/authentication/form';
 import { CommonModule } from '@angular/common';
 
-// Interfaces del formulario
-export interface SignIn {
-    email: string;
-    password: string;
-}
-
 export type SignInFormControl = {
     email: FormControl<string | null>;
     password: FormControl<string | null>;

@@ -1,1 +1,90 @@
-<p>billing works!</p>
+<div id="billing-data-tab" role="tabpanel" aria-labelledby="billing-data-tab">
+    <div class="card-body pt-0">
+        <div class="grid grid-cols-12 gap-6 items-stretch">
+            <!-- Sección: Información de Facturación -->
+            <div class="col-span-12">
+                <div class="">
+                    <div class="card-body">
+                        <h5 class="card-title">Información de Facturación</h5>
+                        <p class="card-subtitle">Configuración de facturación y datos del cliente</p>
+
+                        <form [formGroup]="billingDataForm" class="mt-6">
+                            <div class="grid grid-cols-12 gap-x-4 gap-y-4">
+                                <!-- Primera fila: Representación Factura y Días de Facturación -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <SelectField [id]="billingData.invoiceRepresentation.id"
+                                        [label]="billingData.invoiceRepresentation.label"
+                                        [formControlName]="billingData.invoiceRepresentation.formControlName"
+                                        [control]="billingDataForm.get(billingData.invoiceRepresentation.formControlName)"
+                                        [options]="invoiceRepresentationOptions"
+                                        [placeholder]="billingData.invoiceRepresentation.placeholder">
+                                    </SelectField>
+                                </div>
+                                <div class="lg:col-span-6 col-span-12">
+                                    <SelectField [id]="billingData.billingDays.id"
+                                        [label]="billingData.billingDays.label"
+                                        [formControlName]="billingData.billingDays.formControlName"
+                                        [control]="billingDataForm.get(billingData.billingDays.formControlName)"
+                                        [options]="billingDaysOptions"
+                                        [placeholder]="billingData.billingDays.placeholder">
+                                    </SelectField>
+                                </div>
+
+                                <!-- Segunda fila: Emails de Facturación y Frecuencia de Facturación -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="billingData.billingEmails.id"
+                                        [label]="billingData.billingEmails.label"
+                                        [formControlName]="billingData.billingEmails.formControlName"
+                                        [placeholder]="billingData.billingEmails.placeholder"
+                                        [control]="billingDataForm.get(billingData.billingEmails.formControlName)" />
+                                </div>
+                                <div class="lg:col-span-6 col-span-12">
+                                    <SelectField [id]="billingData.billingFrequency.id"
+                                        [label]="billingData.billingFrequency.label"
+                                        [formControlName]="billingData.billingFrequency.formControlName"
+                                        [control]="billingDataForm.get(billingData.billingFrequency.formControlName)"
+                                        [options]="billingFrequencyOptions"
+                                        [placeholder]="billingData.billingFrequency.placeholder">
+                                    </SelectField>
+                                </div>
+
+                                <!-- Tercera fila: Fecha de Inicio y Fecha de Fin -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="billingData.startDate.id" [label]="billingData.startDate.label"
+                                        [formControlName]="billingData.startDate.formControlName"
+                                        [placeholder]="billingData.startDate.placeholder"
+                                        [type]="billingData.startDate.type"
+                                        [control]="billingDataForm.get(billingData.startDate.formControlName)" />
+                                </div>
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="billingData.endDate.id" [label]="billingData.endDate.label"
+                                        [formControlName]="billingData.endDate.formControlName"
+                                        [placeholder]="billingData.endDate.placeholder"
+                                        [type]="billingData.endDate.type"
+                                        [control]="billingDataForm.get(billingData.endDate.formControlName)" />
+                                </div>
+
+                                <!-- Cuarta fila: Facturación Automática -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <SelectField [id]="billingData.automaticBilling.id"
+                                        [label]="billingData.automaticBilling.label"
+                                        [formControlName]="billingData.automaticBilling.formControlName"
+                                        [control]="billingDataForm.get(billingData.automaticBilling.formControlName)"
+                                        [options]="automaticBillingOptions"
+                                        [placeholder]="billingData.automaticBilling.placeholder">
+                                    </SelectField>
+                                </div>
+                            </div>
+
+                            <!-- Botones de acción -->
+                            <div class="flex gap-3 justify-end mt-6">
+                                <button type="button" class="btn btn-light-error">Cancelar</button>
+                                <button type="submit" class="btn">Guardar Facturación</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

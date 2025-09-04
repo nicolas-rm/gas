@@ -1,6 +1,16 @@
-import { TextFieldType } from "@/components/text-field/text-field.component";
+import { TextFieldType, TextFieldInterface } from "@/components/text-field/text-field.component";
 
-export const authentication = {
+type LoginFieldKeys = 'email' | 'password' | 'username';
+
+type Section<T extends LoginFieldKeys> = Record<T, TextFieldInterface>;
+
+export interface AuthenticationForm {
+    signIn: Section<'email' | 'password'>;  // requerido
+    signUp?: Section<'username' | 'email' | 'password'>; // opcional
+    resetPassword?: Section<'email'>; // opcional
+};
+
+export const authentication: AuthenticationForm = {
     signIn: {
         email: {
             id: 'email',
@@ -18,5 +28,5 @@ export const authentication = {
             type: 'password' as TextFieldType,
             control: 'password',
         },
-    }
-}
+    },    
+};

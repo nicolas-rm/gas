@@ -1,0 +1,94 @@
+/* TextArea Component - Estilos consistentes con TextField */
+
+/* Focus normal: primario (solo si NO hay error) */
+.form-control:focus {
+    border-color: #0d6efd !important; /* primario */
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
+}
+
+.form-control.input-error:focus {
+    border-color: #dc3545 !important; /* rojo bootstrap, sobrescribe el azul */
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important; /* ring rojo */
+}
+
+/* Borde rojo siempre que hay error */
+.form-control.input-error {
+    border-color: #dc3545 !important; /* rojo bootstrap */
+}
+
+/* Estados deshabilitado y readonly */
+.form-control:disabled {
+    background-color: #e9ecef;
+    opacity: 1;
+    cursor: not-allowed;
+}
+
+.form-control[readonly] {
+    background-color: #f8f9fa;
+    cursor: default;
+}
+
+/* Eliminar color de fondo en autofill y hacerlo transparente */
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+    box-shadow: 0 0 0 1000px transparent inset !important;
+    -webkit-text-fill-color: inherit !important;
+    transition: background-color 5000s ease-in-out 0s;
+    background-color: transparent !important;
+}
+
+/* Reemplazo de estilos Tailwind eliminados - consistente con TextField */
+.mt-1 {
+    margin-top: 0.25rem;
+}
+
+.mt-2 {
+    margin-top: 0.5rem;
+}
+
+.border {
+    border: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
+}
+
+.border-gray-300 {
+    border-color: #d1d5da !important;
+}
+
+.text-gray-900 {
+    color: #111827 !important;
+}
+
+.text-gray-500 {
+    color: #6b7280 !important;
+}
+
+.text-sm {
+    font-size: 0.875rem !important;
+}
+
+.rounded-lg {
+    border-radius: 0.5rem !important;
+}
+
+.block {
+    display: block !important;
+}
+
+.w-full {
+    width: 100% !important;
+}
+
+.p-2\.5 {
+    padding: 0.625rem !important;
+}
+
+.text-right {
+    text-align: right !important;
+}
+
+.resize-vertical {
+    resize: vertical;
+}

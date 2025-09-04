@@ -1,1 +1,94 @@
-<p>sale works!</p>
+<div id="sale-data-tab" role="tabpanel" aria-labelledby="sale-data-tab">
+    <div class="card-body pt-0">
+        <div class="grid grid-cols-12 gap-6 items-stretch">
+            <!-- Sección: Información de Venta -->
+            <div class="col-span-12">
+                <div class="">
+                    <div class="card-body">
+                        <h5 class="card-title">Información de Venta</h5>
+                        <p class="card-subtitle">Configuración de cuenta y datos de venta del cliente</p>
+
+                        <form [formGroup]="saleDataForm" class="mt-6">
+                            <div class="grid grid-cols-12 gap-x-4 gap-y-4">
+                                <!-- Primera fila: Tipo de Cuenta y Vendedor -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <SelectField [id]="saleData.accountType.id" [label]="saleData.accountType.label"
+                                        [formControlName]="saleData.accountType.formControlName"
+                                        [control]="saleDataForm.get(saleData.accountType.formControlName)"
+                                        [options]="accountTypeOptions" [placeholder]="saleData.accountType.placeholder">
+                                    </SelectField>
+                                </div>
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="saleData.seller.id" [label]="saleData.seller.label"
+                                        [formControlName]="saleData.seller.formControlName"
+                                        [placeholder]="saleData.seller.placeholder"
+                                        [control]="saleDataForm.get(saleData.seller.formControlName)" />
+                                </div>
+
+                                <!-- Segunda fila: Número de Cuenta y Tipo de Prepago -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="saleData.accountNumber.id" [label]="saleData.accountNumber.label"
+                                        [formControlName]="saleData.accountNumber.formControlName"
+                                        [placeholder]="saleData.accountNumber.placeholder"
+                                        [control]="saleDataForm.get(saleData.accountNumber.formControlName)" />
+                                </div>
+                                <div class="lg:col-span-6 col-span-12">
+                                    <SelectField [id]="saleData.prepaidType.id" [label]="saleData.prepaidType.label"
+                                        [formControlName]="saleData.prepaidType.formControlName"
+                                        [control]="saleDataForm.get(saleData.prepaidType.formControlName)"
+                                        [options]="prepaidTypeOptions" [placeholder]="saleData.prepaidType.placeholder">
+                                    </SelectField>
+                                </div>
+
+                                <!-- Tercera fila: Días de Crédito y Límite de Crédito -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="saleData.creditDays.id" [label]="saleData.creditDays.label"
+                                        [formControlName]="saleData.creditDays.formControlName"
+                                        [placeholder]="saleData.creditDays.placeholder"
+                                        [control]="saleDataForm.get(saleData.creditDays.formControlName)" />
+                                </div>
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="saleData.creditLimit.id" [label]="saleData.creditLimit.label"
+                                        [formControlName]="saleData.creditLimit.formControlName"
+                                        [placeholder]="saleData.creditLimit.placeholder"
+                                        [control]="saleDataForm.get(saleData.creditLimit.formControlName)" />
+                                </div>
+
+                                <!-- Cuarta fila: Comisión Adelantada y Forma de Pago -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="saleData.advanceCommission.id"
+                                        [label]="saleData.advanceCommission.label"
+                                        [formControlName]="saleData.advanceCommission.formControlName"
+                                        [placeholder]="saleData.advanceCommission.placeholder"
+                                        [control]="saleDataForm.get(saleData.advanceCommission.formControlName)" />
+                                </div>
+                                <div class="lg:col-span-6 col-span-12">
+                                    <SelectField [id]="saleData.paymentMethod.id" [label]="saleData.paymentMethod.label"
+                                        [formControlName]="saleData.paymentMethod.formControlName"
+                                        [control]="saleDataForm.get(saleData.paymentMethod.formControlName)"
+                                        [options]="paymentMethodOptions"
+                                        [placeholder]="saleData.paymentMethod.placeholder">
+                                    </SelectField>
+                                </div>
+
+                                <!-- Quinta fila: Monto de Vales -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="saleData.voucherAmount.id" [label]="saleData.voucherAmount.label"
+                                        [formControlName]="saleData.voucherAmount.formControlName"
+                                        [placeholder]="saleData.voucherAmount.placeholder"
+                                        [control]="saleDataForm.get(saleData.voucherAmount.formControlName)" />
+                                </div>
+                            </div>
+
+                            <!-- Botones de acción -->
+                            <div class="flex gap-3 justify-end mt-6">
+                                <button type="button" class="btn btn-light-error">Cancelar</button>
+                                <button type="submit" class="btn">Guardar Venta</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

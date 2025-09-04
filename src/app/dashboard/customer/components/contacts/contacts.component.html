@@ -1,1 +1,91 @@
-<p>contacts works!</p>
+<div id="contacts-data-tab" role="tabpanel" aria-labelledby="contacts-data-tab">
+    <div class="card-body pt-0">
+        <div class="grid grid-cols-12 gap-6 items-stretch">
+            <!-- Sección: Información de Contactos -->
+            <div class="col-span-12">
+                <div class="">
+                    <div class="card-body">
+                        <h5 class="card-title">Información de Contactos</h5>
+                        <p class="card-subtitle">Gestión de contactos del cliente (máximo 3 contactos)</p>
+
+                        <form [formGroup]="contactsForm" class="mt-6">
+                            <div formArrayName="contacts">
+                                <div *ngFor="let contact of contactsArray.controls; let i = index" 
+                                     [formGroupName]="i" 
+                                     class="mb-4">
+                                    
+                                    <!-- Encabezado del contacto -->
+                                    <div class="flex justify-between items-center mb-4">
+                                        <h6 class="text-lg font-semibold text-gray-800">Contacto {{ i + 1 }}</h6>
+                                        <button type="button" 
+                                                *ngIf="canRemoveContact()" 
+                                                (click)="removeContact(i)"
+                                                class="btn btn-sm btn-light-error">
+                                            <i class="ti ti-trash text-base"></i>
+                                            Eliminar
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Campos del contacto -->
+                                    <div class="grid grid-cols-12 gap-x-4 gap-y-4">
+                                        <!-- Primera fila: Nombre y Puesto -->
+                                        <div class="lg:col-span-6 col-span-12">
+                                            <TextField 
+                                                [id]="contactData.name.id + '-' + i" 
+                                                [label]="contactData.name.label"
+                                                [formControlName]="contactData.name.formControlName"
+                                                [placeholder]="contactData.name.placeholder"
+                                                [control]="contact.get(contactData.name.formControlName)" />
+                                        </div>
+                                        <div class="lg:col-span-6 col-span-12">
+                                            <TextField 
+                                                [id]="contactData.position.id + '-' + i" 
+                                                [label]="contactData.position.label"
+                                                [formControlName]="contactData.position.formControlName"
+                                                [placeholder]="contactData.position.placeholder"
+                                                [control]="contact.get(contactData.position.formControlName)" />
+                                        </div>
+                                        
+                                        <!-- Segunda fila: Teléfono y Correo Electrónico -->
+                                        <div class="lg:col-span-6 col-span-12">
+                                            <TextField 
+                                                [id]="contactData.phone.id + '-' + i" 
+                                                [label]="contactData.phone.label"
+                                                [formControlName]="contactData.phone.formControlName"
+                                                [placeholder]="contactData.phone.placeholder"
+                                                [control]="contact.get(contactData.phone.formControlName)" />
+                                        </div>
+                                        <div class="lg:col-span-6 col-span-12">
+                                            <TextField 
+                                                [id]="contactData.email.id + '-' + i" 
+                                                [label]="contactData.email.label"
+                                                [formControlName]="contactData.email.formControlName"
+                                                [placeholder]="contactData.email.placeholder"
+                                                [control]="contact.get(contactData.email.formControlName)" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Botón para agregar contacto -->
+                            <div class="mb-6" *ngIf="canAddContact()">
+                                <button type="button" 
+                                        (click)="addContact()"
+                                        class="btn btn-light-primary">
+                                    <i class="ti ti-plus text-base"></i>
+                                    Agregar Contacto
+                                </button>
+                            </div>
+                            
+                            <!-- Botones de acción -->
+                            <div class="flex gap-3 justify-end mt-6">
+                                <button type="button" class="btn btn-light-error">Cancelar</button>
+                                <button type="submit" class="btn">Guardar Contactos</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

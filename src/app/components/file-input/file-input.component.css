@@ -1,0 +1,251 @@
+.form-field {
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+    font-size: 0.875rem;
+}
+
+.form-control {
+    padding: 8px;
+    background: #fff;
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+    color: #111827;
+    border-color: #d1d5da !important;
+}
+
+/* FileInput Component - Estilos consistentes con TextField */
+
+/* Focus normal: primario (solo si NO hay error) */
+.form-control:focus {
+    border-color: #0d6efd !important; /* primario */
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
+}
+
+.form-control.input-error:focus {
+    border-color: #dc3545 !important; /* rojo bootstrap, sobrescribe el azul */
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important; /* ring rojo */
+}
+
+/* Borde rojo siempre que hay error */
+.form-control.input-error {
+    border-color: #dc3545 !important; /* rojo bootstrap */
+}
+
+/* Estados deshabilitado */
+.form-control:disabled {
+    background-color: #e9ecef;
+    opacity: 1;
+    cursor: not-allowed;
+}
+
+/* Reemplazo de estilos Tailwind eliminados - consistente con TextField */
+.mt-1 {
+    margin-top: 0.25rem;
+}
+
+.mt-3 {
+    margin-top: 0.75rem;
+}
+
+.mb-0 {
+    margin-bottom: 0;
+}
+
+.mb-1 {
+    margin-bottom: 0.25rem;
+}
+
+.mr-2 {
+    margin-right: 0.5rem;
+}
+
+.border {
+    border: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
+}
+
+.border-gray-300 {
+    border-color: #d1d5da !important;
+}
+
+.border-gray-200 {
+    border-color: #e5e7eb !important;
+}
+
+.border-b {
+    border-bottom-width: 1px;
+}
+
+.text-gray-900 {
+    color: #111827 !important;
+}
+
+.text-gray-600 {
+    color: #4b5563 !important;
+}
+
+.text-gray-500 {
+    color: #6b7280 !important;
+}
+
+.text-blue-600 {
+    color: #2563eb !important;
+}
+
+.text-green-600 {
+    color: #16a34a !important;
+}
+
+.text-red-600 {
+    color: #dc2626 !important;
+}
+
+.text-sm {
+    font-size: 0.875rem !important;
+}
+
+.text-lg {
+    font-size: 1.125rem !important;
+}
+
+.font-medium {
+    font-weight: 500 !important;
+}
+
+.font-semibold {
+    font-weight: 600 !important;
+}
+
+.rounded-lg {
+    border-radius: 0.5rem !important;
+}
+
+.rounded {
+    border-radius: 0.25rem !important;
+}
+
+.block {
+    display: block !important;
+}
+
+.flex {
+    display: flex !important;
+}
+
+.items-center {
+    align-items: center !important;
+}
+
+.justify-between {
+    justify-content: space-between !important;
+}
+
+.space-x-2 > * + * {
+    margin-left: 0.5rem !important;
+}
+
+.space-x-3 > * + * {
+    margin-left: 0.75rem !important;
+}
+
+.w-full {
+    width: 100% !important;
+}
+
+.w-10 {
+    width: 2.5rem !important;
+}
+
+.h-10 {
+    height: 2.5rem !important;
+}
+
+.p-1 {
+    padding: 0.25rem !important;
+}
+
+.p-4 {
+    padding: 1rem !important;
+}
+
+.p-2\.5 {
+    padding: 0.625rem !important;
+}
+
+.px-4 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+}
+
+.py-3 {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+}
+
+.flex-1 {
+    flex: 1 1 0% !important;
+}
+
+.flex-shrink-0 {
+    flex-shrink: 0 !important;
+}
+
+.min-w-0 {
+    min-width: 0 !important;
+}
+
+.truncate {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.divide-y > * + * {
+    border-top-width: 1px !important;
+    border-color: #e5e7eb !important;
+}
+
+.overflow-hidden {
+    overflow: hidden !important;
+}
+
+.bg-gray-50 {
+    background-color: #f9fafb !important;
+}
+
+.transition-colors {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke !important;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition-duration: 150ms !important;
+}
+
+.duration-200 {
+    transition-duration: 200ms !important;
+}
+
+.hover\:text-blue-800:hover {
+    color: #1e40af !important;
+}
+
+.hover\:text-green-800:hover {
+    color: #166534 !important;
+}
+
+.hover\:text-red-800:hover {
+    color: #991b1b !important;
+}
+
+.focus\:outline-none:focus {
+    outline: 2px solid transparent !important;
+    outline-offset: 2px !important;
+}
+
+.form-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+}

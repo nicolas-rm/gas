@@ -1,0 +1,48 @@
+<!-- TextArea Component Template -->
+<div class="form-field">
+    <!-- Label con indicador de requerido -->
+    <label *ngIf="label" [for]="id" class="block mb-1 text-sm font-semibold text-gray-900 dark:text-white">
+        {{ label }}
+        <span *ngIf="isRequired" class="text-red-500 text-lg">*</span>
+    </label>
+
+    <!-- Contenedor relativo para el textarea -->
+    <div class="relative">
+        <textarea
+            [id]="id"
+            [value]="currentValue"
+            (input)="onValueChange($event)"
+            (focus)="onFocus()"
+            (blur)="onBlur()"
+            [placeholder]="placeholder"
+            [rows]="rows"
+            [cols]="cols"
+            [attr.maxlength]="maxLength"
+            [attr.minlength]="minLength"
+            [name]="name || id"
+            [disabled]="disabled"
+            [readonly]="readonly"
+            [ngClass]="{
+                'input-error': getErrors().length > 0
+            }"
+            [class]="inputClass"
+            class="form-control mt-1 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:text-white transition-colors duration-200 focus:outline-none resize-vertical"
+            style="background-color: transparent; border: 1px solid #D1D5DB; min-height: 60px;"
+            [required]="isRequired"
+        ></textarea>
+    </div>
+
+    <!-- Mensajes de error -->
+    @if (getErrors().length > 0) {
+    <div class="text-red-500 text-sm mt-1" role="alert">
+        <span>{{ getErrors()[0].message }}</span>
+    </div>
+    }
+
+    <!-- Contador de caracteres si se especifica maxLength -->
+    @if (maxLength && showCharCount) {
+    <div class="text-gray-500 text-sm text-right mt-1">
+        {{ (currentValue || '').length }} / {{ maxLength }}
+    </div>
+    }
+</div>

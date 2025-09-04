@@ -9,5 +9,8 @@ export { SearchComponent } from "@/components/search/search.component";
 export { ShoppingCartComponent } from "@/components/shopping-cart/shopping-cart.component";
 export { SidebarComponent } from "@/components/sidebar/sidebar.component";
 export { TextFieldComponent } from "@/components/text-field/text-field.component";
+export { TextAreaFieldComponent } from "@/components/text-area/text-area.component";
+export { FileInputFieldComponent } from "@/components/file-input/file-input.component";
 export { ToastComponent } from "@/components/toast/toast.component";
-
+export { CheckBoxComponent } from '@/components/check-box/check-box.component';
+export { SelectFieldComponent } from '@/components/select/select.component';

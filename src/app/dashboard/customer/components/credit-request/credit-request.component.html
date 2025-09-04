@@ -1,1 +1,121 @@
-<p>credit-request works!</p>
+<div id="credit-request-data-tab" role="tabpanel" aria-labelledby="credit-request-data-tab">
+    <div class="card-body pt-0">
+        <div class="grid grid-cols-12 gap-6 items-stretch">
+            <!-- Sección: Información de Solicitud de Crédito -->
+            <div class="col-span-12">
+                <div class="">
+                    <div class="card-body">
+                        <h5 class="card-title">Información de Solicitud de Crédito</h5>
+                        <p class="card-subtitle">Complete la información para la solicitud de crédito del cliente</p>
+
+                        <form [formGroup]="creditRequestForm" class="mt-6">
+                            <div class="grid grid-cols-12 gap-x-4 gap-y-4">
+                                <!-- Primera fila: Representante Legal y Recibe Documentos -->
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="creditRequestData.legalRepresentative.id"
+                                        [label]="creditRequestData.legalRepresentative.label"
+                                        [formControlName]="creditRequestData.legalRepresentative.formControlName"
+                                        [placeholder]="creditRequestData.legalRepresentative.placeholder"
+                                        [control]="creditRequestForm.get('legalRepresentative')" />
+                                </div>
+                                <div class="lg:col-span-6 col-span-12">
+                                    <TextField [id]="creditRequestData.documentsReceiver.id"
+                                        [label]="creditRequestData.documentsReceiver.label"
+                                        [formControlName]="creditRequestData.documentsReceiver.formControlName"
+                                        [placeholder]="creditRequestData.documentsReceiver.placeholder"
+                                        [control]="creditRequestForm.get('documentsReceiver')" />
+                                </div>
+
+                                <!-- Segunda fila: Documento de Solicitud de Crédito -->
+                                <div class="col-span-12">
+                                    <FileInputField [id]="creditRequestData.creditApplicationDocument.id"
+                                        [label]="creditRequestData.creditApplicationDocument.label"
+                                        [formControlName]="creditRequestData.creditApplicationDocument.formControlName"
+                                        [control]="creditRequestForm.get('creditApplicationDocument')"
+                                        [accept]="creditRequestData.creditApplicationDocument.accept ?? '.pdf,.jpg,.jpeg,.png,.doc,.docx'"
+                                        [maxSizeMB]="creditRequestData.creditApplicationDocument.maxSizeMB ?? 5"
+                                        [multiple]="creditRequestData.creditApplicationDocument.multiple ?? false" />
+                                </div>
+                            </div>
+
+                            <!-- Sección de Referencias -->
+                            <div class="mt-8">
+                                <div class="flex justify-between items-center mb-6">
+                                    <div>
+                                        <h5 class="card-title">Información de Referencias</h5>
+                                        <p class="card-subtitle">Gestión de referencias del cliente (máximo 3 referencias)
+                                        </p>
+                                    </div>
+                                    <button type="button" (click)="addReference()"
+                                        class="btn btn-light-primary max-w-xs" *ngIf="canAddReference">
+                                        <i class="ti ti-plus text-base"></i>
+                                        Agregar Referencia
+                                    </button>
+                                </div>
+
+                                <div formArrayName="references">
+                                    <div *ngFor="let reference of references.controls; let i = index; trackBy: trackByIndex"
+                                        [formGroupName]="i" class="mb-4">
+
+                                        <!-- Encabezado de la referencia -->
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h6 class="text-lg font-semibold text-gray-800">Referencia {{ i + 1 }}</h6>
+                                            <button type="button" (click)="removeReference(i)"
+                                                class="btn btn-sm btn-light-error">
+                                                <i class="ti ti-trash text-base"></i>
+                                                Eliminar
+                                            </button>
+                                        </div>
+
+                                        <!-- Campos de la referencia -->
+                                        <div class="grid grid-cols-12 gap-x-4 gap-y-4">
+                                            <!-- Primera fila: Nombre y Puesto -->
+                                            <div class="lg:col-span-6 col-span-12">
+                                                <TextField [id]="referenceData.name.id + '-' + i"
+                                                    [label]="referenceData.name.label"
+                                                    [formControlName]="referenceData.name.formControlName"
+                                                    [placeholder]="referenceData.name.placeholder"
+                                                    [control]="reference.get(referenceData.name.formControlName)" />
+                                            </div>
+                                            <div class="lg:col-span-6 col-span-12">
+                                                <TextField [id]="referenceData.position.id + '-' + i"
+                                                    [label]="referenceData.position.label"
+                                                    [formControlName]="referenceData.position.formControlName"
+                                                    [placeholder]="referenceData.position.placeholder"
+                                                    [control]="reference.get(referenceData.position.formControlName)" />
+                                            </div>
+
+                                            <!-- Segunda fila: Teléfono y Correo Electrónico -->
+                                            <div class="lg:col-span-6 col-span-12">
+                                                <TextField [id]="referenceData.phone.id + '-' + i"
+                                                    [label]="referenceData.phone.label"
+                                                    [formControlName]="referenceData.phone.formControlName"
+                                                    [placeholder]="referenceData.phone.placeholder"
+                                                    [control]="reference.get(referenceData.phone.formControlName)" />
+                                            </div>
+                                            <div class="lg:col-span-6 col-span-12">
+                                                <TextField [id]="referenceData.email.id + '-' + i"
+                                                    [label]="referenceData.email.label"
+                                                    [formControlName]="referenceData.email.formControlName"
+                                                    [placeholder]="referenceData.email.placeholder"
+                                                    [control]="reference.get(referenceData.email.formControlName)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                            <!-- Botones de acción -->
+                            <div class="flex gap-3 justify-end mt-6">
+                                <button type="button" class="btn btn-light-error">Cancelar</button>
+                                <button type="submit" class="btn">Guardar Solicitud de Crédito</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
