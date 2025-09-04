@@ -2,6 +2,7 @@ import { SelectFieldComponent, TextFieldComponent } from '@/app/components/compo
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { commissionForm } from '@/app/dashboard/customer/components/commission/form';
+import { HotToastService } from '@ngxpert/hot-toast';
 
 export type CommissionDataFormControl = {
     commissionClassification: FormControl<string | null>;
@@ -34,6 +35,7 @@ export class CommissionComponent {
     ]
 
     private readonly fb = inject(FormBuilder);
+    private readonly toast = inject(HotToastService);
 
     commissionDataForm: FormGroup<CommissionDataFormControl>
 
@@ -47,4 +49,14 @@ export class CommissionComponent {
         })
     }
 
+    onSubmit() {
+        if (this.commissionDataForm.valid) {
+            this.toast.success('Formulario de Comisión válido');
+        }
+
+        if (this.commissionDataForm.invalid) {
+            this.toast.error('Formulario de Comisión invalido, Favor de revisar los campos requeridos.');
+            this.commissionDataForm.markAllAsTouched();
+        }
+    }
 }

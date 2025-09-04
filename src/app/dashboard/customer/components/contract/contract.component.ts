@@ -2,6 +2,7 @@ import { SelectFieldComponent, TextFieldComponent } from '@/app/components/compo
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { contractForm } from '@/app/dashboard/customer/components/contract/form';
+import { HotToastService } from '@ngxpert/hot-toast';
 
 export type ContractDataFormControl = {
     printName: FormControl<string | null>;
@@ -24,8 +25,6 @@ export type ContractDataFormControl = {
   styleUrl: './contract.component.css'
 })
 export class ContractComponent {
-
-    // Agregar después de la línea 28 (readonly contractData = contractForm)
     
     readonly cfdiUsageOptions = [
         { label: 'G01 - Adquisición de mercancías', value: 'G01' },
@@ -61,6 +60,7 @@ export class ContractComponent {
     readonly contractData = contractForm
 
     private readonly fb = inject(FormBuilder);
+    private readonly toast = inject(HotToastService);
 
     contractDataForm: FormGroup<ContractDataFormControl>
 
@@ -80,4 +80,14 @@ export class ContractComponent {
         })
     }
 
+    onSubmit() {
+        if (this.contractDataForm.valid) {
+            this.toast.success('Datos de Contrato guardados exitosamente');
+        }
+
+        if (this.contractDataForm.invalid) {
+            this.toast.error('Formulario de Contrato invalido, Favor de revisar los campos requeridos.');
+            this.contractDataForm.markAllAsTouched();
+        }
+    }
 }

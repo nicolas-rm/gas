@@ -165,7 +165,7 @@
                         <h5 class="card-title">Información de Contacto</h5>
                         <p class="card-subtitle">Datos de contacto del cliente</p>
 
-                        <form [formGroup]="generalDataForm" class="mt-6">
+                        <form [formGroup]="generalDataForm" class="mt-6" (ngSubmit)="onSubmit()">
                             <div class="grid grid-cols-12 gap-x-4 gap-y-4">
                                 <!-- Teléfono y Fax -->
                                 <div class="lg:col-span-6 col-span-12">

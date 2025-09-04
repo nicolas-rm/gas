@@ -8,7 +8,7 @@
                         <h5 class="card-title">Información de Contactos</h5>
                         <p class="card-subtitle">Gestión de contactos del cliente (máximo 3 contactos)</p>
 
-                        <form [formGroup]="contactsForm" class="mt-6">
+                        <form [formGroup]="contactsForm" class="mt-6" (ngSubmit)="onSubmit()">
                             <div formArrayName="contacts">
                                 <div *ngFor="let contact of contactsArray.controls; let i = index" 
                                      [formGroupName]="i" 

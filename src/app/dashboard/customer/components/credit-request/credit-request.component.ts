@@ -4,6 +4,7 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormArray, ReactiveFormsModule } from '@angular/forms';
 import { creditRequestForm } from '@/app/dashboard/customer/components/credit-request/form';
 import { CommonModule } from '@angular/common';
+import { HotToastService } from '@ngxpert/hot-toast';
 
 export type CreditRequestDataFormControl = {
     legalRepresentative: FormControl<string | null>;
@@ -31,6 +32,7 @@ export class CreditRequestComponent {
     readonly maxReferences = 3;
 
     private readonly fb = inject(FormBuilder);
+    private readonly toast = inject(HotToastService);
 
     creditRequestForm: FormGroup<CreditRequestDataFormControl>;
 
@@ -77,6 +79,17 @@ export class CreditRequestComponent {
 
     onSave(): void {
         console.log('Credit Request Data:', this.creditRequestForm.value);
+    }
+
+    onSubmit(): void {
+        if (this.creditRequestForm.valid) {
+            this.toast.success('Formulario de Solicitud de Crédito válido');
+        }
+
+        if (this.creditRequestForm.invalid) {
+            this.toast.error('Formulario de Solicitud de Crédito invalido, Favor de revisar los campos requeridos.');
+            this.creditRequestForm.markAllAsTouched();
+        }
     }
 
     onCancel(): void {

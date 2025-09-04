@@ -2,6 +2,7 @@ import { SelectFieldComponent, TextFieldComponent } from '@/app/components/compo
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { saleForm } from '@/app/dashboard/customer/components/sale/form';
+import { HotToastService } from '@ngxpert/hot-toast';
 
 export type SaleDataFormControl = {
     accountType: FormControl<string | null>;
@@ -46,6 +47,7 @@ export class SaleComponent {
     ]
 
     private readonly fb = inject(FormBuilder);
+    private readonly toast = inject(HotToastService);
 
     saleDataForm: FormGroup<SaleDataFormControl>
 
@@ -63,4 +65,14 @@ export class SaleComponent {
         })
     }
 
+    onSubmit() {
+        if (this.saleDataForm.valid) {
+            this.toast.success('Formulario de Venta válido');
+        }
+
+        if (this.saleDataForm.invalid) {
+            this.toast.error('Formulario de Venta invalido, Favor de revisar los campos requeridos.');
+            this.saleDataForm.markAllAsTouched();
+        }
+    }
 }

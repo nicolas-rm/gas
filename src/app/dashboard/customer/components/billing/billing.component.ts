@@ -2,6 +2,7 @@ import { SelectFieldComponent, TextFieldComponent } from '@/app/components/compo
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { billingForm } from '@/app/dashboard/customer/components/billing/form';
+import { HotToastService } from '@ngxpert/hot-toast';
 
 export type BillingDataFormControl = {
     invoiceRepresentation: FormControl<string | null>;
@@ -48,6 +49,7 @@ export class BillingComponent {
     ]
 
     private readonly fb = inject(FormBuilder);
+    private readonly toast = inject(HotToastService);
 
     billingDataForm: FormGroup<BillingDataFormControl>
 
@@ -63,4 +65,14 @@ export class BillingComponent {
         })
     }
 
+    onSubmit() {
+        if (this.billingDataForm.valid) {
+            this.toast.success('Formulario de Facturación válido');
+        }
+
+        if (this.billingDataForm.invalid) {
+            this.toast.error('Formulario de Facturación invalido, Favor de revisar los campos requeridos.');
+            this.billingDataForm.markAllAsTouched();
+        }
+    }
 }

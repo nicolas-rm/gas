@@ -8,7 +8,7 @@
                         <h5 class="card-title">Información de Facturación</h5>
                         <p class="card-subtitle">Configuración de facturación y datos del cliente</p>
 
-                        <form [formGroup]="billingDataForm" class="mt-6">
+                        <form [formGroup]="billingDataForm" class="mt-6" (ngSubmit)="onSubmit()">
                             <div class="grid grid-cols-12 gap-x-4 gap-y-4">
                                 <!-- Primera fila: Representación Factura y Días de Facturación -->
                                 <div class="lg:col-span-6 col-span-12">

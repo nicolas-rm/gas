@@ -3,6 +3,7 @@ import { FileInputFieldComponent } from '@/components/file-input/file-input.comp
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ineForm } from '@/app/dashboard/customer/components/ine/form';
+import { HotToastService } from '@ngxpert/hot-toast';
 
 export type IneDataFormControl = {
     accountingKey: FormControl<string | null>;
@@ -44,6 +45,7 @@ export class IneComponent {
     ]
 
     private readonly fb = inject(FormBuilder);
+    private readonly toast = inject(HotToastService);
 
     ineDataForm: FormGroup<IneDataFormControl>
 
@@ -55,5 +57,16 @@ export class IneComponent {
             scope: this.fb.control<string | null>(null),
             document: this.fb.control<File | File[] | null>(null),
         })
+    }
+
+    onSubmit() {
+        if (this.ineDataForm.valid) {
+            this.toast.success('Formulario de INE válido');
+        }
+
+        if (this.ineDataForm.invalid) {
+            this.toast.error('Formulario de INE invalido, Favor de revisar los campos requeridos.');
+            this.ineDataForm.markAllAsTouched();
+        }
     }
 }

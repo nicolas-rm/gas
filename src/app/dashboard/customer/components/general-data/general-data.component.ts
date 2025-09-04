@@ -2,6 +2,8 @@ import { SelectFieldComponent, TextFieldComponent } from '@/app/components/compo
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { generalDataForm } from '@/app/dashboard/customer/components/general-data/form';
+import { ReactiveValidators } from '@/app/utils/validators/ReactiveValidators';
+import { HotToastService } from '@ngxpert/hot-toast';
 
 export type GeneralDataFormControl = {
     personType: FormControl<string | null>;
@@ -38,13 +40,14 @@ export class GeneralDataComponent {
         { label: 'Persona Moral', value: 'Persona Moral' }
     ]
     private readonly fb = inject(FormBuilder);
+    private readonly toast = inject(HotToastService);
 
     generalDataForm: FormGroup<GeneralDataFormControl>
 
     constructor() {
         this.generalDataForm = this.fb.group({
-            personType: ['', []],
-            groupType: ['', []],
+            personType: ['', [ReactiveValidators.required]],
+            groupType: ['', [ReactiveValidators.required]],
             rfc: ['', []],
             tradeName: ['', []],
             businessName: ['', []],
@@ -61,6 +64,17 @@ export class GeneralDataComponent {
             city: ['', []],
             fax: ['', []],
         })
+    }
+
+    onSubmit() {
+        if (this.generalDataForm.valid) {
+            this.toast.success('Formulario de Datos Generales válido');
+        }
+
+        if (this.generalDataForm.invalid) {
+            this.toast.error('Formulario de Datos Generales invalido, Favor de revisar los campos requeridos.');
+            this.generalDataForm.markAllAsTouched();
+        }
     }
 
 }

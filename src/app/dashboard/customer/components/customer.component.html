@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-body pt-2 pb-0">
-        <nav class="flex overflow-x-auto scrollbar-hide border-b border-b-gray-100" aria-label="Tabs" role="tablist">
+        <nav class="flex border-b border-b-gray-100" aria-label="Tabs" role="tablist" data-simplebar>
             <div class="flex min-w-max">
                 <div *ngFor="let tab of customerTabs">
                     <button type="button" (click)="activeTab = tab.value"

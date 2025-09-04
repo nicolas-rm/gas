@@ -3,6 +3,7 @@ import { Component, inject } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { contactForm } from '@/app/dashboard/customer/components/contacts/form';
 import { CommonModule } from '@angular/common';
+import { HotToastService } from '@ngxpert/hot-toast';
 
 export type ContactFormControl = {
     name: FormControl<string | null>;
@@ -22,6 +23,7 @@ export class ContactsComponent {
     readonly maxContacts = 3;
     
     private readonly fb = inject(FormBuilder);
+    private readonly toast = inject(HotToastService);
     
     contactsForm: FormGroup;
     
@@ -45,9 +47,6 @@ export class ContactsComponent {
             phone: ['', []],
             email: ['', []]
         });
-
-        // Agregar una referencia inicial
-        this.addContact();
     }
     
     addContact(): void {
@@ -68,5 +67,16 @@ export class ContactsComponent {
     
     canRemoveContact(): boolean {
         return this.contactsArray.length > 1;
+    }
+
+    onSubmit() {
+        if (this.contactsForm.valid) {
+            this.toast.success('Formulario de Contactos válido');
+        }
+
+        if (this.contactsForm.invalid) {
+            this.toast.error('Formulario de Contactos invalido, Favor de revisar los campos requeridos.');
+            this.contactsForm.markAllAsTouched();
+        }
     }
 }
