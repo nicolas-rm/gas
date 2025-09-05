@@ -1,6 +1,6 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { GeneralDataState } from './general-data.state';
-import { GeneralData } from './general-data.models';
+import { GeneralDataState } from '@/dashboard/customer/components/general-data/ngrx/general-data.state';
+import { GeneralData } from '@/dashboard/customer/components/general-data/ngrx/general-data.models';
 
 // Feature selector
 export const selectGeneralDataState = createFeatureSelector<GeneralDataState>('generalData');

@@ -1,4 +1,4 @@
-import { GeneralData } from './general-data.models';
+import { GeneralData } from '@/dashboard/customer/components/general-data/ngrx/general-data.models';
 
 export type GeneralDataStatus =
     | 'idle'

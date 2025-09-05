@@ -1,8 +1,19 @@
-import { SelectFieldComponent, TextFieldComponent } from '@/app/components/components';
+// Angular Core
 import { Component, inject } from '@angular/core';
+
+// Angular Forms
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+
+// Componentes personalizados
+import { SelectFieldComponent, TextFieldComponent } from '@/app/components/components';
+
+// Formulario de datos generales
 import { generalDataForm } from '@/app/dashboard/customer/components/general-data/form';
+
+// Validadores personalizados
 import { ReactiveValidators } from '@/app/utils/validators/ReactiveValidators';
+
+// Servicio de notificaciones
 import { HotToastService } from '@ngxpert/hot-toast';
 
 export type GeneralDataFormControl = {

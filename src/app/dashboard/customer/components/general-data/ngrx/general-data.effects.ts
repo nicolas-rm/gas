@@ -10,9 +10,9 @@ import { of, timer } from 'rxjs';
 import { catchError, exhaustMap, map, withLatestFrom } from 'rxjs/operators';
 
 // Servicios y modelos propios
-import { CustomerService } from '../../../customer.service';
-import { GeneralDataPageActions, GeneralDataApiActions } from './general-data.actions';
-import { selectGeneralData } from './general-data.selectors';
+import { CustomerService } from '@/dashboard/customer/customer.service';
+import { GeneralDataPageActions, GeneralDataApiActions } from '@/dashboard/customer/components/general-data/ngrx/general-data.actions';
+import { selectGeneralData } from '@/dashboard/customer/components/general-data/ngrx/general-data.selectors';
 
 // Librerías externas
 import { HotToastService } from '@ngxpert/hot-toast';

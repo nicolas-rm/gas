@@ -2,9 +2,9 @@
 import { createReducer, on } from '@ngrx/store';
 import { EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 
-import { GeneralDataState, initialGeneralDataState } from './general-data.state';
-import { GeneralDataPageActions, GeneralDataApiActions } from './general-data.actions';
-import { GeneralData } from './general-data.models';
+import { GeneralDataState, initialGeneralDataState } from '@/dashboard/customer/components/general-data/ngrx/general-data.state';
+import { GeneralDataPageActions, GeneralDataApiActions } from '@/dashboard/customer/components/general-data/ngrx/general-data.actions';
+import { GeneralData } from '@/dashboard/customer/components/general-data/ngrx/general-data.models';
 
 // Entity Adapter para manejar colecciones si fuera necesario en el futuro
 export const generalDataAdapter: EntityAdapter<GeneralData> = createEntityAdapter<GeneralData>({
