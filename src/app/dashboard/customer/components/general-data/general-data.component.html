@@ -93,9 +93,6 @@
                                         [placeholder]="generalData.groupType.placeholder"
                                         [disabled]="isBusy()">
                                     </SelectField>
-                                    @if (isFieldInvalid('groupType')) {
-                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('groupType') }}</p>
-                                    }
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
                                     <SelectField 
@@ -107,9 +104,6 @@
                                         [placeholder]="generalData.personType.placeholder"
                                         [disabled]="isBusy()">
                                     </SelectField>
-                                    @if (isFieldInvalid('personType')) {
-                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('personType') }}</p>
-                                    }
                                 </div>
 
                                 <!-- Segunda fila: RFC -->
@@ -121,9 +115,6 @@
                                         [placeholder]="generalData.rfc.placeholder"
                                         [control]="generalDataForm.get(generalData.rfc.formControlName)"
                                         [disabled]="isBusy()" />
-                                    @if (isFieldInvalid('rfc')) {
-                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('rfc') }}</p>
-                                    }
                                 </div>
 
                                 <!-- Tercera fila: Razón Social -->
@@ -135,9 +126,6 @@
                                         [placeholder]="generalData.businessName.placeholder"
                                         [control]="generalDataForm.get(generalData.businessName.formControlName)"
                                         [disabled]="isBusy()" />
-                                    @if (isFieldInvalid('businessName')) {
-                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('businessName') }}</p>
-                                    }
                                 </div>
 
                                 <!-- Cuarta fila: Nombre Comercial -->
@@ -149,9 +137,6 @@
                                         [placeholder]="generalData.tradeName.placeholder"
                                         [control]="generalDataForm.get(generalData.tradeName.formControlName)"
                                         [disabled]="isBusy()" />
-                                    @if (isFieldInvalid('tradeName')) {
-                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('tradeName') }}</p>
-                                    }
                                 </div>
                             </div>
                         </form>
@@ -177,9 +162,6 @@
                                         [placeholder]="generalData.street.placeholder"
                                         [control]="generalDataForm.get(generalData.street.formControlName)"
                                         [disabled]="isBusy()" />
-                                    @if (isFieldInvalid('street')) {
-                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('street') }}</p>
-                                    }
                                 </div>
 
                                 <!-- Segunda fila: Números -->
@@ -191,9 +173,6 @@
                                         [placeholder]="generalData.exteriorNumber.placeholder"
                                         [control]="generalDataForm.get(generalData.exteriorNumber.formControlName)"
                                         [disabled]="isBusy()" />
-                                    @if (isFieldInvalid('exteriorNumber')) {
-                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('exteriorNumber') }}</p>
-                                    }
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
                                     <TextField 
@@ -203,9 +182,6 @@
                                         [placeholder]="generalData.interiorNumber.placeholder"
                                         [control]="generalDataForm.get(generalData.interiorNumber.formControlName)"
                                         [disabled]="isBusy()" />
-                                    @if (isFieldInvalid('interiorNumber')) {
-                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('interiorNumber') }}</p>
-                                    }
                                 </div>
 
                                 <!-- Tercera fila: Colonia y Código Postal -->
@@ -217,9 +193,6 @@
                                         [placeholder]="generalData.colony.placeholder"
                                         [control]="generalDataForm.get(generalData.colony.formControlName)"
                                         [disabled]="isBusy()" />
-                                    @if (isFieldInvalid('colony')) {
-                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('colony') }}</p>
-                                    }
                                 </div>
                                 <div class="lg:col-span-4 col-span-12">
                                     <TextField 
@@ -229,9 +202,6 @@
                                         [placeholder]="generalData.postalCode.placeholder"
                                         [control]="generalDataForm.get(generalData.postalCode.formControlName)"
                                         [disabled]="isBusy()" />
-                                    @if (isFieldInvalid('postalCode')) {
-                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('postalCode') }}</p>
-                                    }
                                 </div>
 
                                 <!-- Cuarta fila: Ciudad y Municipio -->
@@ -243,9 +213,6 @@
                                         [placeholder]="generalData.city.placeholder"
                                         [control]="generalDataForm.get(generalData.city.formControlName)"
                                         [disabled]="isBusy()" />
-                                    @if (isFieldInvalid('city')) {
-                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('city') }}</p>
-                                    }
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
                                     <TextField 
@@ -255,9 +222,6 @@
                                         [placeholder]="generalData.municipality.placeholder"
                                         [control]="generalDataForm.get(generalData.municipality.formControlName)"
                                         [disabled]="isBusy()" />
-                                    @if (isFieldInvalid('municipality')) {
-                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('municipality') }}</p>
-                                    }
                                 </div>
 
                                 <!-- Quinta fila: Estado y País -->
@@ -269,9 +233,6 @@
                                         [placeholder]="generalData.state.placeholder"
                                         [control]="generalDataForm.get(generalData.state.formControlName)"
                                         [disabled]="isBusy()" />
-                                    @if (isFieldInvalid('state')) {
-                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('state') }}</p>
-                                    }
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
                                     <TextField 
@@ -281,9 +242,6 @@
                                         [placeholder]="generalData.country.placeholder"
                                         [control]="generalDataForm.get(generalData.country.formControlName)"
                                         [disabled]="isBusy()" />
-                                    @if (isFieldInvalid('country')) {
-                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('country') }}</p>
-                                    }
                                 </div>
                             </div>
                         </form>
@@ -309,9 +267,6 @@
                                         [placeholder]="generalData.phone.placeholder"
                                         [control]="generalDataForm.get(generalData.phone.formControlName)"
                                         [disabled]="isBusy()" />
-                                    @if (isFieldInvalid('phone')) {
-                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('phone') }}</p>
-                                    }
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
                                     <TextField 
@@ -321,9 +276,6 @@
                                         [placeholder]="generalData.fax.placeholder"
                                         [control]="generalDataForm.get(generalData.fax.formControlName)"
                                         [disabled]="isBusy()" />
-                                    @if (isFieldInvalid('fax')) {
-                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('fax') }}</p>
-                                    }
                                 </div>
                             </div>
 
@@ -359,7 +311,7 @@
                                     <button 
                                         type="submit" 
                                         class="btn"
-                                        [disabled]="isBusy() || !generalDataForm.valid">
+                                        [disabled]="isBusy()">
                                         @if (isSaving()) {
                                             <div class="flex items-center">
                                                 <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>

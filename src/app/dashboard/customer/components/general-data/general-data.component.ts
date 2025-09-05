@@ -1,5 +1,5 @@
 // Angular
-import { Component, ChangeDetectionStrategy, inject, effect, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -137,36 +137,24 @@ export class GeneralDataComponent {
         return false;
     }
 
-    // Helpers de plantilla
-    getFieldError(field: keyof ControlsOf<GeneralData>): string {
-        const control = this.generalDataForm.get(field as string);
-        if (control?.touched && control.invalid) {
-            if (control.errors?.['required']) return 'Campo requerido';
-            // agrega más mensajes según tus validadores
-        }
-        return '';
-    }
-
-    isFieldInvalid(field: keyof ControlsOf<GeneralData>): boolean {
-        const control = this.generalDataForm.get(field as string);
-        return !!(control && control.touched && control.invalid);
-    }
-
     // Acciones varias
     resetForm(): void {
         this.store.dispatch(GeneralDataPageActions.resetForm());
         this.generalDataForm.reset();
     }
 
+    // Marcar como pristine (sin cambios)
     markAsPristine(): void {
         this.store.dispatch(GeneralDataPageActions.markAsPristine());
         this.generalDataForm.markAsPristine();
     }
 
+    // Limpiar errores
     clearErrors(): void {
         this.store.dispatch(GeneralDataPageActions.clearErrors());
     }
 
+    // Guardado de cambios antes de salir
     canDeactivate(): boolean {
         // Puedes combinar la bandera del store con el estado del form
         if (this.hasUnsavedChanges() || this.generalDataForm.dirty) {
