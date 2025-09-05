@@ -70,6 +70,10 @@ export interface ContactData {
     email: string | null;
 }
 
+export interface ContactsData {
+    contacts: ContactData[];
+}
+
 export interface IneData {
     accountingKey: string | null;
     processType: string | null;
@@ -93,7 +97,7 @@ export interface ICustomer {
     commissionData: CommissionData;
     saleData: SaleData;
     billingData: BillingData;
-    contacts: ContactData[];
+    contactsData: ContactsData;
     ineData: IneData;
     creditRequestData: CreditRequestData;
     createdAt?: Date;
@@ -120,7 +124,7 @@ export type CustomerFormSection =
     | 'commissionData'
     | 'saleData'
     | 'billingData'
-    | 'contacts'
+    | 'contactsData'
     | 'ineData'
     | 'creditRequestData';
 
@@ -128,4 +132,143 @@ export interface SaveFormRequest {
     section: CustomerFormSection;
     data: any;
     customerId?: string;
+}
+
+// Interfaces específicas para requests de cada sección
+export interface SaveGeneralDataRequest {
+    customerId?: string;
+    data: GeneralData;
+}
+
+export interface SaveContractDataRequest {
+    customerId?: string;
+    data: ContractData;
+}
+
+export interface SaveCommissionDataRequest {
+    customerId?: string;
+    data: CommissionData;
+}
+
+export interface SaveSaleDataRequest {
+    customerId?: string;
+    data: SaleData;
+}
+
+export interface SaveBillingDataRequest {
+    customerId?: string;
+    data: BillingData;
+}
+
+export interface SaveContactsDataRequest {
+    customerId?: string;
+    data: ContactsData;
+}
+
+export interface SaveIneDataRequest {
+    customerId?: string;
+    data: IneData;
+}
+
+export interface SaveCreditRequestDataRequest {
+    customerId?: string;
+    data: CreditRequestData;
+}
+
+// Interfaces para respuestas específicas de cada sección
+export interface GeneralDataResponse {
+    success: boolean;
+    data: GeneralData;
+    message?: string;
+}
+
+export interface ContractDataResponse {
+    success: boolean;
+    data: ContractData;
+    message?: string;
+}
+
+export interface CommissionDataResponse {
+    success: boolean;
+    data: CommissionData;
+    message?: string;
+}
+
+export interface SaleDataResponse {
+    success: boolean;
+    data: SaleData;
+    message?: string;
+}
+
+export interface BillingDataResponse {
+    success: boolean;
+    data: BillingData;
+    message?: string;
+}
+
+export interface ContactsDataResponse {
+    success: boolean;
+    data: ContactsData;
+    message?: string;
+}
+
+export interface IneDataResponse {
+    success: boolean;
+    data: IneData;
+    message?: string;
+}
+
+export interface CreditRequestDataResponse {
+    success: boolean;
+    data: CreditRequestData;
+    message?: string;
+}
+
+// Interfaces para errores específicos
+export interface GeneralDataError {
+    message: string;
+    code?: string;
+    field?: string;
+}
+
+export interface ContractDataError {
+    message: string;
+    code?: string;
+    field?: string;
+}
+
+export interface CommissionDataError {
+    message: string;
+    code?: string;
+    field?: string;
+}
+
+export interface SaleDataError {
+    message: string;
+    code?: string;
+    field?: string;
+}
+
+export interface BillingDataError {
+    message: string;
+    code?: string;
+    field?: string;
+}
+
+export interface ContactsDataError {
+    message: string;
+    code?: string;
+    field?: string;
+}
+
+export interface IneDataError {
+    message: string;
+    code?: string;
+    field?: string;
+}
+
+export interface CreditRequestDataError {
+    message: string;
+    code?: string;
+    field?: string;
 }

@@ -4,7 +4,26 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { of } from 'rxjs';
 import { map, exhaustMap, catchError, withLatestFrom, tap } from 'rxjs/operators';
-import { CustomerUIActions, CustomerAPIActions } from './customer.actions';
+import {
+    CustomerUIActions,
+    CustomerAPIActions,
+    GeneralDataPageActions,
+    GeneralDataApiActions,
+    ContractDataPageActions,
+    ContractDataApiActions,
+    CommissionDataPageActions,
+    CommissionDataApiActions,
+    SaleDataPageActions,
+    SaleDataApiActions,
+    BillingDataPageActions,
+    BillingDataApiActions,
+    ContactsDataPageActions,
+    ContactsDataApiActions,
+    IneDataPageActions,
+    IneDataApiActions,
+    CreditRequestDataPageActions,
+    CreditRequestDataApiActions
+} from './customer.actions';
 import { CustomerService } from '../customer.service';
 import { selectSelectedCustomerId, selectSelectedCustomer } from './customer.selectors';
 import { ICustomer, SaveFormRequest } from './customer.models';
@@ -309,21 +328,260 @@ export const deleteCustomerSuccessNavEffect = createEffect(
     { functional: true, dispatch: false }
 );
 
+// ========== SECTION-SPECIFIC EFFECTS ==========
 
-// Exportar todos los efectos como CustomerEffects
-export const CustomerEffects = {
-    loadCustomerEffect,
-    loadCustomersEffect,
-    saveSectionEffect,
-    createCustomerEffect,
-    updateCustomerEffect,
-    deleteCustomerEffect,
-    saveCustomerEffect,
-    selectCustomerEffect,
-    saveSectionRequestedEffect,
-    createCustomerRequestedEffect,
-    updateCustomerRequestedEffect,
-    deleteCustomerRequestedEffect,
-    createCustomerSuccessNavEffect,
-    deleteCustomerSuccessNavEffect
-};
+/**
+ * Effects para General Data
+ */
+export const saveGeneralDataEffect = createEffect(
+    (actions$ = inject(Actions), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
+        actions$.pipe(
+            ofType(GeneralDataPageActions.saveData),
+            exhaustMap(({ customerId, data }) => {
+                const toastRef = toast.loading('Guardando datos generales...');
+                return customerService.saveSection({
+                    section: 'generalData',
+                    customerId,
+                    data
+                }).pipe(
+                    map(response => {
+                        toastRef.close();
+                        toast.success('Datos generales guardados exitosamente');
+                        return GeneralDataApiActions.saveDataSuccess({
+                            data: response.data as any
+                        });
+                    }),
+                    catchError(error => {
+                        toastRef.close();
+                        toast.error('Error al guardar datos generales');
+                        return of(GeneralDataApiActions.saveDataFailure({ error }));
+                    })
+                );
+            })
+        ),
+    { functional: true }
+);
+
+/**
+ * Effects para Contract Data
+ */
+export const saveContractDataEffect = createEffect(
+    (actions$ = inject(Actions), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
+        actions$.pipe(
+            ofType(ContractDataPageActions.saveData),
+            exhaustMap(({ customerId, data }) => {
+                const toastRef = toast.loading('Guardando datos de contrato...');
+                return customerService.saveSection({
+                    section: 'contractData',
+                    customerId,
+                    data
+                }).pipe(
+                    map(response => {
+                        toastRef.close();
+                        toast.success('Datos de contrato guardados exitosamente');
+                        return ContractDataApiActions.saveDataSuccess({
+                            data: response.data as any
+                        });
+                    }),
+                    catchError(error => {
+                        toastRef.close();
+                        toast.error('Error al guardar datos de contrato');
+                        return of(ContractDataApiActions.saveDataFailure({ error }));
+                    })
+                );
+            })
+        ),
+    { functional: true }
+);
+
+/**
+ * Effects para Commission Data
+ */
+export const saveCommissionDataEffect = createEffect(
+    (actions$ = inject(Actions), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
+        actions$.pipe(
+            ofType(CommissionDataPageActions.saveData),
+            exhaustMap(({ customerId, data }) => {
+                const toastRef = toast.loading('Guardando datos de comisión...');
+                return customerService.saveSection({
+                    section: 'commissionData',
+                    customerId,
+                    data
+                }).pipe(
+                    map(response => {
+                        toastRef.close();
+                        toast.success('Datos de comisión guardados exitosamente');
+                        return CommissionDataApiActions.saveDataSuccess({
+                            data: response.data as any
+                        });
+                    }),
+                    catchError(error => {
+                        toastRef.close();
+                        toast.error('Error al guardar datos de comisión');
+                        return of(CommissionDataApiActions.saveDataFailure({ error }));
+                    })
+                );
+            })
+        ),
+    { functional: true }
+);
+
+/**
+ * Effects para Sale Data
+ */
+export const saveSaleDataEffect = createEffect(
+    (actions$ = inject(Actions), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
+        actions$.pipe(
+            ofType(SaleDataPageActions.saveData),
+            exhaustMap(({ customerId, data }) => {
+                const toastRef = toast.loading('Guardando datos de venta...');
+                return customerService.saveSection({
+                    section: 'saleData',
+                    customerId,
+                    data
+                }).pipe(
+                    map(response => {
+                        toastRef.close();
+                        toast.success('Datos de venta guardados exitosamente');
+                        return SaleDataApiActions.saveDataSuccess({
+                            data: response.data as any
+                        });
+                    }),
+                    catchError(error => {
+                        toastRef.close();
+                        toast.error('Error al guardar datos de venta');
+                        return of(SaleDataApiActions.saveDataFailure({ error }));
+                    })
+                );
+            })
+        ),
+    { functional: true }
+);
+
+/**
+ * Effects para Billing Data
+ */
+export const saveBillingDataEffect = createEffect(
+    (actions$ = inject(Actions), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
+        actions$.pipe(
+            ofType(BillingDataPageActions.saveData),
+            exhaustMap(({ customerId, data }) => {
+                const toastRef = toast.loading('Guardando datos de facturación...');
+                return customerService.saveSection({
+                    section: 'billingData',
+                    customerId,
+                    data
+                }).pipe(
+                    map(response => {
+                        toastRef.close();
+                        toast.success('Datos de facturación guardados exitosamente');
+                        return BillingDataApiActions.saveDataSuccess({
+                            data: response.data as any
+                        });
+                    }),
+                    catchError(error => {
+                        toastRef.close();
+                        toast.error('Error al guardar datos de facturación');
+                        return of(BillingDataApiActions.saveDataFailure({ error }));
+                    })
+                );
+            })
+        ),
+    { functional: true }
+);
+
+/**
+ * Effects para Contacts Data
+ */
+export const saveContactsDataEffect = createEffect(
+    (actions$ = inject(Actions), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
+        actions$.pipe(
+            ofType(ContactsDataPageActions.saveData),
+            exhaustMap(({ customerId, data }) => {
+                const toastRef = toast.loading('Guardando datos de contactos...');
+                return customerService.saveSection({
+                    section: 'contactsData',
+                    customerId,
+                    data
+                }).pipe(
+                    map(response => {
+                        toastRef.close();
+                        toast.success('Datos de contactos guardados exitosamente');
+                        return ContactsDataApiActions.saveDataSuccess({
+                            data: response.data as any
+                        });
+                    }),
+                    catchError(error => {
+                        toastRef.close();
+                        toast.error('Error al guardar datos de contactos');
+                        return of(ContactsDataApiActions.saveDataFailure({ error }));
+                    })
+                );
+            })
+        ),
+    { functional: true }
+);
+
+/**
+ * Effects para INE Data
+ */
+export const saveIneDataEffect = createEffect(
+    (actions$ = inject(Actions), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
+        actions$.pipe(
+            ofType(IneDataPageActions.saveData),
+            exhaustMap(({ customerId, data }) => {
+                const toastRef = toast.loading('Guardando datos INE...');
+                return customerService.saveSection({
+                    section: 'ineData',
+                    customerId,
+                    data
+                }).pipe(
+                    map(response => {
+                        toastRef.close();
+                        toast.success('Datos INE guardados exitosamente');
+                        return IneDataApiActions.saveDataSuccess({
+                            data: response.data as any
+                        });
+                    }),
+                    catchError(error => {
+                        toastRef.close();
+                        toast.error('Error al guardar datos INE');
+                        return of(IneDataApiActions.saveDataFailure({ error }));
+                    })
+                );
+            })
+        ),
+    { functional: true }
+);
+
+/**
+ * Effects para Credit Request Data
+ */
+export const saveCreditRequestDataEffect = createEffect(
+    (actions$ = inject(Actions), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
+        actions$.pipe(
+            ofType(CreditRequestDataPageActions.saveData),
+            exhaustMap(({ customerId, data }) => {
+                const toastRef = toast.loading('Guardando solicitud de crédito...');
+                return customerService.saveSection({
+                    section: 'creditRequestData',
+                    customerId,
+                    data
+                }).pipe(
+                    map(response => {
+                        toastRef.close();
+                        toast.success('Solicitud de crédito guardada exitosamente');
+                        return CreditRequestDataApiActions.saveDataSuccess({
+                            data: response.data as any
+                        });
+                    }),
+                    catchError(error => {
+                        toastRef.close();
+                        toast.error('Error al guardar solicitud de crédito');
+                        return of(CreditRequestDataApiActions.saveDataFailure({ error }));
+                    })
+                );
+            })
+        ),
+    { functional: true }
+);

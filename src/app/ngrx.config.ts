@@ -11,7 +11,7 @@ import * as authenticationEffects from '@/authentication/ngrx/authentication.eff
 import { authenticationReducer } from '@/authentication/ngrx/authentication.reducer';
 
 // Customer
-import { CustomerEffects } from '@/dashboard/customer/ngrx/customer.effects';
+import * as CustomerEffects from '@/dashboard/customer/ngrx/customer.effects';
 import { customerReducer } from '@/dashboard/customer/ngrx/customer.reducer';
 
 export const ngrxProviders = [
