@@ -13,7 +13,7 @@ export const selectCreditRequestData = createSelector(
 
 export const selectCreditRequestDataField = (field: keyof CreditRequestData) => createSelector(
     selectCreditRequestData,
-    (data: CreditRequestData) => data[field]
+    (data: CreditRequestData | null) => data ? data[field] : null
 );
 
 // === STATUS SELECTORS ===
@@ -100,26 +100,31 @@ export const selectCreditRequestDataFormState = createSelector(
 // === SPECIFIC FIELD SELECTORS ===
 export const selectLegalRepresentative = createSelector(
     selectCreditRequestData,
-    (data: CreditRequestData) => data.legalRepresentative
+    (data: CreditRequestData | null) => data?.legalRepresentative || null
 );
 
 export const selectDocumentsReceiver = createSelector(
     selectCreditRequestData,
-    (data: CreditRequestData) => data.documentsReceiver
+    (data: CreditRequestData | null) => data?.documentsReceiver || null
 );
 
 export const selectCreditApplicationDocument = createSelector(
     selectCreditRequestData,
-    (data: CreditRequestData) => data.creditApplicationDocument
+    (data: CreditRequestData | null) => data?.creditApplicationDocument || null
 );
 
 // === GROUPED SELECTORS ===
 export const selectCreditRequestDataSummary = createSelector(
     selectCreditRequestData,
-    (data: CreditRequestData) => ({
+    (data: CreditRequestData | null) => data ? ({
         hasLegalRepresentative: !!data.legalRepresentative,
         hasDocumentsReceiver: !!data.documentsReceiver,
         hasDocument: !!data.creditApplicationDocument,
         isComplete: !!data.legalRepresentative && !!data.documentsReceiver
-    })
+    }) : {
+        hasLegalRepresentative: false,
+        hasDocumentsReceiver: false,
+        hasDocument: false,
+        isComplete: false
+    }
 );

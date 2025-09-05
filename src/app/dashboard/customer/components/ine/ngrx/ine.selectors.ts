@@ -13,7 +13,7 @@ export const selectIneData = createSelector(
 
 export const selectIneDataField = (field: keyof IneData) => createSelector(
     selectIneData,
-    (data: IneData) => data[field]
+    (data: IneData | null) => data ? data[field] : null
 );
 
 // === STATUS SELECTORS ===
@@ -100,36 +100,41 @@ export const selectIneDataFormState = createSelector(
 // === SPECIFIC FIELD SELECTORS ===
 export const selectAccountingKey = createSelector(
     selectIneData,
-    (data: IneData) => data.accountingKey
+    (data: IneData | null) => data?.accountingKey || null
 );
 
 export const selectProcessType = createSelector(
     selectIneData,
-    (data: IneData) => data.processType
+    (data: IneData | null) => data?.processType || null
 );
 
 export const selectCommitteeType = createSelector(
     selectIneData,
-    (data: IneData) => data.committeeType
+    (data: IneData | null) => data?.committeeType || null
 );
 
 export const selectScope = createSelector(
     selectIneData,
-    (data: IneData) => data.scope
+    (data: IneData | null) => data?.scope || null
 );
 
 export const selectDocument = createSelector(
     selectIneData,
-    (data: IneData) => data.document
+    (data: IneData | null) => data?.document || null
 );
 
 // === GROUPED SELECTORS ===
 export const selectIneDataConfiguration = createSelector(
     selectIneData,
-    (data: IneData) => ({
+    (data: IneData | null) => data ? ({
         accountingKey: data.accountingKey,
         processType: data.processType,
         committeeType: data.committeeType,
         scope: data.scope
-    })
+    }) : {
+        accountingKey: null,
+        processType: null,
+        committeeType: null,
+        scope: null
+    }
 );

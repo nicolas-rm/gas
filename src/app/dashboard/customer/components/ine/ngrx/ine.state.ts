@@ -7,7 +7,7 @@ export type IneDataStatus = 'idle' | 'loading' | 'saving' | 'saved' | 'error';
 // Estado principal del formulario INE siguiendo el estándar
 export interface IneDataState extends EntityState<IneData> {
     // Datos del formulario
-    data: IneData;
+    data: IneData | null;
     
     // Estados operacionales
     status: IneDataStatus;
@@ -24,7 +24,7 @@ export interface IneDataState extends EntityState<IneData> {
     isDirty: boolean;
     
     // Metadatos
-    lastSaved: string | null;
+    lastSaved: number | null;
 }
 
 // Entity Adapter
@@ -34,13 +34,7 @@ export const ineDataAdapter: EntityAdapter<IneData> = createEntityAdapter<IneDat
 
 // Estado inicial
 export const initialIneDataState: IneDataState = ineDataAdapter.getInitialState({
-    data: {
-        accountingKey: null,
-        processType: null,
-        committeeType: null,
-        scope: null,
-        document: null
-    },
+    data: null,
     status: 'idle',
     loading: false,
     saving: false,

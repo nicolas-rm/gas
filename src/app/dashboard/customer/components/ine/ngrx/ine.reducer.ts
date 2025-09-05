@@ -34,8 +34,15 @@ export const ineDataReducer = createReducer(
     
     // === UPDATE FIELD ===
     on(IneDataPageActions.updateField, (state, { field, value }): IneDataState => {
+        const currentData = state.data || {
+            accountingKey: null,
+            processType: null,
+            committeeType: null,
+            scope: null,
+            document: null
+        };
         const updatedData = {
-            ...state.data,
+            ...currentData,
             [field]: value
         };
         
@@ -76,7 +83,7 @@ export const ineDataReducer = createReducer(
             error: null,
             hasUnsavedChanges: false,
             isDirty: false,
-            lastSaved: new Date().toISOString()
+            lastSaved: Date.now()
         })
     ),
     
@@ -90,14 +97,7 @@ export const ineDataReducer = createReducer(
     // === FORM MANAGEMENT ===
     on(IneDataPageActions.resetForm, (state): IneDataState => 
         ineDataAdapter.removeAll({
-            ...initialIneDataState,
-            data: {
-                accountingKey: null,
-                processType: null,
-                committeeType: null,
-                scope: null,
-                document: null
-            }
+            ...initialIneDataState
         })
     ),
     

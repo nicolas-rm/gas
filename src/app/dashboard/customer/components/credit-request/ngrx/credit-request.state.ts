@@ -7,7 +7,7 @@ export type CreditRequestDataStatus = 'idle' | 'loading' | 'saving' | 'saved' | 
 // Estado principal del formulario Credit Request siguiendo el estándar
 export interface CreditRequestDataState extends EntityState<CreditRequestData> {
     // Datos del formulario
-    data: CreditRequestData;
+    data: CreditRequestData | null;
     
     // Estados operacionales
     status: CreditRequestDataStatus;
@@ -24,7 +24,7 @@ export interface CreditRequestDataState extends EntityState<CreditRequestData> {
     isDirty: boolean;
     
     // Metadatos
-    lastSaved: string | null;
+    lastSaved: number | null;
 }
 
 // Entity Adapter
@@ -34,11 +34,7 @@ export const creditRequestDataAdapter: EntityAdapter<CreditRequestData> = create
 
 // Estado inicial
 export const initialCreditRequestDataState: CreditRequestDataState = creditRequestDataAdapter.getInitialState({
-    data: {
-        legalRepresentative: null,
-        documentsReceiver: null,
-        creditApplicationDocument: null
-    },
+    data: null,
     status: 'idle',
     loading: false,
     saving: false,

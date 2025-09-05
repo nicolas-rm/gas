@@ -34,8 +34,13 @@ export const creditRequestDataReducer = createReducer(
     
     // === UPDATE FIELD ===
     on(CreditRequestDataPageActions.updateField, (state, { field, value }): CreditRequestDataState => {
+        const currentData = state.data || {
+            legalRepresentative: null,
+            documentsReceiver: null,
+            creditApplicationDocument: null
+        };
         const updatedData = {
-            ...state.data,
+            ...currentData,
             [field]: value
         };
         
@@ -76,7 +81,7 @@ export const creditRequestDataReducer = createReducer(
             error: null,
             hasUnsavedChanges: false,
             isDirty: false,
-            lastSaved: new Date().toISOString()
+            lastSaved: Date.now()
         })
     ),
     
@@ -90,12 +95,7 @@ export const creditRequestDataReducer = createReducer(
     // === FORM MANAGEMENT ===
     on(CreditRequestDataPageActions.resetForm, (state): CreditRequestDataState => 
         creditRequestDataAdapter.removeAll({
-            ...initialCreditRequestDataState,
-            data: {
-                legalRepresentative: null,
-                documentsReceiver: null,
-                creditApplicationDocument: null
-            }
+            ...initialCreditRequestDataState
         })
     ),
     

@@ -13,7 +13,7 @@ export const selectGeneralData = createSelector(
 
 export const selectGeneralDataField = (field: keyof GeneralData) => createSelector(
     selectGeneralData,
-    (data: GeneralData) => data[field]
+    (data: GeneralData | null) => data ? data[field] : null
 );
 
 // === STATUS SELECTORS ===
@@ -100,33 +100,33 @@ export const selectGeneralDataFormState = createSelector(
 // === SPECIFIC FIELD SELECTORS ===
 export const selectPersonType = createSelector(
     selectGeneralData,
-    (data: GeneralData) => data.personType
+    (data: GeneralData | null) => data?.personType || null
 );
 
 export const selectGroupType = createSelector(
     selectGeneralData,
-    (data: GeneralData) => data.groupType
+    (data: GeneralData | null) => data?.groupType || null
 );
 
 export const selectRfc = createSelector(
     selectGeneralData,
-    (data: GeneralData) => data.rfc
+    (data: GeneralData | null) => data?.rfc || null
 );
 
 export const selectBusinessName = createSelector(
     selectGeneralData,
-    (data: GeneralData) => data.businessName
+    (data: GeneralData | null) => data?.businessName || null
 );
 
 export const selectTradeName = createSelector(
     selectGeneralData,
-    (data: GeneralData) => data.tradeName
+    (data: GeneralData | null) => data?.tradeName || null
 );
 
 // === GROUPED SELECTORS ===
 export const selectGeneralDataAddress = createSelector(
     selectGeneralData,
-    (data: GeneralData) => ({
+    (data: GeneralData | null) => data ? ({
         street: data.street,
         exteriorNumber: data.exteriorNumber,
         interiorNumber: data.interiorNumber,
@@ -137,13 +137,13 @@ export const selectGeneralDataAddress = createSelector(
         municipality: data.municipality,
         postalCode: data.postalCode,
         city: data.city
-    })
+    }) : null
 );
 
 export const selectGeneralDataContact = createSelector(
     selectGeneralData,
-    (data: GeneralData) => ({
+    (data: GeneralData | null) => data ? ({
         phone: data.phone,
         fax: data.fax
-    })
+    }) : null
 );

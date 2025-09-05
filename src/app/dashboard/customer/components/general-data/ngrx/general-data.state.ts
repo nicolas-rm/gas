@@ -1,3 +1,6 @@
+// NgRx
+import { EntityState } from '@ngrx/entity';
+
 import { GeneralData } from '@/dashboard/customer/components/general-data/ngrx/general-data.models';
 
 export type GeneralDataStatus =
@@ -7,9 +10,9 @@ export type GeneralDataStatus =
     | 'saved'
     | 'error';
 
-export interface GeneralDataState {
+export interface GeneralDataState extends EntityState<GeneralData> {
     // Datos del formulario
-    data: GeneralData;
+    data: GeneralData | null;
 
     // Estado de la operación
     status: GeneralDataStatus;
@@ -26,25 +29,12 @@ export interface GeneralDataState {
 }
 
 export const initialGeneralDataState: GeneralDataState = {
-    data: {
-        personType: null,
-        groupType: null,
-        rfc: null,
-        businessName: null,
-        tradeName: null,
-        street: null,
-        exteriorNumber: null,
-        interiorNumber: null,
-        crossing: null,
-        country: null,
-        state: null,
-        colony: null,
-        municipality: null,
-        postalCode: null,
-        phone: null,
-        city: null,
-        fax: null
-    },
+    // Propiedades del EntityState
+    ids: [],
+    entities: {},
+    
+    // Propiedades customizadas
+    data: null,
     status: 'idle',
     loading: false,
     saving: false,
