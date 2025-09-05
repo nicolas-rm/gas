@@ -11,6 +11,11 @@ export const selectContractData = createSelector(
     (state: ContractDataState) => state.data
 );
 
+export const selectContractDataOriginal = createSelector(
+    selectContractDataState,
+    (state: ContractDataState) => state.originalData
+);
+
 export const selectContractDataField = (field: keyof ContractData) => createSelector(
     selectContractData,
     (data: ContractData) => data[field]
@@ -62,6 +67,13 @@ export const selectContractDataCanSave = createSelector(
     selectContractDataHasUnsavedChanges,
     (loading: boolean, saving: boolean, error: string | null, hasUnsavedChanges: boolean) =>
         !loading && !saving && !error && hasUnsavedChanges
+);
+
+export const selectContractDataCanReset = createSelector(
+    selectContractDataHasUnsavedChanges,
+    selectContractDataIsBusy,
+    (hasUnsavedChanges: boolean, isBusy: boolean) =>
+        hasUnsavedChanges && !isBusy
 );
 
 // === METADATA SELECTORS ===

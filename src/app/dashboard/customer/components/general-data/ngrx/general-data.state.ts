@@ -13,6 +13,9 @@ export type GeneralDataStatus =
 export interface GeneralDataState extends EntityState<GeneralData> {
     // Datos del formulario
     data: GeneralData | null;
+    
+    // Datos originales para restablecer
+    originalData: GeneralData | null;
 
     // Estado de la operación
     status: GeneralDataStatus;
@@ -35,6 +38,7 @@ export const initialGeneralDataState: GeneralDataState = {
     
     // Propiedades customizadas
     data: null,
+    originalData: null,
     status: 'idle',
     loading: false,
     saving: false,

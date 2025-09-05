@@ -26,6 +26,7 @@ export const contractDataReducer = createReducer(
     on(ContractDataApiActions.loadDataSuccess, (state, { data }) => ({
         ...state,
         data,
+        originalData: data, // Guardar datos originales al cargar
         status: 'idle' as const,
         loading: false,
         error: null,
@@ -65,6 +66,8 @@ export const contractDataReducer = createReducer(
     on(ContractDataPageActions.setData, (state, { data }) => ({
         ...state,
         data,
+        // Si no hay datos originales, establecer estos como originales (modo crear)
+        originalData: state.originalData || data,
         hasUnsavedChanges: false,
         isDirty: false,
     })),
@@ -80,6 +83,7 @@ export const contractDataReducer = createReducer(
     on(ContractDataApiActions.saveDataSuccess, (state, { data }) => ({
         ...state,
         data,
+        originalData: data, // Actualizar datos originales después de guardar exitosamente
         status: 'saved' as const,
         saving: false,
         error: null,
@@ -96,7 +100,32 @@ export const contractDataReducer = createReducer(
     })),
 
     // === RESET & CLEANUP ===
+    // Resetear formulario completamente (volver al estado inicial)
     on(ContractDataPageActions.resetForm, () => initialContractDataState),
+
+    // Restablecer a datos originales (crear: campos vacíos, actualizar: datos cargados)
+    on(ContractDataPageActions.resetToOriginal, (state) => {
+        const dataToRestore = state.originalData || {
+            printName: null,
+            adminFee: null,
+            cardIssueFee: null,
+            reportsFee: null,
+            accountingAccount: null,
+            cfdiUsage: null,
+            type: null,
+            loyalty: null,
+            percentage: null,
+            rfcOrderingAccount: null,
+            bank: null
+        };
+        
+        return {
+            ...state,
+            data: dataToRestore,
+            hasUnsavedChanges: false,
+            isDirty: false
+        };
+    }),
 
     on(ContractDataPageActions.clearErrors, (state) => ({
         ...state,

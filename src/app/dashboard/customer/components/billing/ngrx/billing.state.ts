@@ -10,6 +10,9 @@ export type BillingDataStatus =
 export interface BillingDataState {
     // Datos del formulario
     data: BillingData;
+    
+    // Datos originales para restablecer
+    originalData: BillingData | null;
 
     // Estado de la operación
     status: BillingDataStatus;
@@ -35,6 +38,7 @@ export const initialBillingDataState: BillingDataState = {
         endDate: null,
         automaticBilling: null
     },
+    originalData: null,
     status: 'idle',
     loading: false,
     saving: false,

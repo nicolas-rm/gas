@@ -286,8 +286,8 @@
                                     <button 
                                         type="button" 
                                         class="btn btn-light-secondary"
-                                        (click)="resetForm()"
-                                        [disabled]="isBusy() || !hasUnsavedChanges()">
+                                        (click)="resetToOriginal()"
+                                        [disabled]="!canReset()">
                                         Restablecer
                                     </button>
                                     @if (error()) {

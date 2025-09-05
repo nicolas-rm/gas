@@ -23,6 +23,7 @@ export const CommissionDataPageActions = createActionGroup({
 
         // Reset y limpieza
         'Reset Form': emptyProps(),
+        'Reset To Original': emptyProps(),
         'Clear Errors': emptyProps(),
         'Mark As Pristine': emptyProps(),
         'Mark As Dirty': emptyProps(),

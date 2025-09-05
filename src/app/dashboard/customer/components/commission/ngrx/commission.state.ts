@@ -9,6 +9,7 @@ export type CommissionDataStatus =
 
 export interface CommissionDataState {
     data: CommissionData;
+    originalData: CommissionData | null;
     status: CommissionDataStatus;
     loading: boolean;
     saving: boolean;
@@ -26,6 +27,7 @@ export const initialCommissionDataState: CommissionDataState = {
         earlyPaymentPercentage: null,
         incomeAccountingAccount: null
     },
+    originalData: null,
     status: 'idle',
     loading: false,
     saving: false,

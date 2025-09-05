@@ -9,6 +9,9 @@ export interface CreditRequestDataState extends EntityState<CreditRequestData> {
     // Datos del formulario
     data: CreditRequestData | null;
     
+    // Datos originales para restablecer
+    originalData: CreditRequestData | null;
+    
     // Estados operacionales
     status: CreditRequestDataStatus;
     
@@ -35,6 +38,7 @@ export const creditRequestDataAdapter: EntityAdapter<CreditRequestData> = create
 // Estado inicial
 export const initialCreditRequestDataState: CreditRequestDataState = creditRequestDataAdapter.getInitialState({
     data: null,
+    originalData: null,
     status: 'idle',
     loading: false,
     saving: false,

@@ -11,6 +11,11 @@ export const selectBillingData = createSelector(
     (state: BillingDataState) => state.data
 );
 
+export const selectBillingDataOriginal = createSelector(
+    selectBillingDataState,
+    (state: BillingDataState) => state.originalData
+);
+
 export const selectBillingDataField = (field: keyof BillingData) => createSelector(
     selectBillingData,
     (data: BillingData) => data[field]
@@ -65,6 +70,13 @@ export const selectBillingDataCanSave = createSelector(
     selectBillingDataSaving,
     (hasUnsavedChanges: boolean, saving: boolean) =>
         hasUnsavedChanges && !saving
+);
+
+export const selectBillingDataCanReset = createSelector(
+    selectBillingDataHasUnsavedChanges,
+    selectBillingDataIsBusy,
+    (hasUnsavedChanges: boolean, isBusy: boolean) =>
+        hasUnsavedChanges && !isBusy
 );
 
 // === COMBINED SELECTORS ===

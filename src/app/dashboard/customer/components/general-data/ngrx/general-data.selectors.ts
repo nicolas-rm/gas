@@ -11,6 +11,11 @@ export const selectGeneralData = createSelector(
     (state: GeneralDataState) => state.data
 );
 
+export const selectGeneralDataOriginal = createSelector(
+    selectGeneralDataState,
+    (state: GeneralDataState) => state.originalData
+);
+
 export const selectGeneralDataField = (field: keyof GeneralData) => createSelector(
     selectGeneralData,
     (data: GeneralData | null) => data ? data[field] : null
@@ -65,6 +70,13 @@ export const selectGeneralDataCanSave = createSelector(
     selectGeneralDataSaving,
     (hasUnsavedChanges: boolean, saving: boolean) =>
         hasUnsavedChanges && !saving
+);
+
+export const selectGeneralDataCanReset = createSelector(
+    selectGeneralDataHasUnsavedChanges,
+    selectGeneralDataIsBusy,
+    (hasUnsavedChanges: boolean, isBusy: boolean) =>
+        hasUnsavedChanges && !isBusy
 );
 
 // === COMBINED SELECTORS ===

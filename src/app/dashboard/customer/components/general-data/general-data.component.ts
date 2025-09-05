@@ -21,11 +21,13 @@ import { GeneralDataPageActions } from '@/dashboard/customer/components/general-
 import {
     selectGeneralDataFormState,
     selectGeneralData,
+    selectGeneralDataOriginal,
     selectGeneralDataIsBusy,
     selectGeneralDataLoading,
     selectGeneralDataSaving,
     selectGeneralDataError,
-    selectGeneralDataHasUnsavedChanges
+    selectGeneralDataHasUnsavedChanges,
+    selectGeneralDataCanReset
 } from '@/dashboard/customer/components/general-data/ngrx/general-data.selectors';
 import { GeneralData } from '@/dashboard/customer/components/general-data/ngrx/general-data.models';
 
@@ -66,7 +68,9 @@ export class GeneralDataComponent {
     isBusy = this.store.selectSignal(selectGeneralDataIsBusy);
     error = this.store.selectSignal(selectGeneralDataError);
     hasUnsavedChanges = this.store.selectSignal(selectGeneralDataHasUnsavedChanges);
+    canReset = this.store.selectSignal(selectGeneralDataCanReset);
     data = this.store.selectSignal(selectGeneralData);
+    originalData = this.store.selectSignal(selectGeneralDataOriginal);
     formState = this.store.selectSignal(selectGeneralDataFormState);
 
     // FormGroup tipado a partir de tu modelo GeneralData
@@ -140,7 +144,15 @@ export class GeneralDataComponent {
     // Acciones varias
     resetForm(): void {
         this.store.dispatch(GeneralDataPageActions.resetForm());
-        this.generalDataForm.reset();
+        this.generalDataForm.reset({}, { emitEvent: false }); // Evita que se dispare valueChanges
+        this.generalDataForm.markAsPristine(); // Marca el form como pristine
+    }
+
+    // Restablecer a datos originales (crear: vacío, actualizar: datos cargados)
+    resetToOriginal(): void {
+        this.store.dispatch(GeneralDataPageActions.resetToOriginal());
+        // El efecto se encargará de actualizar el formulario con los datos originales
+        this.generalDataForm.markAsPristine();
     }
 
     // Marcar como pristine (sin cambios)

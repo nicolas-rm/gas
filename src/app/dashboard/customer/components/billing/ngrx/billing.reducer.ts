@@ -26,6 +26,7 @@ export const billingDataReducer = createReducer(
     on(BillingDataApiActions.loadDataSuccess, (state, { data }) => ({
         ...state,
         data,
+        originalData: data, // Guardar datos originales al cargar
         status: 'idle' as const,
         loading: false,
         error: null,
@@ -65,6 +66,8 @@ export const billingDataReducer = createReducer(
     on(BillingDataPageActions.setData, (state, { data }) => ({
         ...state,
         data,
+        // Si no hay datos originales, establecer estos como originales (modo crear)
+        originalData: state.originalData || data,
         hasUnsavedChanges: false,
         isDirty: false,
     })),
@@ -80,6 +83,7 @@ export const billingDataReducer = createReducer(
     on(BillingDataApiActions.saveDataSuccess, (state, { data }) => ({
         ...state,
         data,
+        originalData: data, // Actualizar datos originales después de guardar exitosamente
         status: 'saved' as const,
         saving: false,
         error: null,
@@ -96,7 +100,28 @@ export const billingDataReducer = createReducer(
     })),
 
     // === RESET Y LIMPIEZA ===
+    // Resetear formulario completamente (volver al estado inicial)
     on(BillingDataPageActions.resetForm, () => initialBillingDataState),
+
+    // Restablecer a datos originales (crear: campos vacíos, actualizar: datos cargados)
+    on(BillingDataPageActions.resetToOriginal, (state) => {
+        const dataToRestore = state.originalData || {
+            invoiceRepresentation: null,
+            billingDays: null,
+            billingEmails: null,
+            billingFrequency: null,
+            startDate: null,
+            endDate: null,
+            automaticBilling: null
+        };
+        
+        return {
+            ...state,
+            data: dataToRestore,
+            hasUnsavedChanges: false,
+            isDirty: false
+        };
+    }),
 
     on(BillingDataPageActions.clearErrors, (state) => ({
         ...state,

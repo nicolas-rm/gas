@@ -10,6 +10,9 @@ export type ContractDataStatus =
 export interface ContractDataState {
     // Datos del formulario
     data: ContractData;
+    
+    // Datos originales para restablecer
+    originalData: ContractData | null;
 
     // Estado de la operación
     status: ContractDataStatus;
@@ -39,6 +42,7 @@ export const initialContractDataState: ContractDataState = {
         rfcOrderingAccount: null,
         bank: null
     },
+    originalData: null,
     status: 'idle',
     loading: false,
     saving: false,

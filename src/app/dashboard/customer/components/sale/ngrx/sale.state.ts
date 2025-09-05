@@ -10,6 +10,9 @@ export type SaleDataStatus =
 export interface SaleDataState {
     // Datos del formulario
     data: SaleData;
+    
+    // Datos originales para restablecer
+    originalData: SaleData | null;
 
     // Estado de la operación
     status: SaleDataStatus;
@@ -37,6 +40,7 @@ export const initialSaleDataState: SaleDataState = {
         paymentMethod: null,
         voucherAmount: null
     },
+    originalData: null,
     status: 'idle',
     loading: false,
     saving: false,

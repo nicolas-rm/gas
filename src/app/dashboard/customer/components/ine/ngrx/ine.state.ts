@@ -9,6 +9,9 @@ export interface IneDataState extends EntityState<IneData> {
     // Datos del formulario
     data: IneData | null;
     
+    // Datos originales para restablecer
+    originalData: IneData | null;
+    
     // Estados operacionales
     status: IneDataStatus;
     
@@ -35,6 +38,7 @@ export const ineDataAdapter: EntityAdapter<IneData> = createEntityAdapter<IneDat
 // Estado inicial
 export const initialIneDataState: IneDataState = ineDataAdapter.getInitialState({
     data: null,
+    originalData: null,
     status: 'idle',
     loading: false,
     saving: false,

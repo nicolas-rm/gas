@@ -29,6 +29,7 @@ export const generalDataReducer = createReducer<GeneralDataState>(
         return {
             ...withEntity,
             data,
+            originalData: data, // Guardar los datos originales al cargar
             status: 'idle' as const,
             loading: false,
             saving: false,
@@ -131,6 +132,8 @@ export const generalDataReducer = createReducer<GeneralDataState>(
         return {
             ...withEntity,
             data,
+            // Si no hay datos originales, establecer estos como originales (modo crear)
+            originalData: state.originalData || data,
             status: state.status,
             loading: state.loading,
             saving: state.saving,
@@ -155,6 +158,7 @@ export const generalDataReducer = createReducer<GeneralDataState>(
         return {
             ...withEntity,
             data,
+            originalData: data, // Actualizar datos originales después de guardar exitosamente
             status: 'saved' as const,
             loading: false,
             saving: false,
@@ -173,7 +177,46 @@ export const generalDataReducer = createReducer<GeneralDataState>(
     })),
 
     // === RESET Y LIMPIEZA ===
+    // Resetear formulario completamente (volver al estado inicial)
     on(GeneralDataPageActions.resetForm, () => generalDataAdapter.getInitialState(initialGeneralDataState)),
+
+    // Restablecer a datos originales (crear: campos vacíos, actualizar: datos cargados)
+    on(GeneralDataPageActions.resetToOriginal, (state: GeneralDataState) => {
+        const dataToRestore = state.originalData || {
+            personType: null,
+            groupType: null,
+            rfc: null,
+            businessName: null,
+            tradeName: null,
+            street: null,
+            exteriorNumber: null,
+            interiorNumber: null,
+            crossing: null,
+            country: null,
+            state: null,
+            colony: null,
+            municipality: null,
+            postalCode: null,
+            phone: null,
+            city: null,
+            fax: null
+        };
+        
+        const withEntity = generalDataAdapter.setOne(dataToRestore, state);
+        
+        return {
+            ...withEntity,
+            data: dataToRestore,
+            originalData: state.originalData,
+            status: state.status,
+            loading: state.loading,
+            saving: state.saving,
+            error: state.error,
+            hasUnsavedChanges: false,
+            isDirty: false,
+            lastSaved: state.lastSaved
+        };
+    }),
 
     on(GeneralDataPageActions.clearErrors, (state: GeneralDataState) => ({
         ...state,
