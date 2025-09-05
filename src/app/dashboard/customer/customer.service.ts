@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { ICustomer, ICustomerResponse, SaveFormRequest } from '@/dashboard/customer/ngrx/customer.models';
+import { ICustomer, ICustomerResponse, SaveFormRequest } from './customer.models';
 import { environment } from '@/env/environment.development';
 
 @Injectable({

@@ -50,48 +50,9 @@ export const loadBillingDataEffect = createEffect(
 
 /**
  * Effect: Save Billing Data
+ * Maneja el guardado de datos de facturación con datos proporcionados o del store
  */
 export const saveBillingDataEffect = createEffect(
-    (actions$ = inject(Actions), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
-        actions$.pipe(
-            ofType(BillingDataPageActions.saveData),
-            exhaustMap(({ customerId, data }) => {
-                const toastRef = toast.loading('Guardando datos de facturación...');
-                return customerService.saveSection({
-                    section: 'billingData',
-                    customerId,
-                    data
-                }).pipe(
-                    map(response => {
-                        toastRef.close();
-                        toast.success('Datos de facturación guardados exitosamente');
-                        // Crear response compatible con BillingDataResponse
-                        const billingResponse = {
-                            success: response.success,
-                            data: response.data.billingData,
-                            message: response.message
-                        };
-                        return BillingDataApiActions.saveDataSuccess({ 
-                            data: response.data.billingData,
-                            response: billingResponse
-                        });
-                    }),
-                    catchError(error => {
-                        toastRef.close();
-                        toast.error(error); // El error ya viene procesado del service
-                        return of(BillingDataApiActions.saveDataFailure({ error }));
-                    })
-                );
-            })
-        ),
-    { functional: true }
-);
-
-/**
- * Effect: Save Billing Data from Store
- * Obtiene los datos del store cuando no se proporcionan en la acción
- */
-export const saveBillingDataFromStoreEffect = createEffect(
     (actions$ = inject(Actions), store = inject(Store), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
         actions$.pipe(
             ofType(BillingDataPageActions.saveData),
@@ -102,35 +63,40 @@ export const saveBillingDataFromStoreEffect = createEffect(
                 if (!dataToSave) {
                     const errorMessage = 'No hay datos de facturación para guardar';
                     toast.error(errorMessage);
-                    return of(BillingDataApiActions.saveDataFailure({ 
+                    return of(BillingDataApiActions.saveDataFailure({
                         error: { message: errorMessage }
                     }));
                 }
 
-                const toastRef = toast.loading('Guardando datos de facturación...');
-                
-                return customerService.saveSection({
-                    section: 'billingData',
-                    customerId: action.customerId,
-                    data: dataToSave
-                }).pipe(
-                    map(response => {
-                        toastRef.close();
-                        toast.success('Datos de facturación guardados exitosamente');
-                        const billingResponse = {
-                            success: response.success,
-                            data: response.data.billingData,
-                            message: response.message
-                        };
-                        return BillingDataApiActions.saveDataSuccess({ 
-                            data: response.data.billingData,
-                            response: billingResponse
-                        });
-                    }),
-                    catchError(error => {
-                        toastRef.close();
-                        toast.error(error); // El error ya viene procesado del service
-                        return of(BillingDataApiActions.saveDataFailure({ error }));
+                // Agregar pequeño delay para evitar conflictos de toast
+                return timer(100).pipe(
+                    exhaustMap(() => {
+                        const toastRef = toast.loading('Guardando datos de facturación...');
+
+                        return customerService.saveSection({
+                            section: 'billingData',
+                            customerId: action.customerId,
+                            data: dataToSave
+                        }).pipe(
+                            map(response => {
+                                toastRef.close();
+                                toast.success('Datos de facturación guardados exitosamente');
+                                const billingResponse = {
+                                    success: response.success,
+                                    data: response.data.billingData,
+                                    message: response.message
+                                };
+                                return BillingDataApiActions.saveDataSuccess({
+                                    data: response.data.billingData,
+                                    response: billingResponse
+                                });
+                            }),
+                            catchError(error => {
+                                toastRef.close();
+                                toast.error(error); // El error ya viene procesado del service
+                                return of(BillingDataApiActions.saveDataFailure({ error }));
+                            })
+                        );
                     })
                 );
             })

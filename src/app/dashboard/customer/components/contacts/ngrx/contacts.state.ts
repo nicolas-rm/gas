@@ -1,13 +1,12 @@
-import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
 import { ContactsData } from './contacts.models';
 
 // Estados operacionales específicos siguiendo el estándar de general-data
 export type ContactsDataStatus = 'idle' | 'loading' | 'saving' | 'saved' | 'error';
 
 // Estado principal del formulario Contacts siguiendo el estándar
-export interface ContactsDataState extends EntityState<ContactsData> {
+export interface ContactsDataState {
     // Datos del formulario
-    data: ContactsData;
+    data: ContactsData | null;
     
     // Estados operacionales
     status: ContactsDataStatus;
@@ -24,19 +23,12 @@ export interface ContactsDataState extends EntityState<ContactsData> {
     isDirty: boolean;
     
     // Metadatos
-    lastSaved: string | null;
+    lastSaved: number | null;
 }
 
-// Entity Adapter
-export const contactsDataAdapter: EntityAdapter<ContactsData> = createEntityAdapter<ContactsData>({
-    selectId: () => 'contacts' // Solo hay un registro de contactos por customer
-});
-
 // Estado inicial
-export const initialContactsDataState: ContactsDataState = contactsDataAdapter.getInitialState({
-    data: {
-        contacts: []
-    },
+export const initialContactsDataState: ContactsDataState = {
+    data: null,
     status: 'idle',
     loading: false,
     saving: false,
@@ -44,4 +36,4 @@ export const initialContactsDataState: ContactsDataState = contactsDataAdapter.g
     hasUnsavedChanges: false,
     isDirty: false,
     lastSaved: null
-});
+};

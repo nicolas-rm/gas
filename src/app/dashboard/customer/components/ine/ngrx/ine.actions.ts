@@ -1,28 +1,44 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { IneData, IneDataResponse, IneDataError, SaveIneDataRequest } from './ine.models';
+import {
+    IneData,
+    SaveIneDataRequest,
+    IneDataError,
+    IneDataResponse
+} from './ine.models';
 
-// Acciones de la página/UI
+// Acciones de UI
 export const IneDataPageActions = createActionGroup({
     source: 'Ine Data Page',
     events: {
-        'Load Data': emptyProps(),
-        'Update Field': props<{ field: string; value: any }>(),
+        // Cargar datos
+        'Load Data': props<{ customerId: string }>(),
+
+        // Actualizar campos
+        'Update Field': props<{ field: keyof IneData; value: string | null }>(),
+        'Update Multiple Fields': props<{ updates: Partial<IneData> }>(),
         'Set Data': props<{ data: IneData }>(),
-        'Save Data': emptyProps(),
+
+        // Guardar
+        'Save Data': props<SaveIneDataRequest>(),
+
+        // Reset y limpieza
         'Reset Form': emptyProps(),
         'Clear Errors': emptyProps(),
         'Mark As Pristine': emptyProps(),
-        'Mark As Dirty': emptyProps()
+        'Mark As Dirty': emptyProps(),
     }
 });
 
-// Acciones de la API
+// Acciones de API
 export const IneDataApiActions = createActionGroup({
     source: 'Ine Data API',
     events: {
+        // Load
         'Load Data Success': props<{ data: IneData }>(),
         'Load Data Failure': props<{ error: IneDataError }>(),
-        'Save Data Success': props<{ data: IneData }>(),
-        'Save Data Failure': props<{ error: IneDataError }>()
+
+        // Save
+        'Save Data Success': props<{ data: IneData; response: IneDataResponse }>(),
+        'Save Data Failure': props<{ error: IneDataError }>(),
     }
 });

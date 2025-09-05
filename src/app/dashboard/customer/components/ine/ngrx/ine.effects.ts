@@ -13,29 +13,18 @@ import { catchError, exhaustMap, map, withLatestFrom } from 'rxjs/operators';
 import { CustomerService } from '../../../customer.service';
 import { IneDataPageActions, IneDataApiActions } from './ine.actions';
 import { selectIneData } from './ine.selectors';
-import { selectSelectedCustomerId } from '../../../ngrx/customer.selectors';
 
 // Librerías externas
 import { HotToastService } from '@ngxpert/hot-toast';
 
 /**
  * Effect: Load INE Data
- * Nota: Requiere que el customerId esté disponible en el store
  */
 export const loadIneDataEffect = createEffect(
-    (actions$ = inject(Actions), store = inject(Store), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
+    (actions$ = inject(Actions), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
         actions$.pipe(
             ofType(IneDataPageActions.loadData),
-            withLatestFrom(store.select(selectSelectedCustomerId)),
-            exhaustMap(([action, customerId]) => {
-                if (!customerId) {
-                    const errorMessage = 'ID de cliente no disponible';
-                    toast.error(errorMessage);
-                    return of(IneDataApiActions.loadDataFailure({ 
-                        error: { message: errorMessage }
-                    }));
-                }
-
+            exhaustMap(({ customerId }) => {
                 // Agregar pequeño delay para evitar conflictos de toast
                 return timer(100).pipe(
                     exhaustMap(() => {
@@ -61,51 +50,53 @@ export const loadIneDataEffect = createEffect(
 
 /**
  * Effect: Save INE Data
- * Obtiene los datos del store y el customerId para guardar
+ * Maneja el guardado de datos de INE con datos proporcionados o del store
  */
 export const saveIneDataEffect = createEffect(
     (actions$ = inject(Actions), store = inject(Store), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
         actions$.pipe(
             ofType(IneDataPageActions.saveData),
-            withLatestFrom(
-                store.select(selectIneData),
-                store.select(selectSelectedCustomerId)
-            ),
-            exhaustMap(([action, currentData, customerId]) => {
-                if (!customerId) {
-                    const errorMessage = 'ID de cliente no disponible';
-                    toast.error(errorMessage);
-                    return of(IneDataApiActions.saveDataFailure({ 
-                        error: { message: errorMessage }
-                    }));
-                }
-
-                if (!currentData) {
+            withLatestFrom(store.select(selectIneData)),
+            exhaustMap(([action, currentData]) => {
+                // Si no se proporcionan datos en la acción, usar los del store
+                const dataToSave = action.data || currentData;
+                if (!dataToSave) {
                     const errorMessage = 'No hay datos de INE para guardar';
                     toast.error(errorMessage);
-                    return of(IneDataApiActions.saveDataFailure({ 
+                    return of(IneDataApiActions.saveDataFailure({
                         error: { message: errorMessage }
                     }));
                 }
 
-                const toastRef = toast.loading('Guardando datos de INE...');
-                
-                return customerService.saveSection({
-                    section: 'ineData',
-                    customerId,
-                    data: currentData
-                }).pipe(
-                    map(response => {
-                        toastRef.close();
-                        toast.success('Datos de INE guardados exitosamente');
-                        return IneDataApiActions.saveDataSuccess({ 
-                            data: response.data.ineData
-                        });
-                    }),
-                    catchError(error => {
-                        toastRef.close();
-                        toast.error(error); // El error ya viene procesado del service
-                        return of(IneDataApiActions.saveDataFailure({ error }));
+                // Agregar pequeño delay para evitar conflictos de toast
+                return timer(100).pipe(
+                    exhaustMap(() => {
+                        const toastRef = toast.loading('Guardando datos de INE...');
+
+                        return customerService.saveSection({
+                            section: 'ineData',
+                            customerId: action.customerId,
+                            data: dataToSave
+                        }).pipe(
+                            map(response => {
+                                toastRef.close();
+                                toast.success('Datos de INE guardados exitosamente');
+                                const ineResponse = {
+                                    success: response.success,
+                                    data: response.data.ineData,
+                                    message: response.message
+                                };
+                                return IneDataApiActions.saveDataSuccess({
+                                    data: response.data.ineData,
+                                    response: ineResponse
+                                });
+                            }),
+                            catchError(error => {
+                                toastRef.close();
+                                toast.error(error); // El error ya viene procesado del service
+                                return of(IneDataApiActions.saveDataFailure({ error }));
+                            })
+                        );
                     })
                 );
             })

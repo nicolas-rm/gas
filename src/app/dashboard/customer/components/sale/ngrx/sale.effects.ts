@@ -50,48 +50,9 @@ export const loadSaleDataEffect = createEffect(
 
 /**
  * Effect: Save Sale Data
+ * Maneja el guardado de datos de venta con datos proporcionados o del store
  */
 export const saveSaleDataEffect = createEffect(
-    (actions$ = inject(Actions), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
-        actions$.pipe(
-            ofType(SaleDataPageActions.saveData),
-            exhaustMap(({ customerId, data }) => {
-                const toastRef = toast.loading('Guardando datos de venta...');
-                return customerService.saveSection({
-                    section: 'saleData',
-                    customerId,
-                    data
-                }).pipe(
-                    map(response => {
-                        toastRef.close();
-                        toast.success('Datos de venta guardados exitosamente');
-                        // Crear response compatible con SaleDataResponse
-                        const saleResponse = {
-                            success: response.success,
-                            data: response.data.saleData,
-                            message: response.message
-                        };
-                        return SaleDataApiActions.saveDataSuccess({ 
-                            data: response.data.saleData,
-                            response: saleResponse
-                        });
-                    }),
-                    catchError(error => {
-                        toastRef.close();
-                        toast.error(error); // El error ya viene procesado del service
-                        return of(SaleDataApiActions.saveDataFailure({ error }));
-                    })
-                );
-            })
-        ),
-    { functional: true }
-);
-
-/**
- * Effect: Save Sale Data from Store
- * Obtiene los datos del store cuando no se proporcionan en la acción
- */
-export const saveSaleDataFromStoreEffect = createEffect(
     (actions$ = inject(Actions), store = inject(Store), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
         actions$.pipe(
             ofType(SaleDataPageActions.saveData),
@@ -102,35 +63,40 @@ export const saveSaleDataFromStoreEffect = createEffect(
                 if (!dataToSave) {
                     const errorMessage = 'No hay datos de venta para guardar';
                     toast.error(errorMessage);
-                    return of(SaleDataApiActions.saveDataFailure({ 
+                    return of(SaleDataApiActions.saveDataFailure({
                         error: { message: errorMessage }
                     }));
                 }
 
-                const toastRef = toast.loading('Guardando datos de venta...');
-                
-                return customerService.saveSection({
-                    section: 'saleData',
-                    customerId: action.customerId,
-                    data: dataToSave
-                }).pipe(
-                    map(response => {
-                        toastRef.close();
-                        toast.success('Datos de venta guardados exitosamente');
-                        const saleResponse = {
-                            success: response.success,
-                            data: response.data.saleData,
-                            message: response.message
-                        };
-                        return SaleDataApiActions.saveDataSuccess({ 
-                            data: response.data.saleData,
-                            response: saleResponse
-                        });
-                    }),
-                    catchError(error => {
-                        toastRef.close();
-                        toast.error(error); // El error ya viene procesado del service
-                        return of(SaleDataApiActions.saveDataFailure({ error }));
+                // Agregar pequeño delay para evitar conflictos de toast
+                return timer(100).pipe(
+                    exhaustMap(() => {
+                        const toastRef = toast.loading('Guardando datos de venta...');
+
+                        return customerService.saveSection({
+                            section: 'saleData',
+                            customerId: action.customerId,
+                            data: dataToSave
+                        }).pipe(
+                            map(response => {
+                                toastRef.close();
+                                toast.success('Datos de venta guardados exitosamente');
+                                const saleResponse = {
+                                    success: response.success,
+                                    data: response.data.saleData,
+                                    message: response.message
+                                };
+                                return SaleDataApiActions.saveDataSuccess({
+                                    data: response.data.saleData,
+                                    response: saleResponse
+                                });
+                            }),
+                            catchError(error => {
+                                toastRef.close();
+                                toast.error(error); // El error ya viene procesado del service
+                                return of(SaleDataApiActions.saveDataFailure({ error }));
+                            })
+                        );
                     })
                 );
             })

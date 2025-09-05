@@ -13,29 +13,18 @@ import { catchError, exhaustMap, map, withLatestFrom } from 'rxjs/operators';
 import { CustomerService } from '../../../customer.service';
 import { CreditRequestDataPageActions, CreditRequestDataApiActions } from './credit-request.actions';
 import { selectCreditRequestData } from './credit-request.selectors';
-import { selectSelectedCustomerId } from '../../../ngrx/customer.selectors';
 
 // Librerías externas
 import { HotToastService } from '@ngxpert/hot-toast';
 
 /**
  * Effect: Load Credit Request Data
- * Nota: Requiere que el customerId esté disponible en el store
  */
 export const loadCreditRequestDataEffect = createEffect(
-    (actions$ = inject(Actions), store = inject(Store), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
+    (actions$ = inject(Actions), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
         actions$.pipe(
             ofType(CreditRequestDataPageActions.loadData),
-            withLatestFrom(store.select(selectSelectedCustomerId)),
-            exhaustMap(([action, customerId]) => {
-                if (!customerId) {
-                    const errorMessage = 'ID de cliente no disponible';
-                    toast.error(errorMessage);
-                    return of(CreditRequestDataApiActions.loadDataFailure({ 
-                        error: { message: errorMessage }
-                    }));
-                }
-
+            exhaustMap(({ customerId }) => {
                 // Agregar pequeño delay para evitar conflictos de toast
                 return timer(100).pipe(
                     exhaustMap(() => {
@@ -61,51 +50,53 @@ export const loadCreditRequestDataEffect = createEffect(
 
 /**
  * Effect: Save Credit Request Data
- * Obtiene los datos del store y el customerId para guardar
+ * Maneja el guardado de datos de solicitud de crédito con datos proporcionados o del store
  */
 export const saveCreditRequestDataEffect = createEffect(
     (actions$ = inject(Actions), store = inject(Store), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
         actions$.pipe(
             ofType(CreditRequestDataPageActions.saveData),
-            withLatestFrom(
-                store.select(selectCreditRequestData),
-                store.select(selectSelectedCustomerId)
-            ),
-            exhaustMap(([action, currentData, customerId]) => {
-                if (!customerId) {
-                    const errorMessage = 'ID de cliente no disponible';
-                    toast.error(errorMessage);
-                    return of(CreditRequestDataApiActions.saveDataFailure({ 
-                        error: { message: errorMessage }
-                    }));
-                }
-
-                if (!currentData) {
+            withLatestFrom(store.select(selectCreditRequestData)),
+            exhaustMap(([action, currentData]) => {
+                // Si no se proporcionan datos en la acción, usar los del store
+                const dataToSave = action.data || currentData;
+                if (!dataToSave) {
                     const errorMessage = 'No hay datos de solicitud de crédito para guardar';
                     toast.error(errorMessage);
-                    return of(CreditRequestDataApiActions.saveDataFailure({ 
+                    return of(CreditRequestDataApiActions.saveDataFailure({
                         error: { message: errorMessage }
                     }));
                 }
 
-                const toastRef = toast.loading('Guardando datos de solicitud de crédito...');
-                
-                return customerService.saveSection({
-                    section: 'creditRequestData',
-                    customerId,
-                    data: currentData
-                }).pipe(
-                    map(response => {
-                        toastRef.close();
-                        toast.success('Datos de solicitud de crédito guardados exitosamente');
-                        return CreditRequestDataApiActions.saveDataSuccess({ 
-                            data: response.data.creditRequestData
-                        });
-                    }),
-                    catchError(error => {
-                        toastRef.close();
-                        toast.error(error); // El error ya viene procesado del service
-                        return of(CreditRequestDataApiActions.saveDataFailure({ error }));
+                // Agregar pequeño delay para evitar conflictos de toast
+                return timer(100).pipe(
+                    exhaustMap(() => {
+                        const toastRef = toast.loading('Guardando datos de solicitud de crédito...');
+
+                        return customerService.saveSection({
+                            section: 'creditRequestData',
+                            customerId: action.customerId,
+                            data: dataToSave
+                        }).pipe(
+                            map(response => {
+                                toastRef.close();
+                                toast.success('Datos de solicitud de crédito guardados exitosamente');
+                                const creditRequestResponse = {
+                                    success: response.success,
+                                    data: response.data.creditRequestData,
+                                    message: response.message
+                                };
+                                return CreditRequestDataApiActions.saveDataSuccess({
+                                    data: response.data.creditRequestData,
+                                    response: creditRequestResponse
+                                });
+                            }),
+                            catchError(error => {
+                                toastRef.close();
+                                toast.error(error); // El error ya viene procesado del service
+                                return of(CreditRequestDataApiActions.saveDataFailure({ error }));
+                            })
+                        );
                     })
                 );
             })

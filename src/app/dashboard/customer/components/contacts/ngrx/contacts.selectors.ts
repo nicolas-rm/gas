@@ -13,7 +13,7 @@ export const selectContactsData = createSelector(
 
 export const selectContactsDataField = (field: keyof ContactsData) => createSelector(
     selectContactsData,
-    (data: ContactsData) => data[field]
+    (data: ContactsData | null) => data ? data[field] : null
 );
 
 // === STATUS SELECTORS ===
@@ -100,14 +100,14 @@ export const selectContactsDataFormState = createSelector(
 // === SPECIFIC FIELD SELECTORS ===
 export const selectContacts = createSelector(
     selectContactsData,
-    (data: ContactsData) => data.contacts
+    (data: ContactsData | null) => data ? data.contacts : []
 );
 
 // === GROUPED SELECTORS ===
 export const selectContactsDataSummary = createSelector(
     selectContactsData,
-    (data: ContactsData) => ({
-        totalContacts: data.contacts.length,
-        hasContacts: data.contacts.length > 0
+    (data: ContactsData | null) => ({
+        totalContacts: data ? data.contacts.length : 0,
+        hasContacts: data ? data.contacts.length > 0 : false
     })
 );

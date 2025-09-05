@@ -50,48 +50,9 @@ export const loadContractDataEffect = createEffect(
 
 /**
  * Effect: Save Contract Data
+ * Maneja el guardado de datos del contrato con datos proporcionados o del store
  */
 export const saveContractDataEffect = createEffect(
-    (actions$ = inject(Actions), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
-        actions$.pipe(
-            ofType(ContractDataPageActions.saveData),
-            exhaustMap(({ customerId, data }) => {
-                const toastRef = toast.loading('Guardando datos del contrato...');
-                return customerService.saveSection({
-                    section: 'contractData',
-                    customerId,
-                    data
-                }).pipe(
-                    map(response => {
-                        toastRef.close();
-                        toast.success('Datos del contrato guardados exitosamente');
-                        // Crear response compatible con ContractDataResponse
-                        const contractResponse = {
-                            success: response.success,
-                            data: response.data.contractData,
-                            message: response.message
-                        };
-                        return ContractDataApiActions.saveDataSuccess({ 
-                            data: response.data.contractData,
-                            response: contractResponse
-                        });
-                    }),
-                    catchError(error => {
-                        toastRef.close();
-                        toast.error(error); // El error ya viene procesado del service
-                        return of(ContractDataApiActions.saveDataFailure({ error }));
-                    })
-                );
-            })
-        ),
-    { functional: true }
-);
-
-/**
- * Effect: Save Contract Data from Store
- * Obtiene los datos del store cuando no se proporcionan en la acción
- */
-export const saveContractDataFromStoreEffect = createEffect(
     (actions$ = inject(Actions), store = inject(Store), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
         actions$.pipe(
             ofType(ContractDataPageActions.saveData),
@@ -102,35 +63,40 @@ export const saveContractDataFromStoreEffect = createEffect(
                 if (!dataToSave) {
                     const errorMessage = 'No hay datos de contrato para guardar';
                     toast.error(errorMessage);
-                    return of(ContractDataApiActions.saveDataFailure({ 
+                    return of(ContractDataApiActions.saveDataFailure({
                         error: { message: errorMessage }
                     }));
                 }
 
-                const toastRef = toast.loading('Guardando datos del contrato...');
-                
-                return customerService.saveSection({
-                    section: 'contractData',
-                    customerId: action.customerId,
-                    data: dataToSave
-                }).pipe(
-                    map(response => {
-                        toastRef.close();
-                        toast.success('Datos del contrato guardados exitosamente');
-                        const contractResponse = {
-                            success: response.success,
-                            data: response.data.contractData,
-                            message: response.message
-                        };
-                        return ContractDataApiActions.saveDataSuccess({ 
-                            data: response.data.contractData,
-                            response: contractResponse
-                        });
-                    }),
-                    catchError(error => {
-                        toastRef.close();
-                        toast.error(error); // El error ya viene procesado del service
-                        return of(ContractDataApiActions.saveDataFailure({ error }));
+                // Agregar pequeño delay para evitar conflictos de toast
+                return timer(100).pipe(
+                    exhaustMap(() => {
+                        const toastRef = toast.loading('Guardando datos del contrato...');
+
+                        return customerService.saveSection({
+                            section: 'contractData',
+                            customerId: action.customerId,
+                            data: dataToSave
+                        }).pipe(
+                            map(response => {
+                                toastRef.close();
+                                toast.success('Datos del contrato guardados exitosamente');
+                                const contractResponse = {
+                                    success: response.success,
+                                    data: response.data.contractData,
+                                    message: response.message
+                                };
+                                return ContractDataApiActions.saveDataSuccess({
+                                    data: response.data.contractData,
+                                    response: contractResponse
+                                });
+                            }),
+                            catchError(error => {
+                                toastRef.close();
+                                toast.error(error); // El error ya viene procesado del service
+                                return of(ContractDataApiActions.saveDataFailure({ error }));
+                            })
+                        );
                     })
                 );
             })
