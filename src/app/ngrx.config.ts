@@ -14,13 +14,18 @@ import { authenticationReducer } from '@/authentication/ngrx/authentication.redu
 import * as CustomerEffects from '@/dashboard/customer/ngrx/customer.effects';
 import { customerReducer } from '@/dashboard/customer/ngrx/customer.reducer';
 
+// General Data
+import * as GeneralDataEffects from '@/dashboard/customer/components/general-data/ngrx/general-data.effects';
+import { generalDataReducer } from '@/dashboard/customer/components/general-data/ngrx/general-data.reducer';
+
 export const ngrxProviders = [
     // Effects
-    provideEffects(authenticationEffects, CustomerEffects),
+    provideEffects(authenticationEffects, CustomerEffects, GeneralDataEffects),
     
     // States
     provideState('authentication', authenticationReducer),
     provideState('customer', customerReducer),
+    provideState('generalData', generalDataReducer),
     
     // Router
     provideRouterStore(),

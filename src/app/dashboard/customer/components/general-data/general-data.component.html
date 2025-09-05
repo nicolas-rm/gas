@@ -1,4 +1,48 @@
 <div id="general-data-tab" role="tabpanel" aria-labelledby="general-data-tab">
+    <!-- Indicador de estado global -->
+    @if (isLoading()) {
+        <div class="flex items-center justify-center p-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span class="ml-3 text-gray-600">Cargando datos...</span>
+        </div>
+    }
+    
+    <!-- Mensaje de error global -->
+    @if (error()) {
+        <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">Error</h3>
+                    <p class="text-sm text-red-700 mt-1">{{ error() }}</p>
+                    <button type="button" (click)="clearErrors()" class="text-sm text-red-600 hover:text-red-500 underline mt-2">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+    
+    <!-- Indicador de cambios sin guardar -->
+    @if (hasUnsavedChanges()) {
+        <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-yellow-700">Tienes cambios sin guardar</p>
+                </div>
+            </div>
+        </div>
+    }
+
     <div class="card-body">
         <div class="grid grid-cols-12 gap-6 items-stretch">
             <!-- Col 1: Foto de perfil -->
@@ -12,8 +56,8 @@
                             <img src="../assets/images/profile/user-1.jpg"
                                 class="rounded-full h-[120px] mx-auto mt-6" />
                             <div class="flex gap-3 justify-center my-6">
-                                <button class="btn">Subir</button>
-                                <button class="btn btn-light-error">Restablecer</button>
+                                <button class="btn" [disabled]="isBusy()">Subir</button>
+                                <button class="btn btn-light-error" [disabled]="isBusy()">Restablecer</button>
                             </div>
                             <p class="card-subtitle">Permitido JPG, GIF o PNG. Tamaño máximo 800K</p>
                         </div>
@@ -25,51 +69,89 @@
             <div class="lg:col-span-8 col-span-12">
                 <div class="h-full flex flex-col">
                     <div class="card-body flex-1 flex flex-col">
-                        <h5 class="card-title">Información Principal</h5>
+                        <div class="flex items-center justify-between mb-2">
+                            <h5 class="card-title">Información Principal</h5>
+                            @if (isSaving()) {
+                                <div class="flex items-center text-blue-600">
+                                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                                    <span class="text-sm">Guardando...</span>
+                                </div>
+                            }
+                        </div>
                         <p class="card-subtitle pb-4">Datos principales del cliente</p>
 
                         <form [formGroup]="generalDataForm" class="mt-1">
                             <div class="grid grid-cols-12 gap-x-4 gap-y-3">
                                 <!-- Primera fila: Tipo de Grupo y Tipo de Persona -->
                                 <div class="lg:col-span-6 col-span-12">
-                                    <SelectField [id]="generalData.groupType.id" [label]="generalData.groupType.label"
+                                    <SelectField 
+                                        [id]="generalData.groupType.id" 
+                                        [label]="generalData.groupType.label"
                                         [formControlName]="generalData.groupType.formControlName"
                                         [control]="generalDataForm.get(generalData.groupType.formControlName)"
-                                        [options]="[]" [placeholder]="generalData.groupType.placeholder">
+                                        [options]="[]" 
+                                        [placeholder]="generalData.groupType.placeholder"
+                                        [disabled]="isBusy()">
                                     </SelectField>
+                                    @if (isFieldInvalid('groupType')) {
+                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('groupType') }}</p>
+                                    }
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
-                                    <SelectField [id]="generalData.personType.id" [label]="generalData.personType.label"
+                                    <SelectField 
+                                        [id]="generalData.personType.id" 
+                                        [label]="generalData.personType.label"
                                         [formControlName]="generalData.personType.formControlName"
                                         [control]="generalDataForm.get(generalData.personType.formControlName)"
                                         [options]="personTypeOptions"
-                                        [placeholder]="generalData.personType.placeholder">
+                                        [placeholder]="generalData.personType.placeholder"
+                                        [disabled]="isBusy()">
                                     </SelectField>
+                                    @if (isFieldInvalid('personType')) {
+                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('personType') }}</p>
+                                    }
                                 </div>
 
                                 <!-- Segunda fila: RFC -->
                                 <div class="col-span-12">
-                                    <TextField [id]="generalData.rfc.id" [label]="generalData.rfc.label"
+                                    <TextField 
+                                        [id]="generalData.rfc.id" 
+                                        [label]="generalData.rfc.label"
                                         [formControlName]="generalData.rfc.formControlName"
                                         [placeholder]="generalData.rfc.placeholder"
-                                        [control]="generalDataForm.get(generalData.rfc.formControlName)" />
+                                        [control]="generalDataForm.get(generalData.rfc.formControlName)"
+                                        [disabled]="isBusy()" />
+                                    @if (isFieldInvalid('rfc')) {
+                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('rfc') }}</p>
+                                    }
                                 </div>
 
                                 <!-- Tercera fila: Razón Social -->
                                 <div class="col-span-12">
-                                    <TextField [id]="generalData.businessName.id"
+                                    <TextField 
+                                        [id]="generalData.businessName.id"
                                         [label]="generalData.businessName.label"
                                         [formControlName]="generalData.businessName.formControlName"
                                         [placeholder]="generalData.businessName.placeholder"
-                                        [control]="generalDataForm.get(generalData.businessName.formControlName)" />
+                                        [control]="generalDataForm.get(generalData.businessName.formControlName)"
+                                        [disabled]="isBusy()" />
+                                    @if (isFieldInvalid('businessName')) {
+                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('businessName') }}</p>
+                                    }
                                 </div>
 
                                 <!-- Cuarta fila: Nombre Comercial -->
                                 <div class="col-span-12">
-                                    <TextField [id]="generalData.tradeName.id" [label]="generalData.tradeName.label"
+                                    <TextField 
+                                        [id]="generalData.tradeName.id" 
+                                        [label]="generalData.tradeName.label"
                                         [formControlName]="generalData.tradeName.formControlName"
                                         [placeholder]="generalData.tradeName.placeholder"
-                                        [control]="generalDataForm.get(generalData.tradeName.formControlName)" />
+                                        [control]="generalDataForm.get(generalData.tradeName.formControlName)"
+                                        [disabled]="isBusy()" />
+                                    @if (isFieldInvalid('tradeName')) {
+                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('tradeName') }}</p>
+                                    }
                                 </div>
                             </div>
                         </form>
@@ -88,69 +170,120 @@
                             <div class="grid grid-cols-12 gap-x-4 gap-y-4">
                                 <!-- Primera fila: Calle -->
                                 <div class="col-span-12">
-                                    <TextField [id]="generalData.street.id" [label]="generalData.street.label"
+                                    <TextField 
+                                        [id]="generalData.street.id" 
+                                        [label]="generalData.street.label"
                                         [formControlName]="generalData.street.formControlName"
                                         [placeholder]="generalData.street.placeholder"
-                                        [control]="generalDataForm.get(generalData.street.formControlName)" />
+                                        [control]="generalDataForm.get(generalData.street.formControlName)"
+                                        [disabled]="isBusy()" />
+                                    @if (isFieldInvalid('street')) {
+                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('street') }}</p>
+                                    }
                                 </div>
 
                                 <!-- Segunda fila: Números -->
                                 <div class="lg:col-span-6 col-span-12">
-                                    <TextField [id]="generalData.exteriorNumber.id"
+                                    <TextField 
+                                        [id]="generalData.exteriorNumber.id"
                                         [label]="generalData.exteriorNumber.label"
                                         [formControlName]="generalData.exteriorNumber.formControlName"
                                         [placeholder]="generalData.exteriorNumber.placeholder"
-                                        [control]="generalDataForm.get(generalData.exteriorNumber.formControlName)" />
+                                        [control]="generalDataForm.get(generalData.exteriorNumber.formControlName)"
+                                        [disabled]="isBusy()" />
+                                    @if (isFieldInvalid('exteriorNumber')) {
+                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('exteriorNumber') }}</p>
+                                    }
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
-                                    <TextField [id]="generalData.interiorNumber.id"
+                                    <TextField 
+                                        [id]="generalData.interiorNumber.id"
                                         [label]="generalData.interiorNumber.label"
                                         [formControlName]="generalData.interiorNumber.formControlName"
                                         [placeholder]="generalData.interiorNumber.placeholder"
-                                        [control]="generalDataForm.get(generalData.interiorNumber.formControlName)" />
+                                        [control]="generalDataForm.get(generalData.interiorNumber.formControlName)"
+                                        [disabled]="isBusy()" />
+                                    @if (isFieldInvalid('interiorNumber')) {
+                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('interiorNumber') }}</p>
+                                    }
                                 </div>
 
                                 <!-- Tercera fila: Colonia y Código Postal -->
                                 <div class="lg:col-span-8 col-span-12">
-                                    <TextField [id]="generalData.colony.id" [label]="generalData.colony.label"
+                                    <TextField 
+                                        [id]="generalData.colony.id" 
+                                        [label]="generalData.colony.label"
                                         [formControlName]="generalData.colony.formControlName"
                                         [placeholder]="generalData.colony.placeholder"
-                                        [control]="generalDataForm.get(generalData.colony.formControlName)" />
+                                        [control]="generalDataForm.get(generalData.colony.formControlName)"
+                                        [disabled]="isBusy()" />
+                                    @if (isFieldInvalid('colony')) {
+                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('colony') }}</p>
+                                    }
                                 </div>
                                 <div class="lg:col-span-4 col-span-12">
-                                    <TextField [id]="generalData.postalCode.id" [label]="generalData.postalCode.label"
+                                    <TextField 
+                                        [id]="generalData.postalCode.id" 
+                                        [label]="generalData.postalCode.label"
                                         [formControlName]="generalData.postalCode.formControlName"
                                         [placeholder]="generalData.postalCode.placeholder"
-                                        [control]="generalDataForm.get(generalData.postalCode.formControlName)" />
+                                        [control]="generalDataForm.get(generalData.postalCode.formControlName)"
+                                        [disabled]="isBusy()" />
+                                    @if (isFieldInvalid('postalCode')) {
+                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('postalCode') }}</p>
+                                    }
                                 </div>
 
                                 <!-- Cuarta fila: Ciudad y Municipio -->
                                 <div class="lg:col-span-6 col-span-12">
-                                    <TextField [id]="generalData.city.id" [label]="generalData.city.label"
+                                    <TextField 
+                                        [id]="generalData.city.id" 
+                                        [label]="generalData.city.label"
                                         [formControlName]="generalData.city.formControlName"
                                         [placeholder]="generalData.city.placeholder"
-                                        [control]="generalDataForm.get(generalData.city.formControlName)" />
+                                        [control]="generalDataForm.get(generalData.city.formControlName)"
+                                        [disabled]="isBusy()" />
+                                    @if (isFieldInvalid('city')) {
+                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('city') }}</p>
+                                    }
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
-                                    <TextField [id]="generalData.municipality.id"
+                                    <TextField 
+                                        [id]="generalData.municipality.id"
                                         [label]="generalData.municipality.label"
                                         [formControlName]="generalData.municipality.formControlName"
                                         [placeholder]="generalData.municipality.placeholder"
-                                        [control]="generalDataForm.get(generalData.municipality.formControlName)" />
+                                        [control]="generalDataForm.get(generalData.municipality.formControlName)"
+                                        [disabled]="isBusy()" />
+                                    @if (isFieldInvalid('municipality')) {
+                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('municipality') }}</p>
+                                    }
                                 </div>
 
                                 <!-- Quinta fila: Estado y País -->
                                 <div class="lg:col-span-6 col-span-12">
-                                    <TextField [id]="generalData.state.id" [label]="generalData.state.label"
+                                    <TextField 
+                                        [id]="generalData.state.id" 
+                                        [label]="generalData.state.label"
                                         [formControlName]="generalData.state.formControlName"
                                         [placeholder]="generalData.state.placeholder"
-                                        [control]="generalDataForm.get(generalData.state.formControlName)" />
+                                        [control]="generalDataForm.get(generalData.state.formControlName)"
+                                        [disabled]="isBusy()" />
+                                    @if (isFieldInvalid('state')) {
+                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('state') }}</p>
+                                    }
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
-                                    <TextField [id]="generalData.country.id" [label]="generalData.country.label"
+                                    <TextField 
+                                        [id]="generalData.country.id" 
+                                        [label]="generalData.country.label"
                                         [formControlName]="generalData.country.formControlName"
                                         [placeholder]="generalData.country.placeholder"
-                                        [control]="generalDataForm.get(generalData.country.formControlName)" />
+                                        [control]="generalDataForm.get(generalData.country.formControlName)"
+                                        [disabled]="isBusy()" />
+                                    @if (isFieldInvalid('country')) {
+                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('country') }}</p>
+                                    }
                                 </div>
                             </div>
                         </form>
@@ -169,23 +302,74 @@
                             <div class="grid grid-cols-12 gap-x-4 gap-y-4">
                                 <!-- Teléfono y Fax -->
                                 <div class="lg:col-span-6 col-span-12">
-                                    <TextField [id]="generalData.phone.id" [label]="generalData.phone.label"
+                                    <TextField 
+                                        [id]="generalData.phone.id" 
+                                        [label]="generalData.phone.label"
                                         [formControlName]="generalData.phone.formControlName"
                                         [placeholder]="generalData.phone.placeholder"
-                                        [control]="generalDataForm.get(generalData.phone.formControlName)" />
+                                        [control]="generalDataForm.get(generalData.phone.formControlName)"
+                                        [disabled]="isBusy()" />
+                                    @if (isFieldInvalid('phone')) {
+                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('phone') }}</p>
+                                    }
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
-                                    <TextField [id]="generalData.fax.id" [label]="generalData.fax.label"
+                                    <TextField 
+                                        [id]="generalData.fax.id" 
+                                        [label]="generalData.fax.label"
                                         [formControlName]="generalData.fax.formControlName"
                                         [placeholder]="generalData.fax.placeholder"
-                                        [control]="generalDataForm.get(generalData.fax.formControlName)" />
+                                        [control]="generalDataForm.get(generalData.fax.formControlName)"
+                                        [disabled]="isBusy()" />
+                                    @if (isFieldInvalid('fax')) {
+                                        <p class="text-red-500 text-sm mt-1">{{ getFieldError('fax') }}</p>
+                                    }
                                 </div>
                             </div>
 
-                            <!-- Botones de acción -->
-                            <div class="flex gap-3 justify-end mt-6">
-                                <button type="button" class="btn btn-light-error">Cancelar</button>
-                                <button type="submit" class="btn">Guardar Información</button>
+                            <!-- Botones de acción mejorados -->
+                            <div class="flex gap-3 justify-between mt-6">
+                                <!-- Botones de utilidad -->
+                                <div class="flex gap-2">
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-light-secondary"
+                                        (click)="resetForm()"
+                                        [disabled]="isBusy() || !hasUnsavedChanges()">
+                                        Restablecer
+                                    </button>
+                                    @if (error()) {
+                                        <button 
+                                            type="button" 
+                                            class="btn btn-light-warning"
+                                            (click)="clearErrors()">
+                                            Limpiar Errores
+                                        </button>
+                                    }
+                                </div>
+                                
+                                <!-- Botones principales -->
+                                <div class="flex gap-3">
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-light-error"
+                                        [disabled]="isBusy()">
+                                        Cancelar
+                                    </button>
+                                    <button 
+                                        type="submit" 
+                                        class="btn"
+                                        [disabled]="isBusy() || !generalDataForm.valid">
+                                        @if (isSaving()) {
+                                            <div class="flex items-center">
+                                                <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                                Guardando...
+                                            </div>
+                                        } @else {
+                                            Guardar Información
+                                        }
+                                    </button>
+                                </div>
                             </div>
                         </form>
                     </div>

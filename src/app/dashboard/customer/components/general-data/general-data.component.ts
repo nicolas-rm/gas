@@ -1,91 +1,181 @@
-// Angular Core
-import { Component, inject } from '@angular/core';
-
-// Angular Forms
+// Angular
+import { Component, ChangeDetectionStrategy, inject, effect, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-// Componentes personalizados
+// NgRx
+import { Store } from '@ngrx/store';
+
+// RxJS
+import { debounceTime } from 'rxjs/operators';
+
+// Componentes
 import { SelectFieldComponent, TextFieldComponent } from '@/app/components/components';
 
-// Formulario de datos generales
+// Config del formulario (labels, ids, etc.)
 import { generalDataForm } from '@/app/dashboard/customer/components/general-data/form';
 
-// Validadores personalizados
+// NgRx General Data
+import { GeneralDataPageActions } from '@/dashboard/customer/components/general-data/ngrx/general-data.actions';
+import {
+    selectGeneralDataFormState,
+    selectGeneralData,
+    selectGeneralDataIsBusy,
+    selectGeneralDataLoading,
+    selectGeneralDataSaving,
+    selectGeneralDataError,
+    selectGeneralDataHasUnsavedChanges
+} from '@/dashboard/customer/components/general-data/ngrx/general-data.selectors';
+import { GeneralData } from '@/dashboard/customer/components/general-data/ngrx/general-data.models';
+
+// Validadores
 import { ReactiveValidators } from '@/app/utils/validators/ReactiveValidators';
 
-// Servicio de notificaciones
+// Toasts
 import { HotToastService } from '@ngxpert/hot-toast';
 
-export type GeneralDataFormControl = {
-    personType: FormControl<string | null>;
-    groupType: FormControl<string | null>;
-    rfc: FormControl<string | null>;
-    businessName: FormControl<string | null>; // Razon social
-    tradeName: FormControl<string | null>; // Nombre comercial
-    street: FormControl<string | null>;
-    exteriorNumber: FormControl<string | null>;
-    interiorNumber: FormControl<string | null>;
-    crossing: FormControl<string | null>; // Cruzamiento
-    country: FormControl<string | null>;
-    state: FormControl<string | null>;
-    colony: FormControl<string | null>; // Colonia
-    municipality: FormControl<string | null>;
-    postalCode: FormControl<string | null>;
-    phone: FormControl<string | null>;
-    city: FormControl<string | null>;
-    fax: FormControl<string | null>;
-}
+type ControlsOf<T> = { [K in keyof T]: FormControl<T[K] | null> };
 
 @Component({
     selector: 'app-general-data',
-    imports: [ReactiveFormsModule, SelectFieldComponent, TextFieldComponent],
+    standalone: true,
+    imports: [CommonModule, ReactiveFormsModule, SelectFieldComponent, TextFieldComponent],
     templateUrl: './general-data.component.html',
-    styleUrl: './general-data.component.css'
+    styleUrl: './general-data.component.css',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GeneralDataComponent {
 
-    readonly generalData = generalDataForm
+    // UI metadata (labels, placeholders…)
+    readonly generalData = generalDataForm;
 
     readonly personTypeOptions = [
         { label: 'Persona Física', value: 'Persona Física' },
         { label: 'Persona Moral', value: 'Persona Moral' }
-    ]
+    ];
+
+    // Inyecciones
     private readonly fb = inject(FormBuilder);
     private readonly toast = inject(HotToastService);
+    private readonly store = inject(Store);
 
-    generalDataForm: FormGroup<GeneralDataFormControl>
+    // Signals desde NgRx (ya los tenías)
+    isLoading = this.store.selectSignal(selectGeneralDataLoading);
+    isSaving = this.store.selectSignal(selectGeneralDataSaving);
+    isBusy = this.store.selectSignal(selectGeneralDataIsBusy);
+    error = this.store.selectSignal(selectGeneralDataError);
+    hasUnsavedChanges = this.store.selectSignal(selectGeneralDataHasUnsavedChanges);
+    data = this.store.selectSignal(selectGeneralData);
+    formState = this.store.selectSignal(selectGeneralDataFormState);
+
+    // FormGroup tipado a partir de tu modelo GeneralData
+    generalDataForm: FormGroup<ControlsOf<GeneralData>> = this.fb.group<ControlsOf<GeneralData>>({
+        personType: this.fb.control<string | null>(null, ReactiveValidators.required),
+        groupType: this.fb.control<string | null>(null, ReactiveValidators.required),
+        rfc: this.fb.control<string | null>(null),
+        tradeName: this.fb.control<string | null>(null),
+        businessName: this.fb.control<string | null>(null),
+        street: this.fb.control<string | null>(null),
+        exteriorNumber: this.fb.control<string | null>(null),
+        interiorNumber: this.fb.control<string | null>(null),
+        crossing: this.fb.control<string | null>(null),
+        country: this.fb.control<string | null>(null),
+        state: this.fb.control<string | null>(null),
+        colony: this.fb.control<string | null>(null),
+        municipality: this.fb.control<string | null>(null),
+        postalCode: this.fb.control<string | null>(null),
+        phone: this.fb.control<string | null>(null),
+        city: this.fb.control<string | null>(null),
+        fax: this.fb.control<string | null>(null),
+    });
 
     constructor() {
-        this.generalDataForm = this.fb.group({
-            personType: ['', [ReactiveValidators.required]],
-            groupType: ['', [ReactiveValidators.required]],
-            rfc: ['', []],
-            tradeName: ['', []],
-            businessName: ['', []],
-            street: ['', []],
-            exteriorNumber: ['', []],
-            interiorNumber: ['', []],
-            crossing: ['', []],
-            country: ['', []],
-            state: ['', []],
-            colony: ['', []],
-            municipality: ['', []],
-            postalCode: ['', []],
-            phone: ['', []],
-            city: ['', []],
-            fax: ['', []],
-        })
+        // Store -> Form (se ejecuta cada vez que cambie el signal)
+        effect(() => {
+            const d = this.data();
+            if (d) this.generalDataForm.patchValue(d, { emitEvent: false });
+        });
+
+        // Form -> Store (cambios del form)
+        this.generalDataForm.valueChanges
+            .pipe(debounceTime(300), takeUntilDestroyed())
+            .subscribe(() => {
+                const data = this.generalDataForm.getRawValue() as GeneralData;
+                this.store.dispatch(GeneralDataPageActions.setData({ data }));
+                this.store.dispatch(GeneralDataPageActions.markAsDirty());
+            });
     }
 
-    onSubmit() {
-        if (this.generalDataForm.valid) {
-            this.toast.success('Formulario de Datos Generales válido');
-        }
-
-        if (this.generalDataForm.invalid) {
-            this.toast.error('Formulario de Datos Generales invalido, Favor de revisar los campos requeridos.');
-            this.generalDataForm.markAllAsTouched();
-        }
+    // Cargar datos desde API
+    loadData(customerId: string): void {
+        this.store.dispatch(GeneralDataPageActions.loadData({ customerId }));
     }
 
+    // Actualizar un campo específico en el store
+    updateField(field: keyof GeneralData, value: string | null): void {
+        this.store.dispatch(GeneralDataPageActions.updateField({ field, value }));
+    }
+
+    // Guardar
+    saveData(customerId?: string): void {
+        if (!this.assertValid()) return;
+        const data = this.generalDataForm.getRawValue() as GeneralData;
+        this.store.dispatch(
+            GeneralDataPageActions.saveData({
+                customerId: customerId ?? 'temp',
+                data
+            })
+        );
+    }
+
+    // Validación rápida con toast
+    private assertValid(): boolean {
+        if (this.generalDataForm.valid) return true;
+        this.toast.error('Formulario inválido. Revisa los campos requeridos.');
+        this.generalDataForm.markAllAsTouched();
+        return false;
+    }
+
+    // Helpers de plantilla
+    getFieldError(field: keyof ControlsOf<GeneralData>): string {
+        const control = this.generalDataForm.get(field as string);
+        if (control?.touched && control.invalid) {
+            if (control.errors?.['required']) return 'Campo requerido';
+            // agrega más mensajes según tus validadores
+        }
+        return '';
+    }
+
+    isFieldInvalid(field: keyof ControlsOf<GeneralData>): boolean {
+        const control = this.generalDataForm.get(field as string);
+        return !!(control && control.touched && control.invalid);
+    }
+
+    // Acciones varias
+    resetForm(): void {
+        this.store.dispatch(GeneralDataPageActions.resetForm());
+        this.generalDataForm.reset();
+    }
+
+    markAsPristine(): void {
+        this.store.dispatch(GeneralDataPageActions.markAsPristine());
+        this.generalDataForm.markAsPristine();
+    }
+
+    clearErrors(): void {
+        this.store.dispatch(GeneralDataPageActions.clearErrors());
+    }
+
+    canDeactivate(): boolean {
+        // Puedes combinar la bandera del store con el estado del form
+        if (this.hasUnsavedChanges() || this.generalDataForm.dirty) {
+            return confirm('Tienes cambios sin guardar. ¿Salir de todos modos?');
+        }
+        return true;
+    }
+
+    onSubmit(): void {
+        this.saveData();
+    }
 }

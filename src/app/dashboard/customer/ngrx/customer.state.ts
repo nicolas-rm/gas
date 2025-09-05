@@ -18,6 +18,15 @@ export type CustomerDataStatus = 'idle' | 'loading' | 'saving' | 'success' | 'er
 // Estados específicos para cada sección
 export type SectionDataStatus = 'idle' | 'loading' | 'saving' | 'saved' | 'error';
 
+// Constantes para los estados de sección
+export const SectionStatus = {
+    IDLE: 'idle' as const,
+    LOADING: 'loading' as const,
+    SAVING: 'saving' as const,
+    SAVED: 'saved' as const,
+    ERROR: 'error' as const
+} satisfies Record<string, SectionDataStatus>;
+
 export interface SectionState<T> {
     data: T;
     status: SectionDataStatus;

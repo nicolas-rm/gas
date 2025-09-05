@@ -25,8 +25,7 @@ export * from './customer.effects';
 // General Data Effects
 export {
     loadGeneralDataEffect,
-    saveGeneralDataEffect,
-    saveGeneralDataFromStoreEffect
+    saveGeneralDataEffect
 } from '../components/general-data/ngrx/general-data.effects';
 
 // Contract Data Effects

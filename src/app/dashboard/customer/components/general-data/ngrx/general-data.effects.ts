@@ -50,48 +50,9 @@ export const loadGeneralDataEffect = createEffect(
 
 /**
  * Effect: Save General Data
+ * Maneja el guardado de datos generales con datos proporcionados o del store
  */
 export const saveGeneralDataEffect = createEffect(
-    (actions$ = inject(Actions), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
-        actions$.pipe(
-            ofType(GeneralDataPageActions.saveData),
-            exhaustMap(({ customerId, data }) => {
-                const toastRef = toast.loading('Guardando datos generales...');
-                return customerService.saveSection({
-                    section: 'generalData',
-                    customerId,
-                    data
-                }).pipe(
-                    map(response => {
-                        toastRef.close();
-                        toast.success('Datos generales guardados exitosamente');
-                        // Crear response compatible con GeneralDataResponse
-                        const generalResponse = {
-                            success: response.success,
-                            data: response.data.generalData,
-                            message: response.message
-                        };
-                        return GeneralDataApiActions.saveDataSuccess({ 
-                            data: response.data.generalData,
-                            response: generalResponse
-                        });
-                    }),
-                    catchError(error => {
-                        toastRef.close();
-                        toast.error(error); // El error ya viene procesado del service
-                        return of(GeneralDataApiActions.saveDataFailure({ error }));
-                    })
-                );
-            })
-        ),
-    { functional: true }
-);
-
-/**
- * Effect: Save General Data from Store
- * Obtiene los datos del store cuando no se proporcionan en la acción
- */
-export const saveGeneralDataFromStoreEffect = createEffect(
     (actions$ = inject(Actions), store = inject(Store), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
         actions$.pipe(
             ofType(GeneralDataPageActions.saveData),
@@ -102,35 +63,40 @@ export const saveGeneralDataFromStoreEffect = createEffect(
                 if (!dataToSave) {
                     const errorMessage = 'No hay datos de general data para guardar';
                     toast.error(errorMessage);
-                    return of(GeneralDataApiActions.saveDataFailure({ 
+                    return of(GeneralDataApiActions.saveDataFailure({
                         error: { message: errorMessage }
                     }));
                 }
 
-                const toastRef = toast.loading('Guardando datos generales...');
-                
-                return customerService.saveSection({
-                    section: 'generalData',
-                    customerId: action.customerId,
-                    data: dataToSave
-                }).pipe(
-                    map(response => {
-                        toastRef.close();
-                        toast.success('Datos generales guardados exitosamente');
-                        const generalResponse = {
-                            success: response.success,
-                            data: response.data.generalData,
-                            message: response.message
-                        };
-                        return GeneralDataApiActions.saveDataSuccess({ 
-                            data: response.data.generalData,
-                            response: generalResponse
-                        });
-                    }),
-                    catchError(error => {
-                        toastRef.close();
-                        toast.error(error); // El error ya viene procesado del service
-                        return of(GeneralDataApiActions.saveDataFailure({ error }));
+                // Agregar pequeño delay para evitar conflictos de toast
+                return timer(100).pipe(
+                    exhaustMap(() => {
+                        const toastRef = toast.loading('Guardando datos generales...');
+
+                        return customerService.saveSection({
+                            section: 'generalData',
+                            customerId: action.customerId,
+                            data: dataToSave
+                        }).pipe(
+                            map(response => {
+                                toastRef.close();
+                                toast.success('Datos generales guardados exitosamente');
+                                const generalResponse = {
+                                    success: response.success,
+                                    data: response.data.generalData,
+                                    message: response.message
+                                };
+                                return GeneralDataApiActions.saveDataSuccess({
+                                    data: response.data.generalData,
+                                    response: generalResponse
+                                });
+                            }),
+                            catchError(error => {
+                                toastRef.close();
+                                toast.error(error); // El error ya viene procesado del service
+                                return of(GeneralDataApiActions.saveDataFailure({ error }));
+                            })
+                        );
                     })
                 );
             })
