@@ -106,7 +106,6 @@ export class GeneralDataComponent {
             .subscribe(() => {
                 const data = this.generalDataForm.getRawValue() as GeneralData;
                 this.store.dispatch(GeneralDataPageActions.setData({ data }));
-                this.store.dispatch(GeneralDataPageActions.markAsDirty());
             });
     }
 
@@ -142,6 +141,7 @@ export class GeneralDataComponent {
         this.store.dispatch(GeneralDataPageActions.resetForm());
         this.generalDataForm.reset({}, { emitEvent: false }); // Evita que se dispare valueChanges
         this.generalDataForm.markAsPristine(); // Marca el form como pristine
+        this.generalDataForm.markAsUntouched();
     }
 
     // Restablecer a datos originales (crear: vacío, actualizar: datos cargados)
@@ -149,6 +149,7 @@ export class GeneralDataComponent {
         this.store.dispatch(GeneralDataPageActions.resetToOriginal());
         // El efecto se encargará de actualizar el formulario con los datos originales
         this.generalDataForm.markAsPristine();
+        this.generalDataForm.markAsUntouched();
     }
 
     // Marcar como pristine (sin cambios)

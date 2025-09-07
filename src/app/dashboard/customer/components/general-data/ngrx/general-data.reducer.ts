@@ -25,7 +25,7 @@ export const generalDataReducer = createReducer<GeneralDataState>(
 
     on(GeneralDataApiActions.loadDataSuccess, (state: GeneralDataState, { data }) => {
         const withEntity = generalDataAdapter.setOne(data, state);
-        
+
         return {
             ...state,
             ...withEntity,
@@ -49,8 +49,15 @@ export const generalDataReducer = createReducer<GeneralDataState>(
 
     // (Eliminadas acciones granulares updateField / updateMultipleFields)
     on(GeneralDataPageActions.setData, (state: GeneralDataState, { data }) => {
-        const withEntity = generalDataAdapter.setOne(data, state);
-        
+        const prevId = state.data ? (state.data.rfc || 'temp-id') : null;
+        const newId = data.rfc || 'temp-id';
+        let workingState = state;
+        if (prevId && prevId !== newId) {
+            workingState = generalDataAdapter.removeOne(prevId, workingState);
+        }
+        const withEntity = generalDataAdapter.setOne(data, workingState);
+        const original = state.originalData;
+        const changed = original ? JSON.stringify(original) !== JSON.stringify(data) : false;
         return {
             ...state,
             ...withEntity,
@@ -61,8 +68,8 @@ export const generalDataReducer = createReducer<GeneralDataState>(
             loading: state.loading,
             saving: state.saving,
             error: state.error,
-            hasUnsavedChanges: false,
-            isDirty: false,
+            hasUnsavedChanges: changed,
+            isDirty: changed,
         };
     }),
 
@@ -76,7 +83,7 @@ export const generalDataReducer = createReducer<GeneralDataState>(
 
     on(GeneralDataApiActions.saveDataSuccess, (state: GeneralDataState, { data }) => {
         const withEntity = generalDataAdapter.setOne(data, state);
-        
+
         return {
             ...state,
             ...withEntity,
@@ -100,7 +107,23 @@ export const generalDataReducer = createReducer<GeneralDataState>(
 
     // === RESET Y LIMPIEZA ===
     // Resetear formulario completamente (volver al estado inicial)
-    on(GeneralDataPageActions.resetForm, () => generalDataAdapter.getInitialState(initialGeneralDataState)),
+    on(GeneralDataPageActions.resetForm, () => {
+        // Limpia completamente el adapter y restablece el estado extendido
+        const base = generalDataAdapter.getInitialState(initialGeneralDataState);
+        const cleared = generalDataAdapter.removeAll(base);
+        return {
+            ...cleared,
+            // Las props custom ya están en initialGeneralDataState
+            error: null,
+            data: null,
+            originalData: null,
+            status: 'idle',
+            loading: false,
+            saving: false,
+            hasUnsavedChanges: false,
+            isDirty: false
+        } as GeneralDataState;
+    }),
 
     // Restablecer a datos originales (crear: campos vacíos, actualizar: datos cargados)
     on(GeneralDataPageActions.resetToOriginal, (state: GeneralDataState) => {
@@ -123,9 +146,14 @@ export const generalDataReducer = createReducer<GeneralDataState>(
             city: null,
             fax: null
         };
-        
-        const withEntity = generalDataAdapter.setOne(dataToRestore, state);
-        
+        const prevId = state.data ? (state.data.rfc || 'temp-id') : null;
+        const restoreId = dataToRestore.rfc || 'temp-id';
+        let working = state.originalData ? state : generalDataAdapter.removeAll(state);
+        if (prevId && prevId !== restoreId) {
+            working = generalDataAdapter.removeOne(prevId, working);
+        }
+        const withEntity = generalDataAdapter.setOne(dataToRestore, working);
+
         return {
             ...state,
             ...withEntity,
@@ -134,7 +162,7 @@ export const generalDataReducer = createReducer<GeneralDataState>(
             status: state.status,
             loading: state.loading,
             saving: state.saving,
-            error: state.error,
+            error: null,
             hasUnsavedChanges: false,
             isDirty: false,
         };
