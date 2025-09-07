@@ -17,6 +17,7 @@ export const creditRequestDataReducer = createReducer(
         creditRequestDataAdapter.setOne(data, {
             ...state,
             data,
+            originalData: data, // Guardar datos originales al cargar
             status: 'idle',
             loading: false,
             error: null,
@@ -58,6 +59,8 @@ export const creditRequestDataReducer = createReducer(
         creditRequestDataAdapter.setOne(data, {
             ...state,
             data,
+            // Si no hay datos originales, establecer estos como originales (modo crear)
+            originalData: state.originalData || data,
             hasUnsavedChanges: true,
             isDirty: true,
             error: null
@@ -76,6 +79,7 @@ export const creditRequestDataReducer = createReducer(
         creditRequestDataAdapter.setOne(data, {
             ...state,
             data,
+            originalData: data, // Actualizar datos originales después de guardar exitosamente
             status: 'saved',
             saving: false,
             error: null,
@@ -93,12 +97,34 @@ export const creditRequestDataReducer = createReducer(
     })),
     
     // === FORM MANAGEMENT ===
+    // Resetear formulario completamente (volver al estado inicial)
     on(CreditRequestDataPageActions.resetForm, (state): CreditRequestDataState => 
         creditRequestDataAdapter.removeAll({
             ...initialCreditRequestDataState
         })
     ),
     
+    // Restablecer a datos originales (crear: campos vacíos, actualizar: datos cargados)
+    on(CreditRequestDataPageActions.resetToOriginal, (state): CreditRequestDataState => {
+        const dataToRestore = state.originalData || null;
+        
+        if (dataToRestore) {
+            return creditRequestDataAdapter.setOne(dataToRestore, {
+                ...state,
+                data: dataToRestore,
+                hasUnsavedChanges: false,
+                isDirty: false
+            });
+        } else {
+            return creditRequestDataAdapter.removeAll({
+                ...state,
+                data: null,
+                hasUnsavedChanges: false,
+                isDirty: false
+            });
+        }
+    }),
+
     on(CreditRequestDataPageActions.clearErrors, (state): CreditRequestDataState => ({
         ...state,
         error: null,

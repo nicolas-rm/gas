@@ -26,7 +26,6 @@ export interface GeneralDataState extends EntityState<GeneralData> {
     error: string | null;
 
     // Metadatos
-    lastSaved: number | null;
     hasUnsavedChanges: boolean;
     isDirty: boolean;
 }
@@ -43,7 +42,6 @@ export const initialGeneralDataState: GeneralDataState = {
     loading: false,
     saving: false,
     error: null,
-    lastSaved: null,
     hasUnsavedChanges: false,
     isDirty: false
 };

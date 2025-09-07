@@ -19,7 +19,6 @@ import { generalDataForm } from '@/app/dashboard/customer/components/general-dat
 // NgRx General Data
 import { GeneralDataPageActions } from '@/dashboard/customer/components/general-data/ngrx/general-data.actions';
 import {
-    selectGeneralDataFormState,
     selectGeneralData,
     selectGeneralDataOriginal,
     selectGeneralDataIsBusy,
@@ -71,7 +70,7 @@ export class GeneralDataComponent {
     canReset = this.store.selectSignal(selectGeneralDataCanReset);
     data = this.store.selectSignal(selectGeneralData);
     originalData = this.store.selectSignal(selectGeneralDataOriginal);
-    formState = this.store.selectSignal(selectGeneralDataFormState);
+    // formState selector removido tras simplificación
 
     // FormGroup tipado a partir de tu modelo GeneralData
     generalDataForm: FormGroup<ControlsOf<GeneralData>> = this.fb.group<ControlsOf<GeneralData>>({
@@ -116,10 +115,7 @@ export class GeneralDataComponent {
         this.store.dispatch(GeneralDataPageActions.loadData({ customerId }));
     }
 
-    // Actualizar un campo específico en el store
-    updateField(field: keyof GeneralData, value: string | null): void {
-        this.store.dispatch(GeneralDataPageActions.updateField({ field, value }));
-    }
+    // (Eliminado updateField granular; ahora todo se maneja vía setData)
 
     // Guardar
     saveData(customerId?: string): void {
@@ -167,13 +163,7 @@ export class GeneralDataComponent {
     }
 
     // Guardado de cambios antes de salir
-    canDeactivate(): boolean {
-        // Puedes combinar la bandera del store con el estado del form
-        if (this.hasUnsavedChanges() || this.generalDataForm.dirty) {
-            return confirm('Tienes cambios sin guardar. ¿Salir de todos modos?');
-        }
-        return true;
-    }
+    // canDeactivate eliminado; se implementará mediante un guard dedicado si se requiere en el futuro
 
     onSubmit(): void {
         this.saveData();

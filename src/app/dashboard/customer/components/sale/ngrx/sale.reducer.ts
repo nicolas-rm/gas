@@ -26,6 +26,7 @@ export const saleDataReducer = createReducer(
     on(SaleDataApiActions.loadDataSuccess, (state, { data }) => ({
         ...state,
         data,
+        originalData: data, // Guardar datos originales al cargar
         status: 'idle' as const,
         loading: false,
         error: null,
@@ -65,6 +66,8 @@ export const saleDataReducer = createReducer(
     on(SaleDataPageActions.setData, (state, { data }) => ({
         ...state,
         data,
+        // Si no hay datos originales, establecer estos como originales (modo crear)
+        originalData: state.originalData || data,
         hasUnsavedChanges: false,
         isDirty: false,
     })),
@@ -80,6 +83,7 @@ export const saleDataReducer = createReducer(
     on(SaleDataApiActions.saveDataSuccess, (state, { data }) => ({
         ...state,
         data,
+        originalData: data, // Actualizar datos originales después de guardar exitosamente
         status: 'saved' as const,
         saving: false,
         error: null,
@@ -96,7 +100,30 @@ export const saleDataReducer = createReducer(
     })),
 
     // === RESET Y LIMPIEZA ===
+    // Resetear formulario completamente (volver al estado inicial)
     on(SaleDataPageActions.resetForm, () => initialSaleDataState),
+
+    // Restablecer a datos originales (crear: campos vacíos, actualizar: datos cargados)
+    on(SaleDataPageActions.resetToOriginal, (state) => {
+        const dataToRestore = state.originalData || {
+            accountType: null,
+            seller: null,
+            accountNumber: null,
+            prepaidType: null,
+            creditDays: null,
+            creditLimit: null,
+            advanceCommission: null,
+            paymentMethod: null,
+            voucherAmount: null
+        };
+        
+        return {
+            ...state,
+            data: dataToRestore,
+            hasUnsavedChanges: false,
+            isDirty: false
+        };
+    }),
 
     on(SaleDataPageActions.clearErrors, (state) => ({
         ...state,

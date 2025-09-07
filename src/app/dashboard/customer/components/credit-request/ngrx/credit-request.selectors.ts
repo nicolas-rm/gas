@@ -11,6 +11,11 @@ export const selectCreditRequestData = createSelector(
     (state: CreditRequestDataState) => state.data
 );
 
+export const selectCreditRequestDataOriginal = createSelector(
+    selectCreditRequestDataState,
+    (state: CreditRequestDataState) => state.originalData
+);
+
 export const selectCreditRequestDataField = (field: keyof CreditRequestData) => createSelector(
     selectCreditRequestData,
     (data: CreditRequestData | null) => data ? data[field] : null
@@ -65,6 +70,13 @@ export const selectCreditRequestDataCanSave = createSelector(
     selectCreditRequestDataSaving,
     (hasUnsavedChanges: boolean, saving: boolean) =>
         hasUnsavedChanges && !saving
+);
+
+export const selectCreditRequestDataCanReset = createSelector(
+    selectCreditRequestDataHasUnsavedChanges,
+    selectCreditRequestDataIsBusy,
+    (hasUnsavedChanges: boolean, isBusy: boolean) =>
+        hasUnsavedChanges && !isBusy
 );
 
 // === COMBINED SELECTORS ===

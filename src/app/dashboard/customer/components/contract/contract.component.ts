@@ -1,8 +1,22 @@
 import { SelectFieldComponent, TextFieldComponent } from '@/app/components/components';
-import { Component, inject } from '@angular/core';
+import { Component, inject, effect } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { contractForm } from '@/app/dashboard/customer/components/contract/form';
 import { HotToastService } from '@ngxpert/hot-toast';
+import { Store } from '@ngrx/store';
+import { ContractDataPageActions } from './ngrx/contract.actions';
+import { 
+    selectContractData, 
+    selectContractDataLoading, 
+    selectContractDataSaving, 
+    selectContractDataIsBusy,
+    selectContractDataError,
+    selectContractDataHasUnsavedChanges,
+    selectContractDataCanReset,
+    selectContractDataOriginal,
+    selectContractDataFormState
+} from './ngrx/contract.selectors';
+import { ContractData } from './ngrx/contract.models';
 
 export type ContractDataFormControl = {
     printName: FormControl<string | null>;
@@ -61,6 +75,18 @@ export class ContractComponent {
 
     private readonly fb = inject(FormBuilder);
     private readonly toast = inject(HotToastService);
+    private readonly store = inject(Store);
+
+    // NgRx signals
+    isLoading = this.store.selectSignal(selectContractDataLoading);
+    isSaving = this.store.selectSignal(selectContractDataSaving);
+    isBusy = this.store.selectSignal(selectContractDataIsBusy);
+    error = this.store.selectSignal(selectContractDataError);
+    hasUnsavedChanges = this.store.selectSignal(selectContractDataHasUnsavedChanges);
+    canReset = this.store.selectSignal(selectContractDataCanReset);
+    data = this.store.selectSignal(selectContractData);
+    originalData = this.store.selectSignal(selectContractDataOriginal);
+    formState = this.store.selectSignal(selectContractDataFormState);
 
     contractDataForm: FormGroup<ContractDataFormControl>
 
@@ -78,16 +104,81 @@ export class ContractComponent {
             rfcOrderingAccount: ['', []],
             bank: ['', []],
         })
+
+        // Store -> Form (se ejecuta cada vez que cambie el signal)
+        effect(() => {
+            const currentData = this.data();
+            if (currentData) {
+                this.contractDataForm.patchValue(currentData, { emitEvent: false });
+            }
+        });
+
+        // Form -> Store (cambios del form)
+        this.contractDataForm.valueChanges.subscribe(value => {
+            if (this.contractDataForm.dirty) {
+                const data = value as ContractData;
+                this.store.dispatch(ContractDataPageActions.setData({ data }));
+                this.store.dispatch(ContractDataPageActions.markAsDirty());
+            }
+        });
+    }
+
+    // Cargar datos
+    loadData(customerId: string): void {
+        this.store.dispatch(ContractDataPageActions.loadData({ customerId }));
+    }
+
+    // Actualizar campo individual
+    updateField(field: keyof ContractData, value: string | null): void {
+        this.store.dispatch(ContractDataPageActions.updateField({ field, value }));
+    }
+
+    // Guardar
+    saveData(customerId?: string): void {
+        if (!this.assertValid()) return;
+        const data = this.contractDataForm.getRawValue() as ContractData;
+        this.store.dispatch(
+            ContractDataPageActions.saveData({
+                customerId: customerId ?? 'temp',
+                data
+            })
+        );
+    }
+
+    // Validación rápida con toast
+    private assertValid(): boolean {
+        if (this.contractDataForm.valid) return true;
+        this.toast.error('Formulario inválido. Revisa los campos requeridos.');
+        this.contractDataForm.markAllAsTouched();
+        return false;
+    }
+
+    // Acciones varias
+    resetForm(): void {
+        this.store.dispatch(ContractDataPageActions.resetForm());
+        this.contractDataForm.reset({}, { emitEvent: false }); // Evita que se dispare valueChanges
+        this.contractDataForm.markAsPristine(); // Marca el form como pristine
+    }
+
+    // Restablecer a datos originales (crear: vacío, actualizar: datos cargados)
+    resetToOriginal(): void {
+        this.store.dispatch(ContractDataPageActions.resetToOriginal());
+        // El efecto se encargará de actualizar el formulario con los datos originales
+        this.contractDataForm.markAsPristine();
+    }
+
+    // Marcar como pristine (sin cambios)
+    markAsPristine(): void {
+        this.store.dispatch(ContractDataPageActions.markAsPristine());
+        this.contractDataForm.markAsPristine();
+    }
+
+    // Limpiar errores
+    clearErrors(): void {
+        this.store.dispatch(ContractDataPageActions.clearErrors());
     }
 
     onSubmit() {
-        if (this.contractDataForm.valid) {
-            this.toast.success('Datos de Contrato guardados exitosamente');
-        }
-
-        if (this.contractDataForm.invalid) {
-            this.toast.error('Formulario de Contrato invalido, Favor de revisar los campos requeridos.');
-            this.contractDataForm.markAllAsTouched();
-        }
+        this.saveData();
     }
 }

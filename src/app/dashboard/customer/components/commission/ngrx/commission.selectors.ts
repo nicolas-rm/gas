@@ -11,6 +11,11 @@ export const selectCommissionData = createSelector(
     (state: CommissionDataState) => state.data
 );
 
+export const selectCommissionDataOriginal = createSelector(
+    selectCommissionDataState,
+    (state: CommissionDataState) => state.originalData
+);
+
 export const selectCommissionDataField = (field: keyof CommissionData) => createSelector(
     selectCommissionData,
     (data: CommissionData) => data[field]
@@ -62,6 +67,13 @@ export const selectCommissionDataCanSave = createSelector(
     selectCommissionDataHasUnsavedChanges,
     (loading: boolean, saving: boolean, error: string | null, hasUnsavedChanges: boolean) =>
         !loading && !saving && !error && hasUnsavedChanges
+);
+
+export const selectCommissionDataCanReset = createSelector(
+    selectCommissionDataHasUnsavedChanges,
+    selectCommissionDataIsBusy,
+    (hasUnsavedChanges: boolean, isBusy: boolean) =>
+        hasUnsavedChanges && !isBusy
 );
 
 // === METADATA SELECTORS ===

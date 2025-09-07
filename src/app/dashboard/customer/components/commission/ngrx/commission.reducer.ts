@@ -26,6 +26,7 @@ export const commissionDataReducer = createReducer(
     on(CommissionDataApiActions.loadDataSuccess, (state, { data }) => ({
         ...state,
         data,
+        originalData: data, // Guardar datos originales al cargar
         status: 'idle' as const,
         loading: false,
         error: null,
@@ -65,6 +66,8 @@ export const commissionDataReducer = createReducer(
     on(CommissionDataPageActions.setData, (state, { data }) => ({
         ...state,
         data,
+        // Si no hay datos originales, establecer estos como originales (modo crear)
+        originalData: state.originalData || data,
         hasUnsavedChanges: false,
         isDirty: false,
     })),
@@ -80,6 +83,7 @@ export const commissionDataReducer = createReducer(
     on(CommissionDataApiActions.saveDataSuccess, (state, { data }) => ({
         ...state,
         data,
+        originalData: data, // Actualizar datos originales después de guardar exitosamente
         status: 'saved' as const,
         saving: false,
         error: null,
@@ -96,7 +100,26 @@ export const commissionDataReducer = createReducer(
     })),
 
     // === RESET & CLEANUP ===
+    // Resetear formulario completamente (volver al estado inicial)
     on(CommissionDataPageActions.resetForm, () => initialCommissionDataState),
+
+    // Restablecer a datos originales (crear: campos vacíos, actualizar: datos cargados)
+    on(CommissionDataPageActions.resetToOriginal, (state) => {
+        const dataToRestore = state.originalData || {
+            commissionClassification: null,
+            customerLevel: null,
+            normalPercentage: null,
+            earlyPaymentPercentage: null,
+            incomeAccountingAccount: null
+        };
+        
+        return {
+            ...state,
+            data: dataToRestore,
+            hasUnsavedChanges: false,
+            isDirty: false
+        };
+    }),
 
     on(CommissionDataPageActions.clearErrors, (state) => ({
         ...state,

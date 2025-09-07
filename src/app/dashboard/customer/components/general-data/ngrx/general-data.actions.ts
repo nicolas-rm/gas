@@ -13,9 +13,7 @@ export const GeneralDataPageActions = createActionGroup({
         // Cargar datos
         'Load Data': props<{ customerId: string }>(),
 
-        // Actualizar campos
-        'Update Field': props<{ field: keyof GeneralData; value: string | null }>(),
-        'Update Multiple Fields': props<{ updates: Partial<GeneralData> }>(),
+        // Establecer snapshot completo del formulario
         'Set Data': props<{ data: GeneralData }>(),
 
         // Guardar

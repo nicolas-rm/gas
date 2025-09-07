@@ -32,14 +32,12 @@ export type GeneralDataForm =
  *  (Opcional) catálogos
  *  ------------------------- */
 const personTypeOptions: SelectOption[] = [
-    { value: 'fisica', label: 'Persona Física' },
-    { value: 'moral', label: 'Persona Moral' },
+    // Opciones provistas dinámicamente desde el componente
 ];
 
 // Define los grupos reales de tu negocio
 const groupTypeOptions: SelectOption[] = [
-    // { value: 'retail', label: 'Retail' },
-    // { value: 'mayoreo', label: 'Mayoreo' },
+    // Opciones provistas dinámicamente desde el componente o futuras
 ];
 
 /** ---------------------------------------

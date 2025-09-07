@@ -11,6 +11,11 @@ export const selectIneData = createSelector(
     (state: IneDataState) => state.data
 );
 
+export const selectIneDataOriginal = createSelector(
+    selectIneDataState,
+    (state: IneDataState) => state.originalData
+);
+
 export const selectIneDataField = (field: keyof IneData) => createSelector(
     selectIneData,
     (data: IneData | null) => data ? data[field] : null
@@ -65,6 +70,13 @@ export const selectIneDataCanSave = createSelector(
     selectIneDataSaving,
     (hasUnsavedChanges: boolean, saving: boolean) =>
         hasUnsavedChanges && !saving
+);
+
+export const selectIneDataCanReset = createSelector(
+    selectIneDataHasUnsavedChanges,
+    selectIneDataIsBusy,
+    (hasUnsavedChanges: boolean, isBusy: boolean) =>
+        hasUnsavedChanges && !isBusy
 );
 
 // === COMBINED SELECTORS ===

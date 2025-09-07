@@ -27,6 +27,7 @@ export const generalDataReducer = createReducer<GeneralDataState>(
         const withEntity = generalDataAdapter.setOne(data, state);
         
         return {
+            ...state,
             ...withEntity,
             data,
             originalData: data, // Guardar los datos originales al cargar
@@ -36,7 +37,6 @@ export const generalDataReducer = createReducer<GeneralDataState>(
             error: null,
             hasUnsavedChanges: false,
             isDirty: false,
-            lastSaved: Date.now(),
         };
     }),
 
@@ -47,89 +47,12 @@ export const generalDataReducer = createReducer<GeneralDataState>(
         error: error.message,
     })),
 
-    // === UPDATE FIELDS ===
-    on(GeneralDataPageActions.updateField, (state: GeneralDataState, { field, value }) => {
-        const currentData = state.data || {
-            personType: null,
-            groupType: null,
-            rfc: null,
-            businessName: null,
-            tradeName: null,
-            street: null,
-            exteriorNumber: null,
-            interiorNumber: null,
-            crossing: null,
-            country: null,
-            state: null,
-            colony: null,
-            municipality: null,
-            postalCode: null,
-            phone: null,
-            city: null,
-            fax: null
-        };
-        const updatedData = {
-            ...currentData,
-            [field]: value,
-        };
-        const withEntity = generalDataAdapter.setOne(updatedData, state);
-        
-        return {
-            ...withEntity,
-            data: updatedData,
-            status: state.status,
-            loading: state.loading,
-            saving: state.saving,
-            error: state.error,
-            hasUnsavedChanges: true,
-            isDirty: true,
-            lastSaved: state.lastSaved
-        };
-    }),
-
-    on(GeneralDataPageActions.updateMultipleFields, (state: GeneralDataState, { updates }) => {
-        const currentData = state.data || {
-            personType: null,
-            groupType: null,
-            rfc: null,
-            businessName: null,
-            tradeName: null,
-            street: null,
-            exteriorNumber: null,
-            interiorNumber: null,
-            crossing: null,
-            country: null,
-            state: null,
-            colony: null,
-            municipality: null,
-            postalCode: null,
-            phone: null,
-            city: null,
-            fax: null
-        };
-        const updatedData = {
-            ...currentData,
-            ...updates,
-        };
-        const withEntity = generalDataAdapter.setOne(updatedData, state);
-        
-        return {
-            ...withEntity,
-            data: updatedData,
-            status: state.status,
-            loading: state.loading,
-            saving: state.saving,
-            error: state.error,
-            hasUnsavedChanges: true,
-            isDirty: true,
-            lastSaved: state.lastSaved
-        };
-    }),
-
+    // (Eliminadas acciones granulares updateField / updateMultipleFields)
     on(GeneralDataPageActions.setData, (state: GeneralDataState, { data }) => {
         const withEntity = generalDataAdapter.setOne(data, state);
         
         return {
+            ...state,
             ...withEntity,
             data,
             // Si no hay datos originales, establecer estos como originales (modo crear)
@@ -140,7 +63,6 @@ export const generalDataReducer = createReducer<GeneralDataState>(
             error: state.error,
             hasUnsavedChanges: false,
             isDirty: false,
-            lastSaved: state.lastSaved
         };
     }),
 
@@ -156,6 +78,7 @@ export const generalDataReducer = createReducer<GeneralDataState>(
         const withEntity = generalDataAdapter.setOne(data, state);
         
         return {
+            ...state,
             ...withEntity,
             data,
             originalData: data, // Actualizar datos originales después de guardar exitosamente
@@ -165,7 +88,6 @@ export const generalDataReducer = createReducer<GeneralDataState>(
             error: null,
             hasUnsavedChanges: false,
             isDirty: false,
-            lastSaved: Date.now(),
         };
     }),
 
@@ -205,6 +127,7 @@ export const generalDataReducer = createReducer<GeneralDataState>(
         const withEntity = generalDataAdapter.setOne(dataToRestore, state);
         
         return {
+            ...state,
             ...withEntity,
             data: dataToRestore,
             originalData: state.originalData,
@@ -214,7 +137,6 @@ export const generalDataReducer = createReducer<GeneralDataState>(
             error: state.error,
             hasUnsavedChanges: false,
             isDirty: false,
-            lastSaved: state.lastSaved
         };
     }),
 

@@ -11,6 +11,11 @@ export const selectSaleData = createSelector(
     (state: SaleDataState) => state.data
 );
 
+export const selectSaleDataOriginal = createSelector(
+    selectSaleDataState,
+    (state: SaleDataState) => state.originalData
+);
+
 export const selectSaleDataField = (field: keyof SaleData) => createSelector(
     selectSaleData,
     (data: SaleData) => data[field]
@@ -65,6 +70,13 @@ export const selectSaleDataCanSave = createSelector(
     selectSaleDataSaving,
     (hasUnsavedChanges: boolean, saving: boolean) =>
         hasUnsavedChanges && !saving
+);
+
+export const selectSaleDataCanReset = createSelector(
+    selectSaleDataHasUnsavedChanges,
+    selectSaleDataIsBusy,
+    (hasUnsavedChanges: boolean, isBusy: boolean) =>
+        hasUnsavedChanges && !isBusy
 );
 
 // === COMBINED SELECTORS ===

@@ -82,8 +82,26 @@
 
                             <!-- Botones de acción -->
                             <div class="flex gap-3 justify-end mt-6">
-                                <button type="button" class="btn btn-light-error">Cancelar</button>
-                                <button type="submit" class="btn">Guardar Venta</button>
+                                <!-- Botón de restablecer -->
+                                <button 
+                                    type="button" 
+                                    class="btn btn-light-secondary"
+                                    (click)="resetToOriginal()"
+                                    [disabled]="!canReset()">
+                                    Restablecer
+                                </button>
+                                
+                                <button type="button" class="btn btn-light-error" [disabled]="isBusy()">Cancelar</button>
+                                <button type="submit" class="btn" [disabled]="isBusy()">
+                                    @if (isSaving()) {
+                                        <div class="flex items-center">
+                                            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                            Guardando...
+                                        </div>
+                                    } @else {
+                                        Guardar Venta
+                                    }
+                                </button>
                             </div>
                         </form>
                     </div>

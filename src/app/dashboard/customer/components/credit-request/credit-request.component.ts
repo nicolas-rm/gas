@@ -1,10 +1,24 @@
 import { TextFieldComponent } from '@/app/components/components';
 import { FileInputFieldComponent } from '@/components/file-input/file-input.component';
-import { Component, inject } from '@angular/core';
+import { Component, inject, effect } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormArray, ReactiveFormsModule } from '@angular/forms';
 import { creditRequestForm } from '@/app/dashboard/customer/components/credit-request/form';
 import { CommonModule } from '@angular/common';
 import { HotToastService } from '@ngxpert/hot-toast';
+import { Store } from '@ngrx/store';
+import { CreditRequestDataPageActions } from './ngrx/credit-request.actions';
+import { 
+    selectCreditRequestData, 
+    selectCreditRequestDataLoading, 
+    selectCreditRequestDataSaving, 
+    selectCreditRequestDataIsBusy,
+    selectCreditRequestDataError,
+    selectCreditRequestDataHasUnsavedChanges,
+    selectCreditRequestDataCanReset,
+    selectCreditRequestDataOriginal,
+    selectCreditRequestDataFormState
+} from './ngrx/credit-request.selectors';
+import { CreditRequestData } from './ngrx/credit-request.models';
 
 export type CreditRequestDataFormControl = {
     legalRepresentative: FormControl<string | null>;
@@ -33,6 +47,18 @@ export class CreditRequestComponent {
 
     private readonly fb = inject(FormBuilder);
     private readonly toast = inject(HotToastService);
+    private readonly store = inject(Store);
+
+    // NgRx signals
+    isLoading = this.store.selectSignal(selectCreditRequestDataLoading);
+    isSaving = this.store.selectSignal(selectCreditRequestDataSaving);
+    isBusy = this.store.selectSignal(selectCreditRequestDataIsBusy);
+    error = this.store.selectSignal(selectCreditRequestDataError);
+    hasUnsavedChanges = this.store.selectSignal(selectCreditRequestDataHasUnsavedChanges);
+    canReset = this.store.selectSignal(selectCreditRequestDataCanReset);
+    data = this.store.selectSignal(selectCreditRequestData);
+    originalData = this.store.selectSignal(selectCreditRequestDataOriginal);
+    formState = this.store.selectSignal(selectCreditRequestDataFormState);
 
     creditRequestForm: FormGroup<CreditRequestDataFormControl>;
 
@@ -46,6 +72,23 @@ export class CreditRequestComponent {
         
         // Agregar una referencia inicial
         this.addReference();
+
+        // Store -> Form (se ejecuta cada vez que cambie el signal)
+        effect(() => {
+            const currentData = this.data();
+            if (currentData) {
+                this.creditRequestForm.patchValue(currentData, { emitEvent: false });
+            }
+        });
+
+        // Form -> Store (cambios del form)
+        this.creditRequestForm.valueChanges.subscribe(value => {
+            if (this.creditRequestForm.dirty) {
+                const data = value as CreditRequestData;
+                this.store.dispatch(CreditRequestDataPageActions.setData({ data }));
+                this.store.dispatch(CreditRequestDataPageActions.markAsDirty());
+            }
+        });
     }
 
     get references(): FormArray<FormGroup<ReferenceDataFormControl>> {
@@ -78,23 +121,72 @@ export class CreditRequestComponent {
     }
 
     onSave(): void {
-        console.log('Credit Request Data:', this.creditRequestForm.value);
+        this.saveData();
+    }
+
+    // Cargar datos
+    loadData(customerId: string): void {
+        this.store.dispatch(CreditRequestDataPageActions.loadData({ customerId }));
+    }
+
+    // Actualizar campo individual
+    updateField(field: keyof CreditRequestData, value: any): void {
+        this.store.dispatch(CreditRequestDataPageActions.updateField({ field, value }));
+    }
+
+    // Guardar
+    saveData(customerId?: string): void {
+        if (!this.assertValid()) return;
+        const data = this.creditRequestForm.getRawValue() as CreditRequestData;
+        this.store.dispatch(
+            CreditRequestDataPageActions.saveData({
+                customerId: customerId ?? 'temp',
+                data
+            })
+        );
+    }
+
+    // Validación rápida con toast
+    private assertValid(): boolean {
+        if (this.creditRequestForm.valid) return true;
+        this.toast.error('Formulario inválido. Revisa los campos requeridos.');
+        this.creditRequestForm.markAllAsTouched();
+        return false;
+    }
+
+    // Acciones varias
+    resetForm(): void {
+        this.store.dispatch(CreditRequestDataPageActions.resetForm());
+        this.creditRequestForm.reset({}, { emitEvent: false }); // Evita que se dispare valueChanges
+        this.creditRequestForm.markAsPristine(); // Marca el form como pristine
+        this.references.clear();
+        this.addReference(); // Agregar referencia inicial
+    }
+
+    // Restablecer a datos originales (crear: vacío, actualizar: datos cargados)
+    resetToOriginal(): void {
+        this.store.dispatch(CreditRequestDataPageActions.resetToOriginal());
+        // El efecto se encargará de actualizar el formulario con los datos originales
+        this.creditRequestForm.markAsPristine();
+    }
+
+    // Marcar como pristine (sin cambios)
+    markAsPristine(): void {
+        this.store.dispatch(CreditRequestDataPageActions.markAsPristine());
+        this.creditRequestForm.markAsPristine();
+    }
+
+    // Limpiar errores
+    clearErrors(): void {
+        this.store.dispatch(CreditRequestDataPageActions.clearErrors());
     }
 
     onSubmit(): void {
-        if (this.creditRequestForm.valid) {
-            this.toast.success('Formulario de Solicitud de Crédito válido');
-        }
-
-        if (this.creditRequestForm.invalid) {
-            this.toast.error('Formulario de Solicitud de Crédito invalido, Favor de revisar los campos requeridos.');
-            this.creditRequestForm.markAllAsTouched();
-        }
+        this.saveData();
     }
 
     onCancel(): void {
-        this.creditRequestForm.reset();
-        this.references.clear();
+        this.resetToOriginal();
     }
 
     // Opcional: mejora performance al iterar el FormArray en el template

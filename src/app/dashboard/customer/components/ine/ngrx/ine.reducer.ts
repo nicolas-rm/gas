@@ -17,6 +17,7 @@ export const ineDataReducer = createReducer(
         ineDataAdapter.setOne(data, {
             ...state,
             data,
+            originalData: data, // Guardar datos originales
             status: 'idle',
             loading: false,
             error: null,
@@ -78,6 +79,7 @@ export const ineDataReducer = createReducer(
         ineDataAdapter.setOne(data, {
             ...state,
             data,
+            originalData: data, // Actualizar datos originales después de guardar
             status: 'saved',
             saving: false,
             error: null,
@@ -117,5 +119,19 @@ export const ineDataReducer = createReducer(
         ...state,
         hasUnsavedChanges: true,
         isDirty: true
-    }))
+    })),
+
+    // === RESET TO ORIGINAL ===
+    on(IneDataPageActions.resetToOriginal, (state): IneDataState => {
+        if (!state.originalData) {
+            return state;
+        }
+        return ineDataAdapter.setOne(state.originalData, {
+            ...state,
+            data: state.originalData,
+            hasUnsavedChanges: false,
+            isDirty: false,
+            error: null
+        });
+    })
 );

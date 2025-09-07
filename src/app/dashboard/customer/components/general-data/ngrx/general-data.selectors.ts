@@ -60,11 +60,6 @@ export const selectGeneralDataIsDirty = createSelector(
     (state: GeneralDataState) => state.isDirty
 );
 
-export const selectGeneralDataLastSaved = createSelector(
-    selectGeneralDataState,
-    (state: GeneralDataState) => state.lastSaved
-);
-
 export const selectGeneralDataCanSave = createSelector(
     selectGeneralDataHasUnsavedChanges,
     selectGeneralDataSaving,
@@ -79,83 +74,4 @@ export const selectGeneralDataCanReset = createSelector(
         hasUnsavedChanges && !isBusy
 );
 
-// === COMBINED SELECTORS ===
-export const selectGeneralDataFormState = createSelector(
-    selectGeneralData,
-    selectGeneralDataStatus,
-    selectGeneralDataLoading,
-    selectGeneralDataSaving,
-    selectGeneralDataError,
-    selectGeneralDataHasUnsavedChanges,
-    selectGeneralDataIsDirty,
-    (
-        data,
-        status,
-        loading,
-        saving,
-        error,
-        hasUnsavedChanges,
-        isDirty
-    ) => ({
-        data,
-        status,
-        loading,
-        saving,
-        error,
-        hasUnsavedChanges,
-        isDirty,
-        canSave: hasUnsavedChanges && !saving,
-        isBusy: loading || saving
-    })
-);
-
-// === SPECIFIC FIELD SELECTORS ===
-export const selectPersonType = createSelector(
-    selectGeneralData,
-    (data: GeneralData | null) => data?.personType || null
-);
-
-export const selectGroupType = createSelector(
-    selectGeneralData,
-    (data: GeneralData | null) => data?.groupType || null
-);
-
-export const selectRfc = createSelector(
-    selectGeneralData,
-    (data: GeneralData | null) => data?.rfc || null
-);
-
-export const selectBusinessName = createSelector(
-    selectGeneralData,
-    (data: GeneralData | null) => data?.businessName || null
-);
-
-export const selectTradeName = createSelector(
-    selectGeneralData,
-    (data: GeneralData | null) => data?.tradeName || null
-);
-
-// === GROUPED SELECTORS ===
-export const selectGeneralDataAddress = createSelector(
-    selectGeneralData,
-    (data: GeneralData | null) => data ? ({
-        street: data.street,
-        exteriorNumber: data.exteriorNumber,
-        interiorNumber: data.interiorNumber,
-        crossing: data.crossing,
-        country: data.country,
-        state: data.state,
-        colony: data.colony,
-        municipality: data.municipality,
-        postalCode: data.postalCode,
-        city: data.city
-    }) : null
-);
-
-export const selectGeneralDataContact = createSelector(
-    selectGeneralData,
-    (data: GeneralData | null) => data ? ({
-        phone: data.phone,
-        fax: data.fax
-    }) : null
-);
+// (Removidos selectores granulares y agrupados no utilizados para simplificar la superficie del estado)
