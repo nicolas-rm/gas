@@ -48,26 +48,17 @@ export const generalDataReducer = createReducer<GeneralDataState>(
     })),
 
     // (Eliminadas acciones granulares updateField / updateMultipleFields)
-    on(GeneralDataPageActions.setData, (state: GeneralDataState, { data }) => {
-        const prevId = state.data ? (state.data.rfc || 'temp-id') : null;
-        const newId = data.rfc || 'temp-id';
-        let workingState = state;
-        if (prevId && prevId !== newId) {
-            workingState = generalDataAdapter.removeOne(prevId, workingState);
-        }
-        const withEntity = generalDataAdapter.setOne(data, workingState);
-        const original = state.originalData;
-        const changed = original ? JSON.stringify(original) !== JSON.stringify(data) : false;
+    on(GeneralDataPageActions.setData, (state, { data }) => {
+        const withEntity = generalDataAdapter.setOne(data, state);
+        const changed = state.originalData
+            ? JSON.stringify(state.originalData) !== JSON.stringify(data)
+            : true; // en crear: cualquier cambio = sucio
+
         return {
             ...state,
             ...withEntity,
             data,
-            // Si no hay datos originales, establecer estos como originales (modo crear)
-            originalData: state.originalData || data,
-            status: state.status,
-            loading: state.loading,
-            saving: state.saving,
-            error: state.error,
+            // NO tocar originalData aquí
             hasUnsavedChanges: changed,
             isDirty: changed,
         };

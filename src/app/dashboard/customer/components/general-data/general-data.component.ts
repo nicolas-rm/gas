@@ -97,7 +97,14 @@ export class GeneralDataComponent {
         // Store -> Form (se ejecuta cada vez que cambie el signal)
         effect(() => {
             const d = this.data();
-            if (d) this.generalDataForm.patchValue(d, { emitEvent: false });
+            if (d) {
+                this.generalDataForm.patchValue(d, { emitEvent: false });
+            } else {
+                // Soporte para time-travel / reset a estado inicial (create)
+                this.generalDataForm.reset({}, { emitEvent: false });
+                this.generalDataForm.markAsPristine();
+                this.generalDataForm.markAsUntouched();
+            }
         });
 
         // Form -> Store (cambios del form)
@@ -106,6 +113,7 @@ export class GeneralDataComponent {
             .subscribe(() => {
                 const data = this.generalDataForm.getRawValue() as GeneralData;
                 this.store.dispatch(GeneralDataPageActions.setData({ data }));
+                this.store.dispatch(GeneralDataPageActions.markAsDirty());
             });
     }
 
