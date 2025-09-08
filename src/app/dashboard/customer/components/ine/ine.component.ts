@@ -2,9 +2,11 @@ import { SelectFieldComponent, TextFieldComponent } from '@/app/components/compo
 import { FileInputFieldComponent } from '@/components/file-input/file-input.component';
 import { Component, inject, effect } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ineForm } from '@/app/dashboard/customer/components/ine/form';
 import { HotToastService } from '@ngxpert/hot-toast';
 import { Store } from '@ngrx/store';
+import { debounceTime } from 'rxjs/operators';
 import { IneDataPageActions } from './ngrx/ine.actions';
 import { 
     selectIneData, 
@@ -89,27 +91,27 @@ export class IneComponent {
             const currentData = this.data();
             if (currentData) {
                 this.ineDataForm.patchValue(currentData, { emitEvent: false });
+            } else {
+                // Soporte para time-travel / reset a estado inicial (create)
+                this.ineDataForm.reset({}, { emitEvent: false });
+                this.ineDataForm.markAsPristine();
+                this.ineDataForm.markAsUntouched();
             }
         });
 
         // Form -> Store (cambios del form)
-        this.ineDataForm.valueChanges.subscribe(value => {
-            if (this.ineDataForm.dirty) {
-                const data = value as IneData;
+        this.ineDataForm.valueChanges
+            .pipe(debounceTime(300), takeUntilDestroyed())
+            .subscribe(() => {
+                const data = this.ineDataForm.getRawValue() as IneData;
                 this.store.dispatch(IneDataPageActions.setData({ data }));
                 this.store.dispatch(IneDataPageActions.markAsDirty());
-            }
-        });
+            });
     }
 
     // Cargar datos
     loadData(customerId: string): void {
         this.store.dispatch(IneDataPageActions.loadData({ customerId }));
-    }
-
-    // Actualizar campo individual
-    updateField(field: keyof IneData, value: any): void {
-        this.store.dispatch(IneDataPageActions.updateField({ field, value }));
     }
 
     // Guardar
@@ -137,6 +139,7 @@ export class IneComponent {
         this.store.dispatch(IneDataPageActions.resetForm());
         this.ineDataForm.reset({}, { emitEvent: false }); // Evita que se dispare valueChanges
         this.ineDataForm.markAsPristine(); // Marca el form como pristine
+        this.ineDataForm.markAsUntouched();
     }
 
     // Restablecer a datos originales (crear: vacío, actualizar: datos cargados)
@@ -144,6 +147,7 @@ export class IneComponent {
         this.store.dispatch(IneDataPageActions.resetToOriginal());
         // El efecto se encargará de actualizar el formulario con los datos originales
         this.ineDataForm.markAsPristine();
+        this.ineDataForm.markAsUntouched();
     }
 
     // Marcar como pristine (sin cambios)

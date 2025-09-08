@@ -1,9 +1,11 @@
 import { SelectFieldComponent, TextFieldComponent } from '@/app/components/components';
 import { Component, inject, effect } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { saleForm } from '@/app/dashboard/customer/components/sale/form';
 import { HotToastService } from '@ngxpert/hot-toast';
 import { Store } from '@ngrx/store';
+import { debounceTime } from 'rxjs/operators';
 import { SaleDataPageActions } from './ngrx/sale.actions';
 import { 
     selectSaleData, 
@@ -95,27 +97,27 @@ export class SaleComponent {
             const currentData = this.data();
             if (currentData) {
                 this.saleDataForm.patchValue(currentData, { emitEvent: false });
+            } else {
+                // Soporte para time-travel / reset a estado inicial (create)
+                this.saleDataForm.reset({}, { emitEvent: false });
+                this.saleDataForm.markAsPristine();
+                this.saleDataForm.markAsUntouched();
             }
         });
 
         // Form -> Store (cambios del form)
-        this.saleDataForm.valueChanges.subscribe(value => {
-            if (this.saleDataForm.dirty) {
-                const data = value as SaleData;
+        this.saleDataForm.valueChanges
+            .pipe(debounceTime(300), takeUntilDestroyed())
+            .subscribe(() => {
+                const data = this.saleDataForm.getRawValue() as SaleData;
                 this.store.dispatch(SaleDataPageActions.setData({ data }));
                 this.store.dispatch(SaleDataPageActions.markAsDirty());
-            }
-        });
+            });
     }
 
     // Cargar datos
     loadData(customerId: string): void {
         this.store.dispatch(SaleDataPageActions.loadData({ customerId }));
-    }
-
-    // Actualizar campo individual
-    updateField(field: keyof SaleData, value: string | null): void {
-        this.store.dispatch(SaleDataPageActions.updateField({ field, value }));
     }
 
     // Guardar
@@ -143,6 +145,7 @@ export class SaleComponent {
         this.store.dispatch(SaleDataPageActions.resetForm());
         this.saleDataForm.reset({}, { emitEvent: false }); // Evita que se dispare valueChanges
         this.saleDataForm.markAsPristine(); // Marca el form como pristine
+        this.saleDataForm.markAsUntouched();
     }
 
     // Restablecer a datos originales (crear: vacío, actualizar: datos cargados)
@@ -150,6 +153,7 @@ export class SaleComponent {
         this.store.dispatch(SaleDataPageActions.resetToOriginal());
         // El efecto se encargará de actualizar el formulario con los datos originales
         this.saleDataForm.markAsPristine();
+        this.saleDataForm.markAsUntouched();
     }
 
     // Marcar como pristine (sin cambios)

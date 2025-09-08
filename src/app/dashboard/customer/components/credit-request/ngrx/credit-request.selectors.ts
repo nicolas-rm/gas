@@ -60,16 +60,13 @@ export const selectCreditRequestDataIsDirty = createSelector(
     (state: CreditRequestDataState) => state.isDirty
 );
 
-export const selectCreditRequestDataLastSaved = createSelector(
-    selectCreditRequestDataState,
-    (state: CreditRequestDataState) => state.lastSaved
-);
-
 export const selectCreditRequestDataCanSave = createSelector(
-    selectCreditRequestDataHasUnsavedChanges,
+    selectCreditRequestDataLoading,
     selectCreditRequestDataSaving,
-    (hasUnsavedChanges: boolean, saving: boolean) =>
-        hasUnsavedChanges && !saving
+    selectCreditRequestDataError,
+    selectCreditRequestDataHasUnsavedChanges,
+    (loading: boolean, saving: boolean, error: string | null, hasUnsavedChanges: boolean) =>
+        !loading && !saving && !error && hasUnsavedChanges
 );
 
 export const selectCreditRequestDataCanReset = createSelector(
@@ -79,7 +76,7 @@ export const selectCreditRequestDataCanReset = createSelector(
         hasUnsavedChanges && !isBusy
 );
 
-// === COMBINED SELECTORS ===
+// === FORM STATE SELECTOR ===
 export const selectCreditRequestDataFormState = createSelector(
     selectCreditRequestData,
     selectCreditRequestDataStatus,
@@ -88,15 +85,9 @@ export const selectCreditRequestDataFormState = createSelector(
     selectCreditRequestDataError,
     selectCreditRequestDataHasUnsavedChanges,
     selectCreditRequestDataIsDirty,
-    (
-        data,
-        status,
-        loading,
-        saving,
-        error,
-        hasUnsavedChanges,
-        isDirty
-    ) => ({
+    selectCreditRequestDataCanSave,
+    selectCreditRequestDataCanReset,
+    (data, status, loading, saving, error, hasUnsavedChanges, isDirty, canSave, canReset) => ({
         data,
         status,
         loading,
@@ -104,39 +95,10 @@ export const selectCreditRequestDataFormState = createSelector(
         error,
         hasUnsavedChanges,
         isDirty,
-        canSave: hasUnsavedChanges && !saving,
+        canSave,
+        canReset,
         isBusy: loading || saving
     })
 );
 
-// === SPECIFIC FIELD SELECTORS ===
-export const selectLegalRepresentative = createSelector(
-    selectCreditRequestData,
-    (data: CreditRequestData | null) => data?.legalRepresentative || null
-);
-
-export const selectDocumentsReceiver = createSelector(
-    selectCreditRequestData,
-    (data: CreditRequestData | null) => data?.documentsReceiver || null
-);
-
-export const selectCreditApplicationDocument = createSelector(
-    selectCreditRequestData,
-    (data: CreditRequestData | null) => data?.creditApplicationDocument || null
-);
-
-// === GROUPED SELECTORS ===
-export const selectCreditRequestDataSummary = createSelector(
-    selectCreditRequestData,
-    (data: CreditRequestData | null) => data ? ({
-        hasLegalRepresentative: !!data.legalRepresentative,
-        hasDocumentsReceiver: !!data.documentsReceiver,
-        hasDocument: !!data.creditApplicationDocument,
-        isComplete: !!data.legalRepresentative && !!data.documentsReceiver
-    }) : {
-        hasLegalRepresentative: false,
-        hasDocumentsReceiver: false,
-        hasDocument: false,
-        isComplete: false
-    }
-);
+// (Removidos selectores granulares específicos de campos y agrupados no utilizados para simplificar la superficie del estado)

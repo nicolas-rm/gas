@@ -32,7 +32,6 @@ export const billingDataReducer = createReducer(
         error: null,
         hasUnsavedChanges: false,
         isDirty: false,
-        lastSaved: Date.now(),
     })),
 
     on(BillingDataApiActions.loadDataFailure, (state, { error }) => ({
@@ -49,8 +48,6 @@ export const billingDataReducer = createReducer(
             ...state.data,
             [field]: value,
         },
-        hasUnsavedChanges: true,
-        isDirty: true,
     })),
 
     on(BillingDataPageActions.updateMultipleFields, (state, { updates }) => ({
@@ -59,18 +56,19 @@ export const billingDataReducer = createReducer(
             ...state.data,
             ...updates,
         },
-        hasUnsavedChanges: true,
-        isDirty: true,
     })),
 
-    on(BillingDataPageActions.setData, (state, { data }) => ({
-        ...state,
-        data,
-        // Si no hay datos originales, establecer estos como originales (modo crear)
-        originalData: state.originalData || data,
-        hasUnsavedChanges: false,
-        isDirty: false,
-    })),
+    on(BillingDataPageActions.setData, (state, { data }) => {
+        const changed = state.originalData
+            ? JSON.stringify(state.originalData) !== JSON.stringify(data)
+            : true;
+        return {
+            ...state,
+            data,
+            hasUnsavedChanges: changed,
+            isDirty: changed,
+        };
+    }),
 
     // === SAVE DATA ===
     on(BillingDataPageActions.saveData, (state) => ({
@@ -89,7 +87,6 @@ export const billingDataReducer = createReducer(
         error: null,
         hasUnsavedChanges: false,
         isDirty: false,
-        lastSaved: Date.now(),
     })),
 
     on(BillingDataApiActions.saveDataFailure, (state, { error }) => ({

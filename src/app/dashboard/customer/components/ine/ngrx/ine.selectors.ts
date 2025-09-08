@@ -60,16 +60,13 @@ export const selectIneDataIsDirty = createSelector(
     (state: IneDataState) => state.isDirty
 );
 
-export const selectIneDataLastSaved = createSelector(
-    selectIneDataState,
-    (state: IneDataState) => state.lastSaved
-);
-
 export const selectIneDataCanSave = createSelector(
-    selectIneDataHasUnsavedChanges,
+    selectIneDataLoading,
     selectIneDataSaving,
-    (hasUnsavedChanges: boolean, saving: boolean) =>
-        hasUnsavedChanges && !saving
+    selectIneDataError,
+    selectIneDataHasUnsavedChanges,
+    (loading: boolean, saving: boolean, error: string | null, hasUnsavedChanges: boolean) =>
+        !loading && !saving && !error && hasUnsavedChanges
 );
 
 export const selectIneDataCanReset = createSelector(
@@ -79,7 +76,7 @@ export const selectIneDataCanReset = createSelector(
         hasUnsavedChanges && !isBusy
 );
 
-// === COMBINED SELECTORS ===
+// === FORM STATE SELECTOR ===
 export const selectIneDataFormState = createSelector(
     selectIneData,
     selectIneDataStatus,
@@ -88,15 +85,9 @@ export const selectIneDataFormState = createSelector(
     selectIneDataError,
     selectIneDataHasUnsavedChanges,
     selectIneDataIsDirty,
-    (
-        data,
-        status,
-        loading,
-        saving,
-        error,
-        hasUnsavedChanges,
-        isDirty
-    ) => ({
+    selectIneDataCanSave,
+    selectIneDataCanReset,
+    (data, status, loading, saving, error, hasUnsavedChanges, isDirty, canSave, canReset) => ({
         data,
         status,
         loading,
@@ -104,49 +95,10 @@ export const selectIneDataFormState = createSelector(
         error,
         hasUnsavedChanges,
         isDirty,
-        canSave: hasUnsavedChanges && !saving,
+        canSave,
+        canReset,
         isBusy: loading || saving
     })
 );
 
-// === SPECIFIC FIELD SELECTORS ===
-export const selectAccountingKey = createSelector(
-    selectIneData,
-    (data: IneData | null) => data?.accountingKey || null
-);
-
-export const selectProcessType = createSelector(
-    selectIneData,
-    (data: IneData | null) => data?.processType || null
-);
-
-export const selectCommitteeType = createSelector(
-    selectIneData,
-    (data: IneData | null) => data?.committeeType || null
-);
-
-export const selectScope = createSelector(
-    selectIneData,
-    (data: IneData | null) => data?.scope || null
-);
-
-export const selectDocument = createSelector(
-    selectIneData,
-    (data: IneData | null) => data?.document || null
-);
-
-// === GROUPED SELECTORS ===
-export const selectIneDataConfiguration = createSelector(
-    selectIneData,
-    (data: IneData | null) => data ? ({
-        accountingKey: data.accountingKey,
-        processType: data.processType,
-        committeeType: data.committeeType,
-        scope: data.scope
-    }) : {
-        accountingKey: null,
-        processType: null,
-        committeeType: null,
-        scope: null
-    }
-);
+// (Removidos selectores granulares específicos de campos y agrupados no utilizados para simplificar la superficie del estado)

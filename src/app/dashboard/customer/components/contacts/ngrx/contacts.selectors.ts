@@ -11,6 +11,11 @@ export const selectContactsData = createSelector(
     (state: ContactsDataState) => state.data
 );
 
+export const selectContactsDataOriginal = createSelector(
+    selectContactsDataState,
+    (state: ContactsDataState) => state.originalData
+);
+
 export const selectContactsDataField = (field: keyof ContactsData) => createSelector(
     selectContactsData,
     (data: ContactsData | null) => data ? data[field] : null
@@ -55,19 +60,23 @@ export const selectContactsDataIsDirty = createSelector(
     (state: ContactsDataState) => state.isDirty
 );
 
-export const selectContactsDataLastSaved = createSelector(
-    selectContactsDataState,
-    (state: ContactsDataState) => state.lastSaved
-);
-
 export const selectContactsDataCanSave = createSelector(
-    selectContactsDataHasUnsavedChanges,
+    selectContactsDataLoading,
     selectContactsDataSaving,
-    (hasUnsavedChanges: boolean, saving: boolean) =>
-        hasUnsavedChanges && !saving
+    selectContactsDataError,
+    selectContactsDataHasUnsavedChanges,
+    (loading: boolean, saving: boolean, error: string | null, hasUnsavedChanges: boolean) =>
+        !loading && !saving && !error && hasUnsavedChanges
 );
 
-// === COMBINED SELECTORS ===
+export const selectContactsDataCanReset = createSelector(
+    selectContactsDataHasUnsavedChanges,
+    selectContactsDataIsBusy,
+    (hasUnsavedChanges: boolean, isBusy: boolean) =>
+        hasUnsavedChanges && !isBusy
+);
+
+// === FORM STATE SELECTOR ===
 export const selectContactsDataFormState = createSelector(
     selectContactsData,
     selectContactsDataStatus,
@@ -76,15 +85,9 @@ export const selectContactsDataFormState = createSelector(
     selectContactsDataError,
     selectContactsDataHasUnsavedChanges,
     selectContactsDataIsDirty,
-    (
-        data,
-        status,
-        loading,
-        saving,
-        error,
-        hasUnsavedChanges,
-        isDirty
-    ) => ({
+    selectContactsDataCanSave,
+    selectContactsDataCanReset,
+    (data, status, loading, saving, error, hasUnsavedChanges, isDirty, canSave, canReset) => ({
         data,
         status,
         loading,
@@ -92,22 +95,10 @@ export const selectContactsDataFormState = createSelector(
         error,
         hasUnsavedChanges,
         isDirty,
-        canSave: hasUnsavedChanges && !saving,
+        canSave,
+        canReset,
         isBusy: loading || saving
     })
 );
 
-// === SPECIFIC FIELD SELECTORS ===
-export const selectContacts = createSelector(
-    selectContactsData,
-    (data: ContactsData | null) => data ? data.contacts : []
-);
-
-// === GROUPED SELECTORS ===
-export const selectContactsDataSummary = createSelector(
-    selectContactsData,
-    (data: ContactsData | null) => ({
-        totalContacts: data ? data.contacts.length : 0,
-        hasContacts: data ? data.contacts.length > 0 : false
-    })
-);
+// (Removidos selectores granulares específicos de campos y agrupados no utilizados para simplificar la superficie del estado)

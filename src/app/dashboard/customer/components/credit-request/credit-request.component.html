@@ -1,12 +1,64 @@
 <div id="credit-request-data-tab" role="tabpanel" aria-labelledby="credit-request-data-tab">
-    <div class="card-body pt-0">
+    <!-- Indicador de estado global -->
+    @if (isLoading()) {
+        <div class="flex items-center justify-center p-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span class="ml-3 text-gray-600">Cargando datos...</span>
+        </div>
+    }
+    
+    <!-- Mensaje de error global -->
+    @if (error()) {
+        <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">Error</h3>
+                    <p class="text-sm text-red-700 mt-1">{{ error() }}</p>
+                    <button type="button" (click)="clearErrors()" class="text-sm text-red-600 hover:text-red-500 underline mt-2">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+    
+    <!-- Indicador de cambios sin guardar -->
+    @if (hasUnsavedChanges()) {
+        <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-yellow-700">Tienes cambios sin guardar</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="card-body">
         <div class="grid grid-cols-12 gap-6 items-stretch">
             <!-- Sección: Información de Solicitud de Crédito -->
             <div class="col-span-12">
                 <div class="">
                     <div class="card-body">
-                        <h5 class="card-title">Información de Solicitud de Crédito</h5>
-                        <p class="card-subtitle">Complete la información para la solicitud de crédito del cliente</p>
+                        <div class="flex items-center justify-between mb-2">
+                            <h5 class="card-title">Información de Solicitud de Crédito</h5>
+                            @if (isSaving()) {
+                                <div class="flex items-center text-blue-600">
+                                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                                    <span class="text-sm">Guardando...</span>
+                                </div>
+                            }
+                        </div>
+                        <p class="card-subtitle pb-4">Complete la información para la solicitud de crédito del cliente</p>
 
                         <form [formGroup]="creditRequestForm" class="mt-6" (ngSubmit)="onSubmit()">
                             <div class="grid grid-cols-12 gap-x-4 gap-y-4">
@@ -16,14 +68,16 @@
                                         [label]="creditRequestData.legalRepresentative.label"
                                         [formControlName]="creditRequestData.legalRepresentative.formControlName"
                                         [placeholder]="creditRequestData.legalRepresentative.placeholder"
-                                        [control]="creditRequestForm.get('legalRepresentative')" />
+                                        [control]="creditRequestForm.get('legalRepresentative')"
+                                        [disabled]="isBusy()" />
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
                                     <TextField [id]="creditRequestData.documentsReceiver.id"
                                         [label]="creditRequestData.documentsReceiver.label"
                                         [formControlName]="creditRequestData.documentsReceiver.formControlName"
                                         [placeholder]="creditRequestData.documentsReceiver.placeholder"
-                                        [control]="creditRequestForm.get('documentsReceiver')" />
+                                        [control]="creditRequestForm.get('documentsReceiver')"
+                                        [disabled]="isBusy()" />
                                 </div>
 
                                 <!-- Segunda fila: Documento de Solicitud de Crédito -->
@@ -34,7 +88,8 @@
                                         [control]="creditRequestForm.get('creditApplicationDocument')"
                                         [accept]="creditRequestData.creditApplicationDocument.accept ?? '.pdf,.jpg,.jpeg,.png,.doc,.docx'"
                                         [maxSizeMB]="creditRequestData.creditApplicationDocument.maxSizeMB ?? 5"
-                                        [multiple]="creditRequestData.creditApplicationDocument.multiple ?? false" />
+                                        [multiple]="creditRequestData.creditApplicationDocument.multiple ?? false"
+                                        [disabled]="isBusy()" />
                                 </div>
                             </div>
 
@@ -47,7 +102,9 @@
                                         </p>
                                     </div>
                                     <button type="button" (click)="addReference()"
-                                        class="btn btn-light-primary max-w-xs" *ngIf="canAddReference">
+                                        class="btn btn-light-primary max-w-xs" 
+                                        *ngIf="canAddReference"
+                                        [disabled]="isBusy()">
                                         <i class="ti ti-plus text-base"></i>
                                         Agregar Referencia
                                     </button>
@@ -61,7 +118,8 @@
                                         <div class="flex justify-between items-center mb-4">
                                             <h6 class="text-lg font-semibold text-gray-800">Referencia {{ i + 1 }}</h6>
                                             <button type="button" (click)="removeReference(i)"
-                                                class="btn btn-sm btn-light-error">
+                                                class="btn btn-sm btn-light-error"
+                                                [disabled]="isBusy()">
                                                 <i class="ti ti-trash text-base"></i>
                                                 Eliminar
                                             </button>
@@ -75,14 +133,16 @@
                                                     [label]="referenceData.name.label"
                                                     [formControlName]="referenceData.name.formControlName"
                                                     [placeholder]="referenceData.name.placeholder"
-                                                    [control]="reference.get(referenceData.name.formControlName)" />
+                                                    [control]="reference.get(referenceData.name.formControlName)"
+                                                    [disabled]="isBusy()" />
                                             </div>
                                             <div class="lg:col-span-6 col-span-12">
                                                 <TextField [id]="referenceData.position.id + '-' + i"
                                                     [label]="referenceData.position.label"
                                                     [formControlName]="referenceData.position.formControlName"
                                                     [placeholder]="referenceData.position.placeholder"
-                                                    [control]="reference.get(referenceData.position.formControlName)" />
+                                                    [control]="reference.get(referenceData.position.formControlName)"
+                                                    [disabled]="isBusy()" />
                                             </div>
 
                                             <!-- Segunda fila: Teléfono y Correo Electrónico -->
@@ -91,44 +151,65 @@
                                                     [label]="referenceData.phone.label"
                                                     [formControlName]="referenceData.phone.formControlName"
                                                     [placeholder]="referenceData.phone.placeholder"
-                                                    [control]="reference.get(referenceData.phone.formControlName)" />
+                                                    [control]="reference.get(referenceData.phone.formControlName)"
+                                                    [disabled]="isBusy()" />
                                             </div>
                                             <div class="lg:col-span-6 col-span-12">
                                                 <TextField [id]="referenceData.email.id + '-' + i"
                                                     [label]="referenceData.email.label"
                                                     [formControlName]="referenceData.email.formControlName"
                                                     [placeholder]="referenceData.email.placeholder"
-                                                    [control]="reference.get(referenceData.email.formControlName)" />
+                                                    [control]="reference.get(referenceData.email.formControlName)"
+                                                    [disabled]="isBusy()" />
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
-
                             </div>
 
-                            <!-- Botones de acción -->
-                            <div class="flex gap-3 justify-end mt-6">
-                                <!-- Botón de restablecer -->
-                                <button 
-                                    type="button" 
-                                    class="btn btn-light-secondary"
-                                    (click)="resetToOriginal()"
-                                    [disabled]="!canReset()">
-                                    Restablecer
-                                </button>
-                                
-                                <button type="button" class="btn btn-light-error" [disabled]="isBusy()">Cancelar</button>
-                                <button type="submit" class="btn" [disabled]="isBusy()">
-                                    @if (isSaving()) {
-                                        <div class="flex items-center">
-                                            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                            Guardando...
-                                        </div>
-                                    } @else {
-                                        Guardar Solicitud de Crédito
+                            <!-- Botones de acción mejorados -->
+                            <div class="flex gap-3 justify-between mt-6">
+                                <!-- Botones de utilidad -->
+                                <div class="flex gap-2">
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-light-secondary"
+                                        (click)="resetToOriginal()"
+                                        [disabled]="!canReset()">
+                                        Restablecer
+                                    </button>
+                                    @if (error()) {
+                                        <button 
+                                            type="button" 
+                                            class="btn btn-light-warning"
+                                            (click)="clearErrors()">
+                                            Limpiar Errores
+                                        </button>
                                     }
-                                </button>
+                                </div>
+                                
+                                <!-- Botones principales -->
+                                <div class="flex gap-3">
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-light-error"
+                                        [disabled]="isBusy()">
+                                        Cancelar
+                                    </button>
+                                    <button 
+                                        type="submit" 
+                                        class="btn"
+                                        [disabled]="isBusy()">
+                                        @if (isSaving()) {
+                                            <div class="flex items-center">
+                                                <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                                Guardando...
+                                            </div>
+                                        } @else {
+                                            Guardar Solicitud de Crédito
+                                        }
+                                    </button>
+                                </div>
                             </div>
                         </form>
                     </div>

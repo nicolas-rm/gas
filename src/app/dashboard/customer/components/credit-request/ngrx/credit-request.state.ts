@@ -25,9 +25,6 @@ export interface CreditRequestDataState extends EntityState<CreditRequestData> {
     // Control de cambios
     hasUnsavedChanges: boolean;
     isDirty: boolean;
-    
-    // Metadatos
-    lastSaved: number | null;
 }
 
 // Entity Adapter
@@ -44,6 +41,5 @@ export const initialCreditRequestDataState: CreditRequestDataState = creditReque
     saving: false,
     error: null,
     hasUnsavedChanges: false,
-    isDirty: false,
-    lastSaved: null
+    isDirty: false
 });

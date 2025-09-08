@@ -23,7 +23,6 @@ export interface BillingDataState {
     error: string | null;
 
     // Metadatos
-    lastSaved: number | null;
     hasUnsavedChanges: boolean;
     isDirty: boolean;
 }
@@ -43,7 +42,6 @@ export const initialBillingDataState: BillingDataState = {
     loading: false,
     saving: false,
     error: null,
-    lastSaved: null,
     hasUnsavedChanges: false,
     isDirty: false
 };

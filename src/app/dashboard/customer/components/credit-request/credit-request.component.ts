@@ -2,10 +2,12 @@ import { TextFieldComponent } from '@/app/components/components';
 import { FileInputFieldComponent } from '@/components/file-input/file-input.component';
 import { Component, inject, effect } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormArray, ReactiveFormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { creditRequestForm } from '@/app/dashboard/customer/components/credit-request/form';
 import { CommonModule } from '@angular/common';
 import { HotToastService } from '@ngxpert/hot-toast';
 import { Store } from '@ngrx/store';
+import { debounceTime } from 'rxjs/operators';
 import { CreditRequestDataPageActions } from './ngrx/credit-request.actions';
 import { 
     selectCreditRequestData, 
@@ -78,17 +80,24 @@ export class CreditRequestComponent {
             const currentData = this.data();
             if (currentData) {
                 this.creditRequestForm.patchValue(currentData, { emitEvent: false });
+            } else {
+                // Soporte para time-travel / reset a estado inicial (create)
+                this.creditRequestForm.reset({}, { emitEvent: false });
+                this.references.clear();
+                this.addReference(); // Agregar referencia inicial
+                this.creditRequestForm.markAsPristine();
+                this.creditRequestForm.markAsUntouched();
             }
         });
 
         // Form -> Store (cambios del form)
-        this.creditRequestForm.valueChanges.subscribe(value => {
-            if (this.creditRequestForm.dirty) {
-                const data = value as CreditRequestData;
+        this.creditRequestForm.valueChanges
+            .pipe(debounceTime(300), takeUntilDestroyed())
+            .subscribe(() => {
+                const data = this.creditRequestForm.getRawValue() as CreditRequestData;
                 this.store.dispatch(CreditRequestDataPageActions.setData({ data }));
                 this.store.dispatch(CreditRequestDataPageActions.markAsDirty());
-            }
-        });
+            });
     }
 
     get references(): FormArray<FormGroup<ReferenceDataFormControl>> {
@@ -129,11 +138,6 @@ export class CreditRequestComponent {
         this.store.dispatch(CreditRequestDataPageActions.loadData({ customerId }));
     }
 
-    // Actualizar campo individual
-    updateField(field: keyof CreditRequestData, value: any): void {
-        this.store.dispatch(CreditRequestDataPageActions.updateField({ field, value }));
-    }
-
     // Guardar
     saveData(customerId?: string): void {
         if (!this.assertValid()) return;
@@ -158,9 +162,10 @@ export class CreditRequestComponent {
     resetForm(): void {
         this.store.dispatch(CreditRequestDataPageActions.resetForm());
         this.creditRequestForm.reset({}, { emitEvent: false }); // Evita que se dispare valueChanges
-        this.creditRequestForm.markAsPristine(); // Marca el form como pristine
         this.references.clear();
         this.addReference(); // Agregar referencia inicial
+        this.creditRequestForm.markAsPristine(); // Marca el form como pristine
+        this.creditRequestForm.markAsUntouched();
     }
 
     // Restablecer a datos originales (crear: vacío, actualizar: datos cargados)
@@ -168,6 +173,7 @@ export class CreditRequestComponent {
         this.store.dispatch(CreditRequestDataPageActions.resetToOriginal());
         // El efecto se encargará de actualizar el formulario con los datos originales
         this.creditRequestForm.markAsPristine();
+        this.creditRequestForm.markAsUntouched();
     }
 
     // Marcar como pristine (sin cambios)

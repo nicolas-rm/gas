@@ -48,24 +48,26 @@ export const creditRequestDataReducer = createReducer(
         return creditRequestDataAdapter.setOne(updatedData, {
             ...state,
             data: updatedData,
-            hasUnsavedChanges: true,
-            isDirty: true,
             error: null
         });
     }),
     
     // === SET DATA ===
-    on(CreditRequestDataPageActions.setData, (state, { data }): CreditRequestDataState => 
-        creditRequestDataAdapter.setOne(data, {
+    on(CreditRequestDataPageActions.setData, (state, { data }): CreditRequestDataState => {
+        const withEntity = creditRequestDataAdapter.setOne(data, state);
+        const changed = state.originalData
+            ? JSON.stringify(state.originalData) !== JSON.stringify(data)
+            : true; // en crear: cualquier cambio = sucio
+
+        return {
             ...state,
+            ...withEntity,
             data,
-            // Si no hay datos originales, establecer estos como originales (modo crear)
-            originalData: state.originalData || data,
-            hasUnsavedChanges: true,
-            isDirty: true,
-            error: null
-        })
-    ),
+            // NO tocar originalData aquí
+            hasUnsavedChanges: changed,
+            isDirty: changed,
+        };
+    }),
     
     // === SAVE DATA ===
     on(CreditRequestDataPageActions.saveData, (state): CreditRequestDataState => ({
@@ -84,8 +86,7 @@ export const creditRequestDataReducer = createReducer(
             saving: false,
             error: null,
             hasUnsavedChanges: false,
-            isDirty: false,
-            lastSaved: Date.now()
+            isDirty: false
         })
     ),
     

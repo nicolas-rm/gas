@@ -18,7 +18,7 @@ export const selectContractDataOriginal = createSelector(
 
 export const selectContractDataField = (field: keyof ContractData) => createSelector(
     selectContractData,
-    (data: ContractData) => data[field]
+    (data: ContractData | null) => data ? data[field] : null
 );
 
 // === STATUS SELECTORS ===
@@ -76,11 +76,7 @@ export const selectContractDataCanReset = createSelector(
         hasUnsavedChanges && !isBusy
 );
 
-// === METADATA SELECTORS ===
-export const selectContractDataLastSaved = createSelector(
-    selectContractDataState,
-    (state: ContractDataState) => state.lastSaved
-);
+// (Se eliminó lastSaved: ya no existe en el estado estandarizado)
 
 // === FORM STATE SELECTOR ===
 export const selectContractDataFormState = createSelector(
@@ -92,7 +88,8 @@ export const selectContractDataFormState = createSelector(
     selectContractDataHasUnsavedChanges,
     selectContractDataIsDirty,
     selectContractDataCanSave,
-    (data, status, loading, saving, error, hasUnsavedChanges, isDirty, canSave) => ({
+    selectContractDataCanReset,
+    (data, status, loading, saving, error, hasUnsavedChanges, isDirty, canSave, canReset) => ({
         data,
         status,
         loading,
@@ -101,6 +98,9 @@ export const selectContractDataFormState = createSelector(
         hasUnsavedChanges,
         isDirty,
         canSave,
+        canReset,
         isBusy: loading || saving
     })
 );
+
+// (Removidos selectores granulares y agrupados no utilizados para simplificar la superficie del estado)

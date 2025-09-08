@@ -46,26 +46,28 @@ export const ineDataReducer = createReducer(
             ...currentData,
             [field]: value
         };
-        
         return ineDataAdapter.setOne(updatedData, {
             ...state,
             data: updatedData,
-            hasUnsavedChanges: true,
-            isDirty: true,
             error: null
         });
     }),
     
     // === SET DATA ===
-    on(IneDataPageActions.setData, (state, { data }): IneDataState => 
-        ineDataAdapter.setOne(data, {
+    on(IneDataPageActions.setData, (state, { data }): IneDataState => {
+        const withEntity = ineDataAdapter.setOne(data, state);
+        const changed = state.originalData
+            ? JSON.stringify(state.originalData) !== JSON.stringify(data)
+            : true;
+        return {
             ...state,
+            ...withEntity,
             data,
-            hasUnsavedChanges: true,
-            isDirty: true,
+            hasUnsavedChanges: changed,
+            isDirty: changed,
             error: null
-        })
-    ),
+        };
+    }),
     
     // === SAVE DATA ===
     on(IneDataPageActions.saveData, (state): IneDataState => ({
@@ -84,8 +86,7 @@ export const ineDataReducer = createReducer(
             saving: false,
             error: null,
             hasUnsavedChanges: false,
-            isDirty: false,
-            lastSaved: Date.now()
+            isDirty: false
         })
     ),
     

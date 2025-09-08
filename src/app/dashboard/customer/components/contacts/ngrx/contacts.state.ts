@@ -11,6 +11,9 @@ export interface ContactsDataState extends EntityState<ContactsData> {
     // Datos del formulario
     data: ContactsData | null;
     
+    // Datos originales para restablecer
+    originalData: ContactsData | null;
+    
     // Estados operacionales
     status: ContactsDataStatus;
     
@@ -24,9 +27,6 @@ export interface ContactsDataState extends EntityState<ContactsData> {
     // Control de cambios
     hasUnsavedChanges: boolean;
     isDirty: boolean;
-    
-    // Metadatos
-    lastSaved: number | null;
 }
 
 // Estado inicial
@@ -37,11 +37,11 @@ export const initialContactsDataState: ContactsDataState = {
     
     // Propiedades customizadas
     data: null,
+    originalData: null,
     status: 'idle',
     loading: false,
     saving: false,
     error: null,
     hasUnsavedChanges: false,
-    isDirty: false,
-    lastSaved: null
+    isDirty: false
 };

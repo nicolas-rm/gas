@@ -18,7 +18,7 @@ export const selectCommissionDataOriginal = createSelector(
 
 export const selectCommissionDataField = (field: keyof CommissionData) => createSelector(
     selectCommissionData,
-    (data: CommissionData) => data[field]
+    (data: CommissionData | null) => data ? data[field] : null
 );
 
 // === STATUS SELECTORS ===
@@ -76,11 +76,7 @@ export const selectCommissionDataCanReset = createSelector(
         hasUnsavedChanges && !isBusy
 );
 
-// === METADATA SELECTORS ===
-export const selectCommissionDataLastSaved = createSelector(
-    selectCommissionDataState,
-    (state: CommissionDataState) => state.lastSaved
-);
+// (Se eliminó lastSaved: ya no existe en el estado estandarizado)
 
 // === FORM STATE SELECTOR ===
 export const selectCommissionDataFormState = createSelector(
@@ -92,7 +88,8 @@ export const selectCommissionDataFormState = createSelector(
     selectCommissionDataHasUnsavedChanges,
     selectCommissionDataIsDirty,
     selectCommissionDataCanSave,
-    (data, status, loading, saving, error, hasUnsavedChanges, isDirty, canSave) => ({
+    selectCommissionDataCanReset,
+    (data, status, loading, saving, error, hasUnsavedChanges, isDirty, canSave, canReset) => ({
         data,
         status,
         loading,
@@ -101,32 +98,9 @@ export const selectCommissionDataFormState = createSelector(
         hasUnsavedChanges,
         isDirty,
         canSave,
+        canReset,
         isBusy: loading || saving
     })
 );
 
-// === SPECIFIC FIELD SELECTORS ===
-export const selectCommissionClassification = createSelector(
-    selectCommissionData,
-    (data: CommissionData) => data.commissionClassification
-);
-
-export const selectCustomerLevel = createSelector(
-    selectCommissionData,
-    (data: CommissionData) => data.customerLevel
-);
-
-export const selectNormalPercentage = createSelector(
-    selectCommissionData,
-    (data: CommissionData) => data.normalPercentage
-);
-
-export const selectEarlyPaymentPercentage = createSelector(
-    selectCommissionData,
-    (data: CommissionData) => data.earlyPaymentPercentage
-);
-
-export const selectIncomeAccountingAccount = createSelector(
-    selectCommissionData,
-    (data: CommissionData) => data.incomeAccountingAccount
-);
+// (Removidos selectores granulares específicos de campos no utilizados para simplificar la superficie del estado)

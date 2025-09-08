@@ -18,7 +18,7 @@ export const selectBillingDataOriginal = createSelector(
 
 export const selectBillingDataField = (field: keyof BillingData) => createSelector(
     selectBillingData,
-    (data: BillingData) => data[field]
+    (data: BillingData | null) => data ? data[field] : null
 );
 
 // === STATUS SELECTORS ===
@@ -60,16 +60,15 @@ export const selectBillingDataIsDirty = createSelector(
     (state: BillingDataState) => state.isDirty
 );
 
-export const selectBillingDataLastSaved = createSelector(
-    selectBillingDataState,
-    (state: BillingDataState) => state.lastSaved
-);
+// (Se eliminó lastSaved: ya no existe en el estado estandarizado)
 
 export const selectBillingDataCanSave = createSelector(
-    selectBillingDataHasUnsavedChanges,
+    selectBillingDataLoading,
     selectBillingDataSaving,
-    (hasUnsavedChanges: boolean, saving: boolean) =>
-        hasUnsavedChanges && !saving
+    selectBillingDataError,
+    selectBillingDataHasUnsavedChanges,
+    (loading: boolean, saving: boolean, error: string | null, hasUnsavedChanges: boolean) =>
+        !loading && !saving && !error && hasUnsavedChanges
 );
 
 export const selectBillingDataCanReset = createSelector(
@@ -79,7 +78,7 @@ export const selectBillingDataCanReset = createSelector(
         hasUnsavedChanges && !isBusy
 );
 
-// === COMBINED SELECTORS ===
+// === FORM STATE SELECTOR ===
 export const selectBillingDataFormState = createSelector(
     selectBillingData,
     selectBillingDataStatus,
@@ -88,6 +87,8 @@ export const selectBillingDataFormState = createSelector(
     selectBillingDataError,
     selectBillingDataHasUnsavedChanges,
     selectBillingDataIsDirty,
+    selectBillingDataCanSave,
+    selectBillingDataCanReset,
     (
         data,
         status,
@@ -95,7 +96,9 @@ export const selectBillingDataFormState = createSelector(
         saving,
         error,
         hasUnsavedChanges,
-        isDirty
+        isDirty,
+        canSave,
+        canReset
     ) => ({
         data,
         status,
@@ -104,51 +107,10 @@ export const selectBillingDataFormState = createSelector(
         error,
         hasUnsavedChanges,
         isDirty,
-        canSave: hasUnsavedChanges && !saving,
+        canSave,
+        canReset,
         isBusy: loading || saving
     })
 );
 
-// === SPECIFIC FIELD SELECTORS ===
-export const selectInvoiceRepresentation = createSelector(
-    selectBillingData,
-    (data: BillingData) => data.invoiceRepresentation
-);
-
-export const selectBillingDays = createSelector(
-    selectBillingData,
-    (data: BillingData) => data.billingDays
-);
-
-export const selectBillingEmails = createSelector(
-    selectBillingData,
-    (data: BillingData) => data.billingEmails
-);
-
-export const selectBillingFrequency = createSelector(
-    selectBillingData,
-    (data: BillingData) => data.billingFrequency
-);
-
-export const selectAutomaticBilling = createSelector(
-    selectBillingData,
-    (data: BillingData) => data.automaticBilling
-);
-
-// === GROUPED SELECTORS ===
-export const selectBillingDataDates = createSelector(
-    selectBillingData,
-    (data: BillingData) => ({
-        startDate: data.startDate,
-        endDate: data.endDate
-    })
-);
-
-export const selectBillingDataConfiguration = createSelector(
-    selectBillingData,
-    (data: BillingData) => ({
-        invoiceRepresentation: data.invoiceRepresentation,
-        billingFrequency: data.billingFrequency,
-        automaticBilling: data.automaticBilling
-    })
-);
+// (Removidos selectores granulares específicos de campos y agrupados no utilizados para simplificar la superficie del estado)

@@ -14,7 +14,6 @@ export interface CommissionDataState {
     loading: boolean;
     saving: boolean;
     error: string | null;
-    lastSaved: number | null;
     hasUnsavedChanges: boolean;
     isDirty: boolean;
 }
@@ -32,7 +31,6 @@ export const initialCommissionDataState: CommissionDataState = {
     loading: false,
     saving: false,
     error: null,
-    lastSaved: null,
     hasUnsavedChanges: false,
     isDirty: false
 };

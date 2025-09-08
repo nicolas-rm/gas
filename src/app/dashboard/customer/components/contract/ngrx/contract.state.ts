@@ -23,7 +23,6 @@ export interface ContractDataState {
     error: string | null;
 
     // Metadatos
-    lastSaved: number | null;
     hasUnsavedChanges: boolean;
     isDirty: boolean;
 }
@@ -47,7 +46,6 @@ export const initialContractDataState: ContractDataState = {
     loading: false,
     saving: false,
     error: null,
-    lastSaved: null,
     hasUnsavedChanges: false,
     isDirty: false
 };

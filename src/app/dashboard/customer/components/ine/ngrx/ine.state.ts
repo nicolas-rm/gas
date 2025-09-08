@@ -25,9 +25,6 @@ export interface IneDataState extends EntityState<IneData> {
     // Control de cambios
     hasUnsavedChanges: boolean;
     isDirty: boolean;
-    
-    // Metadatos
-    lastSaved: number | null;
 }
 
 // Entity Adapter
@@ -44,6 +41,5 @@ export const initialIneDataState: IneDataState = ineDataAdapter.getInitialState(
     saving: false,
     error: null,
     hasUnsavedChanges: false,
-    isDirty: false,
-    lastSaved: null
+    isDirty: false
 });

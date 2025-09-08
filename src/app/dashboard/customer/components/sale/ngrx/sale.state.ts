@@ -23,7 +23,6 @@ export interface SaleDataState {
     error: string | null;
 
     // Metadatos
-    lastSaved: number | null;
     hasUnsavedChanges: boolean;
     isDirty: boolean;
 }
@@ -45,7 +44,6 @@ export const initialSaleDataState: SaleDataState = {
     loading: false,
     saving: false,
     error: null,
-    lastSaved: null,
     hasUnsavedChanges: false,
     isDirty: false
 };

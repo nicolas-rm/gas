@@ -32,7 +32,6 @@ export const saleDataReducer = createReducer(
         error: null,
         hasUnsavedChanges: false,
         isDirty: false,
-        lastSaved: Date.now(),
     })),
 
     on(SaleDataApiActions.loadDataFailure, (state, { error }) => ({
@@ -49,8 +48,6 @@ export const saleDataReducer = createReducer(
             ...state.data,
             [field]: value,
         },
-        hasUnsavedChanges: true,
-        isDirty: true,
     })),
 
     on(SaleDataPageActions.updateMultipleFields, (state, { updates }) => ({
@@ -59,18 +56,19 @@ export const saleDataReducer = createReducer(
             ...state.data,
             ...updates,
         },
-        hasUnsavedChanges: true,
-        isDirty: true,
     })),
 
-    on(SaleDataPageActions.setData, (state, { data }) => ({
-        ...state,
-        data,
-        // Si no hay datos originales, establecer estos como originales (modo crear)
-        originalData: state.originalData || data,
-        hasUnsavedChanges: false,
-        isDirty: false,
-    })),
+    on(SaleDataPageActions.setData, (state, { data }) => {
+        const changed = state.originalData
+            ? JSON.stringify(state.originalData) !== JSON.stringify(data)
+            : true;
+        return {
+            ...state,
+            data,
+            hasUnsavedChanges: changed,
+            isDirty: changed,
+        };
+    }),
 
     // === SAVE DATA ===
     on(SaleDataPageActions.saveData, (state) => ({
@@ -89,7 +87,6 @@ export const saleDataReducer = createReducer(
         error: null,
         hasUnsavedChanges: false,
         isDirty: false,
-        lastSaved: Date.now(),
     })),
 
     on(SaleDataApiActions.saveDataFailure, (state, { error }) => ({

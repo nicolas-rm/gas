@@ -61,10 +61,12 @@ export const selectGeneralDataIsDirty = createSelector(
 );
 
 export const selectGeneralDataCanSave = createSelector(
-    selectGeneralDataHasUnsavedChanges,
+    selectGeneralDataLoading,
     selectGeneralDataSaving,
-    (hasUnsavedChanges: boolean, saving: boolean) =>
-        hasUnsavedChanges && !saving
+    selectGeneralDataError,
+    selectGeneralDataHasUnsavedChanges,
+    (loading: boolean, saving: boolean, error: string | null, hasUnsavedChanges: boolean) =>
+        !loading && !saving && !error && hasUnsavedChanges
 );
 
 export const selectGeneralDataCanReset = createSelector(
@@ -72,6 +74,31 @@ export const selectGeneralDataCanReset = createSelector(
     selectGeneralDataIsBusy,
     (hasUnsavedChanges: boolean, isBusy: boolean) =>
         hasUnsavedChanges && !isBusy
+);
+
+// === FORM STATE SELECTOR ===
+export const selectGeneralDataFormState = createSelector(
+    selectGeneralData,
+    selectGeneralDataStatus,
+    selectGeneralDataLoading,
+    selectGeneralDataSaving,
+    selectGeneralDataError,
+    selectGeneralDataHasUnsavedChanges,
+    selectGeneralDataIsDirty,
+    selectGeneralDataCanSave,
+    selectGeneralDataCanReset,
+    (data, status, loading, saving, error, hasUnsavedChanges, isDirty, canSave, canReset) => ({
+        data,
+        status,
+        loading,
+        saving,
+        error,
+        hasUnsavedChanges,
+        isDirty,
+        canSave,
+        canReset,
+        isBusy: loading || saving
+    })
 );
 
 // (Removidos selectores granulares y agrupados no utilizados para simplificar la superficie del estado)

@@ -1,9 +1,11 @@
 import { SelectFieldComponent, TextFieldComponent } from '@/app/components/components';
 import { Component, inject, effect } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { contractForm } from '@/app/dashboard/customer/components/contract/form';
 import { HotToastService } from '@ngxpert/hot-toast';
 import { Store } from '@ngrx/store';
+import { debounceTime } from 'rxjs/operators';
 import { ContractDataPageActions } from './ngrx/contract.actions';
 import { 
     selectContractData, 
@@ -110,27 +112,27 @@ export class ContractComponent {
             const currentData = this.data();
             if (currentData) {
                 this.contractDataForm.patchValue(currentData, { emitEvent: false });
+            } else {
+                // Soporte para time-travel / reset a estado inicial (create)
+                this.contractDataForm.reset({}, { emitEvent: false });
+                this.contractDataForm.markAsPristine();
+                this.contractDataForm.markAsUntouched();
             }
         });
 
         // Form -> Store (cambios del form)
-        this.contractDataForm.valueChanges.subscribe(value => {
-            if (this.contractDataForm.dirty) {
-                const data = value as ContractData;
+        this.contractDataForm.valueChanges
+            .pipe(debounceTime(300), takeUntilDestroyed())
+            .subscribe(() => {
+                const data = this.contractDataForm.getRawValue() as ContractData;
                 this.store.dispatch(ContractDataPageActions.setData({ data }));
                 this.store.dispatch(ContractDataPageActions.markAsDirty());
-            }
-        });
+            });
     }
 
     // Cargar datos
     loadData(customerId: string): void {
         this.store.dispatch(ContractDataPageActions.loadData({ customerId }));
-    }
-
-    // Actualizar campo individual
-    updateField(field: keyof ContractData, value: string | null): void {
-        this.store.dispatch(ContractDataPageActions.updateField({ field, value }));
     }
 
     // Guardar
@@ -158,6 +160,7 @@ export class ContractComponent {
         this.store.dispatch(ContractDataPageActions.resetForm());
         this.contractDataForm.reset({}, { emitEvent: false }); // Evita que se dispare valueChanges
         this.contractDataForm.markAsPristine(); // Marca el form como pristine
+        this.contractDataForm.markAsUntouched();
     }
 
     // Restablecer a datos originales (crear: vacío, actualizar: datos cargados)
@@ -165,6 +168,7 @@ export class ContractComponent {
         this.store.dispatch(ContractDataPageActions.resetToOriginal());
         // El efecto se encargará de actualizar el formulario con los datos originales
         this.contractDataForm.markAsPristine();
+        this.contractDataForm.markAsUntouched();
     }
 
     // Marcar como pristine (sin cambios)

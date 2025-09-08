@@ -36,13 +36,13 @@ export const contactsDataReducer = createReducer(
         return {
             ...withEntity,
             data,
+            originalData: data, // Guardar los datos originales al cargar
             status: 'idle' as const,
             loading: false,
             saving: false,
             error: null,
             hasUnsavedChanges: false,
-            isDirty: false,
-            lastSaved: Date.now()
+            isDirty: false
         };
     }),
 
@@ -69,13 +69,6 @@ export const contactsDataReducer = createReducer(
             return {
                 ...withEntity,
                 data: updatedData,
-                status: state.status,
-                loading: state.loading,
-                saving: state.saving,
-                error: state.error,
-                hasUnsavedChanges: true,
-                isDirty: true,
-                lastSaved: state.lastSaved
             };
         }
         return state;
@@ -93,30 +86,23 @@ export const contactsDataReducer = createReducer(
         return {
             ...withEntity,
             data: updatedData,
-            status: state.status,
-            loading: state.loading,
-            saving: state.saving,
-            error: state.error,
-            hasUnsavedChanges: true,
-            isDirty: true,
-            lastSaved: state.lastSaved
         };
     }),
 
     // Establecer datos completos
     on(ContactsDataPageActions.setData, (state, { data }) => {
         const withEntity = contactsDataAdapter.setOne(data, state);
-        
+        const changed = state.originalData
+            ? JSON.stringify(state.originalData) !== JSON.stringify(data)
+            : true; // en crear: cualquier cambio = sucio
+
         return {
+            ...state,
             ...withEntity,
             data,
-            status: state.status,
-            loading: state.loading,
-            saving: state.saving,
-            error: state.error,
-            hasUnsavedChanges: false,
-            isDirty: false,
-            lastSaved: state.lastSaved
+            // NO tocar originalData aquí
+            hasUnsavedChanges: changed,
+            isDirty: changed,
         };
     }),
 
@@ -136,13 +122,13 @@ export const contactsDataReducer = createReducer(
         return {
             ...withEntity,
             data,
+            originalData: data, // Actualizar datos originales después de guardar exitosamente
             status: 'saved' as const,
             loading: false,
             saving: false,
             error: null,
             hasUnsavedChanges: false,
-            isDirty: false,
-            lastSaved: Date.now()
+            isDirty: false
         };
     }),
 
@@ -156,9 +142,38 @@ export const contactsDataReducer = createReducer(
 
     // === RESET Y LIMPIEZA ===
     // Resetear formulario (limpia todo el estado)
-    on(ContactsDataPageActions.resetForm, () => ({
-        ...initialState
-    })),
+    on(ContactsDataPageActions.resetForm, () => {
+        // Limpia completamente el adapter y restablece el estado extendido
+        const base = contactsDataAdapter.getInitialState(initialContactsDataState);
+        const cleared = contactsDataAdapter.removeAll(base);
+        return {
+            ...cleared,
+            error: null,
+            data: null,
+            originalData: null,
+            status: 'idle',
+            loading: false,
+            saving: false,
+            hasUnsavedChanges: false,
+            isDirty: false
+        } as ContactsDataState;
+    }),
+
+    // Restablecer a datos originales (crear: campos vacíos, actualizar: datos cargados)
+    on(ContactsDataPageActions.resetToOriginal, (state) => {
+        const dataToRestore = state.originalData || { contacts: [] };
+        const withEntity = contactsDataAdapter.setOne(dataToRestore, state);
+
+        return {
+            ...state,
+            ...withEntity,
+            data: dataToRestore,
+            originalData: state.originalData,
+            error: null,
+            hasUnsavedChanges: false,
+            isDirty: false,
+        };
+    }),
 
     // Limpiar errores
     on(ContactsDataPageActions.clearErrors, state => ({

@@ -18,7 +18,7 @@ export const selectSaleDataOriginal = createSelector(
 
 export const selectSaleDataField = (field: keyof SaleData) => createSelector(
     selectSaleData,
-    (data: SaleData) => data[field]
+    (data: SaleData | null) => data ? data[field] : null
 );
 
 // === STATUS SELECTORS ===
@@ -60,16 +60,14 @@ export const selectSaleDataIsDirty = createSelector(
     (state: SaleDataState) => state.isDirty
 );
 
-export const selectSaleDataLastSaved = createSelector(
-    selectSaleDataState,
-    (state: SaleDataState) => state.lastSaved
-);
 
 export const selectSaleDataCanSave = createSelector(
-    selectSaleDataHasUnsavedChanges,
+    selectSaleDataLoading,
     selectSaleDataSaving,
-    (hasUnsavedChanges: boolean, saving: boolean) =>
-        hasUnsavedChanges && !saving
+    selectSaleDataError,
+    selectSaleDataHasUnsavedChanges,
+    (loading: boolean, saving: boolean, error: string | null, hasUnsavedChanges: boolean) =>
+        !loading && !saving && !error && hasUnsavedChanges
 );
 
 export const selectSaleDataCanReset = createSelector(
@@ -79,7 +77,7 @@ export const selectSaleDataCanReset = createSelector(
         hasUnsavedChanges && !isBusy
 );
 
-// === COMBINED SELECTORS ===
+// === FORM STATE SELECTOR ===
 export const selectSaleDataFormState = createSelector(
     selectSaleData,
     selectSaleDataStatus,
@@ -88,15 +86,9 @@ export const selectSaleDataFormState = createSelector(
     selectSaleDataError,
     selectSaleDataHasUnsavedChanges,
     selectSaleDataIsDirty,
-    (
-        data,
-        status,
-        loading,
-        saving,
-        error,
-        hasUnsavedChanges,
-        isDirty
-    ) => ({
+    selectSaleDataCanSave,
+    selectSaleDataCanReset,
+    (data, status, loading, saving, error, hasUnsavedChanges, isDirty, canSave, canReset) => ({
         data,
         status,
         loading,
@@ -104,52 +96,10 @@ export const selectSaleDataFormState = createSelector(
         error,
         hasUnsavedChanges,
         isDirty,
-        canSave: hasUnsavedChanges && !saving,
+        canSave,
+        canReset,
         isBusy: loading || saving
     })
 );
 
-// === SPECIFIC FIELD SELECTORS ===
-export const selectAccountType = createSelector(
-    selectSaleData,
-    (data: SaleData) => data.accountType
-);
-
-export const selectSeller = createSelector(
-    selectSaleData,
-    (data: SaleData) => data.seller
-);
-
-export const selectAccountNumber = createSelector(
-    selectSaleData,
-    (data: SaleData) => data.accountNumber
-);
-
-export const selectPrepaidType = createSelector(
-    selectSaleData,
-    (data: SaleData) => data.prepaidType
-);
-
-export const selectPaymentMethod = createSelector(
-    selectSaleData,
-    (data: SaleData) => data.paymentMethod
-);
-
-// === GROUPED SELECTORS ===
-export const selectSaleDataCredit = createSelector(
-    selectSaleData,
-    (data: SaleData) => ({
-        creditDays: data.creditDays,
-        creditLimit: data.creditLimit,
-        advanceCommission: data.advanceCommission
-    })
-);
-
-export const selectSaleDataAccount = createSelector(
-    selectSaleData,
-    (data: SaleData) => ({
-        accountType: data.accountType,
-        accountNumber: data.accountNumber,
-        prepaidType: data.prepaidType
-    })
-);
+// (Removidos selectores granulares específicos de campos y agrupados no utilizados para simplificar la superficie del estado)
