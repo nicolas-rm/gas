@@ -6,7 +6,7 @@ import { contactForm } from '@/app/dashboard/customer/components/contacts/form';
 import { CommonModule } from '@angular/common';
 import { HotToastService } from '@ngxpert/hot-toast';
 import { Store } from '@ngrx/store';
-import { debounceTime } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, filter, map, skip } from 'rxjs/operators';
 import { ContactsDataPageActions } from './ngrx/contacts.actions';
 import { 
     selectContactsData, 
@@ -19,6 +19,7 @@ import {
     selectContactsDataOriginal
 } from './ngrx/contacts.selectors';
 import { ContactsData } from './ngrx/contacts.models';
+import { ContactData } from './ngrx/contacts.models';
 
 export type ContactFormControl = {
     name: FormControl<string | null>;
@@ -52,31 +53,56 @@ export class ContactsComponent {
     originalData = this.store.selectSignal(selectContactsDataOriginal);
     
     contactsForm: FormGroup;
+
+    // Control de hidrata / inicialización silenciosa
+    private hydrating = false;
+
+    // ==== Normalización y utilidades ====
+    private toStr = (v: any) => (v == null ? '' : String(v).trim());
+    private isEmptyContact = (c: ContactData | null | undefined) =>
+        !c || (!this.toStr(c.name) && !this.toStr(c.position) && !this.toStr(c.phone) && !this.toStr(c.email));
+
+    private normalize = (d: ContactsData | null | undefined): ContactsData => ({
+        contacts: (d?.contacts ?? [])
+            .filter(c => !this.isEmptyContact(c))
+            .map(c => ({
+                name: c?.name ?? null,
+                position: c?.position ?? null,
+                phone: c?.phone ?? null,
+                email: c?.email ?? null,
+            })),
+    });
+
+    private deepEq = (a: any, b: any) => JSON.stringify(a) === JSON.stringify(b);
     
     constructor() {
         this.contactsForm = this.fb.group({
             contacts: this.fb.array([])
         });
-        
-        // Agregar un contacto inicial
-        this.addContact();
 
-        // Store -> Form (se ejecuta cada vez que cambie el signal)
+        // Añadir fila inicial silenciosa (placeholder) sin ensuciar
+        this.addBlankContactSilent();
+
+        // Store -> Form (reactivo a cambios del store)
         effect(() => {
             const currentData = this.data();
             if (currentData) {
-                // Sincronizar FormArray con datos del store
                 this.syncFormArrayWithData(currentData);
             } else {
-                // Soporte para time-travel / reset a estado inicial (create)
-                this.contactsArray.clear();
-                this.addContact();
-                this.contactsForm.markAsPristine();
-                this.contactsForm.markAsUntouched();
+                // Modo creación / reset total
+                this.hydrating = true;
+                try {
+                    this.contactsArray.clear();
+                    this.addBlankContactSilent();
+                    this.contactsForm.markAsPristine();
+                    this.contactsForm.markAsUntouched();
+                } finally {
+                    this.hydrating = false;
+                }
             }
         });
 
-        // Effect para manejar estado habilitado/deshabilitado del form
+        // Effect: habilitar / deshabilitar
         effect(() => {
             const busy = this.isBusy();
             if (busy) {
@@ -86,14 +112,7 @@ export class ContactsComponent {
             }
         });
 
-        // Form -> Store (cambios del form)
-        this.contactsForm.valueChanges
-            .pipe(debounceTime(300), takeUntilDestroyed())
-            .subscribe(() => {
-                const data = this.contactsForm.getRawValue() as ContactsData;
-                this.store.dispatch(ContactsDataPageActions.setData({ data }));
-                this.store.dispatch(ContactsDataPageActions.markAsDirty());
-            });
+        this.wireFormChanges();
     }
     
     get contactsArray(): FormArray {
@@ -109,24 +128,70 @@ export class ContactsComponent {
         });
     }
 
-    // Sincronizar FormArray con datos del store
+    // Sincronizar FormArray con datos del store (silencioso, no ensucia)
     private syncFormArrayWithData(data: ContactsData): void {
-        const currentLength = this.contactsArray.length;
-        const dataLength = data.contacts ? data.contacts.length : 0;
+        this.hydrating = true;
+        try {
+            const norm = this.normalize(data);
+            const currentLength = this.contactsArray.length;
+            const dataLength = norm.contacts.length;
 
-        // Ajustar tamaño del FormArray
-        if (dataLength > currentLength) {
+            // Ajustar tamaño
             for (let i = currentLength; i < dataLength; i++) {
                 this.contactsArray.push(this.createContactFormGroup());
             }
-        } else if (dataLength < currentLength) {
             for (let i = currentLength - 1; i >= dataLength; i--) {
                 this.contactsArray.removeAt(i);
             }
-        }
 
-        // Actualizar valores
-        this.contactsForm.patchValue(data, { emitEvent: false });
+            // Patch silencioso
+            this.contactsForm.patchValue({ contacts: norm.contacts }, { emitEvent: false });
+
+            // Si no hay contactos reales, mantener 1 fila vacía visible
+            if (norm.contacts.length === 0 && this.contactsArray.length === 0) {
+                this.contactsArray.push(this.createContactFormGroup());
+            }
+
+            this.contactsForm.markAsPristine();
+        } finally {
+            this.hydrating = false;
+        }
+    }
+
+    // Listener avanzado de cambios del formulario
+    private wireFormChanges() {
+        this.contactsForm.valueChanges.pipe(
+            // Ignorar la primera emisión (construcción inicial)
+            skip(1),
+            debounceTime(300),
+            filter(() => !this.hydrating),
+            map(() => this.normalize(this.contactsForm.getRawValue() as ContactsData)),
+            distinctUntilChanged((a, b) => this.deepEq(a, b)),
+            takeUntilDestroyed()
+        ).subscribe(value => {
+            // Sincronizar siempre data normalizada
+            this.store.dispatch(ContactsDataPageActions.setData({ data: value }));
+
+            // Comparar contra original normalizado para dirty/pristine
+            const orig = this.normalize(this.originalData() ?? { contacts: [] });
+            if (!this.deepEq(value, orig)) {
+                this.store.dispatch(ContactsDataPageActions.markAsDirty());
+            } else {
+                this.store.dispatch(ContactsDataPageActions.markAsPristine());
+            }
+        });
+    }
+
+    // Agregar fila inicial silenciosa
+    private addBlankContactSilent() {
+        this.hydrating = true;
+        try {
+            this.contactsArray.push(this.createContactFormGroup());
+            this.contactsForm.updateValueAndValidity({ emitEvent: false });
+            this.contactsForm.markAsPristine();
+        } finally {
+            this.hydrating = false;
+        }
     }
     
     addContact(): void {
@@ -178,15 +243,18 @@ export class ContactsComponent {
     resetForm(): void {
         this.store.dispatch(ContactsDataPageActions.resetForm());
         this.contactsArray.clear();
-        this.addContact(); // Agregar contacto inicial
+        this.addBlankContactSilent();
         this.contactsForm.markAsPristine();
         this.contactsForm.markAsUntouched();
     }
 
     // Restablecer a datos originales (crear: vacío, actualizar: datos cargados)
     resetToOriginal(): void {
-        this.store.dispatch(ContactsDataPageActions.resetToOriginal());
-        // El efecto se encargará de actualizar el formulario con los datos originales
+        // Restauración silenciosa manual para asegurar coherencia con normalize
+        const orig = this.normalize(this.originalData() ?? { contacts: [] });
+        this.syncFormArrayWithData(orig);
+        this.store.dispatch(ContactsDataPageActions.setData({ data: orig }));
+        this.store.dispatch(ContactsDataPageActions.markAsPristine());
         this.contactsForm.markAsPristine();
         this.contactsForm.markAsUntouched();
     }
