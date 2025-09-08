@@ -1,11 +1,21 @@
-import { SelectFieldComponent, TextFieldComponent } from '@/app/components/components';
+// Angular
 import { Component, inject, effect } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { saleForm } from '@/app/dashboard/customer/components/sale/form';
-import { HotToastService } from '@ngxpert/hot-toast';
+
+// NgRx
 import { Store } from '@ngrx/store';
+
+// RxJS
 import { debounceTime } from 'rxjs/operators';
+
+// Componentes
+import { SelectFieldComponent, TextFieldComponent } from '@/app/components/components';
+
+// Config del formulario (labels, ids, etc.)
+import { saleForm } from '@/app/dashboard/customer/components/sale/form';
+
+// NgRx Sale Data
 import { SaleDataPageActions } from './ngrx/sale.actions';
 import { 
     selectSaleData, 
@@ -15,22 +25,14 @@ import {
     selectSaleDataError,
     selectSaleDataHasUnsavedChanges,
     selectSaleDataCanReset,
-    selectSaleDataOriginal,
-    selectSaleDataFormState
+    selectSaleDataOriginal
 } from './ngrx/sale.selectors';
 import { SaleData } from './ngrx/sale.models';
 
-export type SaleDataFormControl = {
-    accountType: FormControl<string | null>;
-    seller: FormControl<string | null>;
-    accountNumber: FormControl<string | null>;
-    prepaidType: FormControl<string | null>;
-    creditDays: FormControl<string | null>;
-    creditLimit: FormControl<string | null>;
-    advanceCommission: FormControl<string | null>;
-    paymentMethod: FormControl<string | null>;
-    voucherAmount: FormControl<string | null>;
-}
+// Toasts
+import { HotToastService } from '@ngxpert/hot-toast';
+
+type ControlsOf<T> = { [K in keyof T]: FormControl<T[K] | null> };
 
 @Component({
   selector: 'app-sale',
@@ -40,19 +42,20 @@ export type SaleDataFormControl = {
 })
 export class SaleComponent {
 
-    readonly saleData = saleForm
+    // UI metadata (labels, placeholders…)
+    readonly saleData = saleForm;
 
     readonly accountTypeOptions = [
         { label: 'Prepago', value: 'prepago' },
         { label: 'Crédito', value: 'credito' },
         { label: 'Efectivo', value: 'efectivo' },
         { label: 'Control', value: 'control' }
-    ]
+    ];
 
     readonly prepaidTypeOptions = [
         { label: 'Cuenta Maestra', value: 'cuenta_maestra' },
         { label: 'Por Tarjetas', value: 'por_tarjetas' }
-    ]
+    ];
 
     readonly paymentMethodOptions = [
         { label: 'Transferencia Bancaria', value: 'transferencia' },
@@ -60,13 +63,14 @@ export class SaleComponent {
         { label: 'Efectivo', value: 'efectivo' },
         { label: 'Tarjeta de Crédito', value: 'tarjeta_credito' },
         { label: 'Tarjeta de Débito', value: 'tarjeta_debito' }
-    ]
+    ];
 
+    // Inyecciones
     private readonly fb = inject(FormBuilder);
     private readonly toast = inject(HotToastService);
     private readonly store = inject(Store);
 
-    // NgRx signals
+    // Signals desde NgRx
     isLoading = this.store.selectSignal(selectSaleDataLoading);
     isSaving = this.store.selectSignal(selectSaleDataSaving);
     isBusy = this.store.selectSignal(selectSaleDataIsBusy);
@@ -75,23 +79,21 @@ export class SaleComponent {
     canReset = this.store.selectSignal(selectSaleDataCanReset);
     data = this.store.selectSignal(selectSaleData);
     originalData = this.store.selectSignal(selectSaleDataOriginal);
-    formState = this.store.selectSignal(selectSaleDataFormState);
 
-    saleDataForm: FormGroup<SaleDataFormControl>
+    // FormGroup tipado a partir del modelo SaleData
+    saleDataForm: FormGroup<ControlsOf<SaleData>> = this.fb.group<ControlsOf<SaleData>>({
+        accountType: this.fb.control<string | null>(null),
+        seller: this.fb.control<string | null>(null),
+        accountNumber: this.fb.control<string | null>(null),
+        prepaidType: this.fb.control<string | null>(null),
+        creditDays: this.fb.control<string | null>(null),
+        creditLimit: this.fb.control<string | null>(null),
+        advanceCommission: this.fb.control<string | null>(null),
+        paymentMethod: this.fb.control<string | null>(null),
+        voucherAmount: this.fb.control<string | null>(null),
+    });
 
     constructor() {
-        this.saleDataForm = this.fb.group({
-            accountType: ['', []],
-            seller: ['', []],
-            accountNumber: ['', []],
-            prepaidType: ['', []],
-            creditDays: ['', []],
-            creditLimit: ['', []],
-            advanceCommission: ['', []],
-            paymentMethod: ['', []],
-            voucherAmount: ['', []],
-        })
-
         // Store -> Form (se ejecuta cada vez que cambie el signal)
         effect(() => {
             const currentData = this.data();
@@ -105,6 +107,16 @@ export class SaleComponent {
             }
         });
 
+        // Effect para manejar estado habilitado/deshabilitado del form
+        effect(() => {
+            const busy = this.isBusy();
+            if (busy) {
+                this.saleDataForm.disable({ emitEvent: false });
+            } else {
+                this.saleDataForm.enable({ emitEvent: false });
+            }
+        });
+
         // Form -> Store (cambios del form)
         this.saleDataForm.valueChanges
             .pipe(debounceTime(300), takeUntilDestroyed())
@@ -115,7 +127,7 @@ export class SaleComponent {
             });
     }
 
-    // Cargar datos
+    // Cargar datos desde API
     loadData(customerId: string): void {
         this.store.dispatch(SaleDataPageActions.loadData({ customerId }));
     }
@@ -167,7 +179,7 @@ export class SaleComponent {
         this.store.dispatch(SaleDataPageActions.clearErrors());
     }
 
-    onSubmit() {
+    onSubmit(): void {
         this.saveData();
     }
 }

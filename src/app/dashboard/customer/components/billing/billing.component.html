@@ -69,8 +69,7 @@
                                         [formControlName]="billingData.invoiceRepresentation.formControlName"
                                         [control]="billingDataForm.get(billingData.invoiceRepresentation.formControlName)"
                                         [options]="invoiceRepresentationOptions"
-                                        [placeholder]="billingData.invoiceRepresentation.placeholder"
-                                        [disabled]="isBusy()">
+                                        [placeholder]="billingData.invoiceRepresentation.placeholder">
                                     </SelectField>
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
@@ -79,8 +78,7 @@
                                         [formControlName]="billingData.billingDays.formControlName"
                                         [control]="billingDataForm.get(billingData.billingDays.formControlName)"
                                         [options]="billingDaysOptions"
-                                        [placeholder]="billingData.billingDays.placeholder"
-                                        [disabled]="isBusy()">
+                                        [placeholder]="billingData.billingDays.placeholder">
                                     </SelectField>
                                 </div>
 
@@ -90,8 +88,7 @@
                                         [label]="billingData.billingEmails.label"
                                         [formControlName]="billingData.billingEmails.formControlName"
                                         [placeholder]="billingData.billingEmails.placeholder"
-                                        [control]="billingDataForm.get(billingData.billingEmails.formControlName)"
-                                        [disabled]="isBusy()" />
+                                        [control]="billingDataForm.get(billingData.billingEmails.formControlName)" />
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
                                     <SelectField [id]="billingData.billingFrequency.id"
@@ -99,8 +96,7 @@
                                         [formControlName]="billingData.billingFrequency.formControlName"
                                         [control]="billingDataForm.get(billingData.billingFrequency.formControlName)"
                                         [options]="billingFrequencyOptions"
-                                        [placeholder]="billingData.billingFrequency.placeholder"
-                                        [disabled]="isBusy()">
+                                        [placeholder]="billingData.billingFrequency.placeholder">
                                     </SelectField>
                                 </div>
 
@@ -110,16 +106,14 @@
                                         [formControlName]="billingData.startDate.formControlName"
                                         [placeholder]="billingData.startDate.placeholder"
                                         [type]="billingData.startDate.type"
-                                        [control]="billingDataForm.get(billingData.startDate.formControlName)"
-                                        [disabled]="isBusy()" />
+                                        [control]="billingDataForm.get(billingData.startDate.formControlName)" />
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
                                     <TextField [id]="billingData.endDate.id" [label]="billingData.endDate.label"
                                         [formControlName]="billingData.endDate.formControlName"
                                         [placeholder]="billingData.endDate.placeholder"
                                         [type]="billingData.endDate.type"
-                                        [control]="billingDataForm.get(billingData.endDate.formControlName)"
-                                        [disabled]="isBusy()" />
+                                        [control]="billingDataForm.get(billingData.endDate.formControlName)" />
                                 </div>
 
                                 <!-- Cuarta fila: Facturación Automática -->
@@ -129,8 +123,7 @@
                                         [formControlName]="billingData.automaticBilling.formControlName"
                                         [control]="billingDataForm.get(billingData.automaticBilling.formControlName)"
                                         [options]="automaticBillingOptions"
-                                        [placeholder]="billingData.automaticBilling.placeholder"
-                                        [disabled]="isBusy()">
+                                        [placeholder]="billingData.automaticBilling.placeholder">
                                     </SelectField>
                                 </div>
                             </div>
@@ -160,14 +153,12 @@
                                 <div class="flex gap-3">
                                     <button 
                                         type="button" 
-                                        class="btn btn-light-error"
-                                        [disabled]="isBusy()">
+                                        class="btn btn-light-error">
                                         Cancelar
                                     </button>
                                     <button 
                                         type="submit" 
-                                        class="btn"
-                                        [disabled]="isBusy()">
+                                        class="btn">
                                         @if (isSaving()) {
                                             <div class="flex items-center">
                                                 <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>

@@ -76,29 +76,4 @@ export const selectGeneralDataCanReset = createSelector(
         hasUnsavedChanges && !isBusy
 );
 
-// === FORM STATE SELECTOR ===
-export const selectGeneralDataFormState = createSelector(
-    selectGeneralData,
-    selectGeneralDataStatus,
-    selectGeneralDataLoading,
-    selectGeneralDataSaving,
-    selectGeneralDataError,
-    selectGeneralDataHasUnsavedChanges,
-    selectGeneralDataIsDirty,
-    selectGeneralDataCanSave,
-    selectGeneralDataCanReset,
-    (data, status, loading, saving, error, hasUnsavedChanges, isDirty, canSave, canReset) => ({
-        data,
-        status,
-        loading,
-        saving,
-        error,
-        hasUnsavedChanges,
-        isDirty,
-        canSave,
-        canReset,
-        isBusy: loading || saving
-    })
-);
-
 // (Removidos selectores granulares y agrupados no utilizados para simplificar la superficie del estado)

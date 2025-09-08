@@ -77,28 +77,4 @@ export const selectIneDataCanReset = createSelector(
 );
 
 // === FORM STATE SELECTOR ===
-export const selectIneDataFormState = createSelector(
-    selectIneData,
-    selectIneDataStatus,
-    selectIneDataLoading,
-    selectIneDataSaving,
-    selectIneDataError,
-    selectIneDataHasUnsavedChanges,
-    selectIneDataIsDirty,
-    selectIneDataCanSave,
-    selectIneDataCanReset,
-    (data, status, loading, saving, error, hasUnsavedChanges, isDirty, canSave, canReset) => ({
-        data,
-        status,
-        loading,
-        saving,
-        error,
-        hasUnsavedChanges,
-        isDirty,
-        canSave,
-        canReset,
-        isBusy: loading || saving
-    })
-);
-
 // (Removidos selectores granulares específicos de campos y agrupados no utilizados para simplificar la superficie del estado)

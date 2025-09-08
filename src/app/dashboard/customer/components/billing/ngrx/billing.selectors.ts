@@ -78,39 +78,4 @@ export const selectBillingDataCanReset = createSelector(
         hasUnsavedChanges && !isBusy
 );
 
-// === FORM STATE SELECTOR ===
-export const selectBillingDataFormState = createSelector(
-    selectBillingData,
-    selectBillingDataStatus,
-    selectBillingDataLoading,
-    selectBillingDataSaving,
-    selectBillingDataError,
-    selectBillingDataHasUnsavedChanges,
-    selectBillingDataIsDirty,
-    selectBillingDataCanSave,
-    selectBillingDataCanReset,
-    (
-        data,
-        status,
-        loading,
-        saving,
-        error,
-        hasUnsavedChanges,
-        isDirty,
-        canSave,
-        canReset
-    ) => ({
-        data,
-        status,
-        loading,
-        saving,
-        error,
-        hasUnsavedChanges,
-        isDirty,
-        canSave,
-        canReset,
-        isBusy: loading || saving
-    })
-);
-
 // (Removidos selectores granulares específicos de campos y agrupados no utilizados para simplificar la superficie del estado)

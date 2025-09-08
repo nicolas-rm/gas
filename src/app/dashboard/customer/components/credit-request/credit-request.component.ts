@@ -17,8 +17,7 @@ import {
     selectCreditRequestDataError,
     selectCreditRequestDataHasUnsavedChanges,
     selectCreditRequestDataCanReset,
-    selectCreditRequestDataOriginal,
-    selectCreditRequestDataFormState
+    selectCreditRequestDataOriginal
 } from './ngrx/credit-request.selectors';
 import { CreditRequestData } from './ngrx/credit-request.models';
 
@@ -60,7 +59,6 @@ export class CreditRequestComponent {
     canReset = this.store.selectSignal(selectCreditRequestDataCanReset);
     data = this.store.selectSignal(selectCreditRequestData);
     originalData = this.store.selectSignal(selectCreditRequestDataOriginal);
-    formState = this.store.selectSignal(selectCreditRequestDataFormState);
 
     creditRequestForm: FormGroup<CreditRequestDataFormControl>;
 
@@ -87,6 +85,16 @@ export class CreditRequestComponent {
                 this.addReference(); // Agregar referencia inicial
                 this.creditRequestForm.markAsPristine();
                 this.creditRequestForm.markAsUntouched();
+            }
+        });
+
+        // Effect para manejar estado habilitado/deshabilitado del form
+        effect(() => {
+            const busy = this.isBusy();
+            if (busy) {
+                this.creditRequestForm.disable({ emitEvent: false });
+            } else {
+                this.creditRequestForm.enable({ emitEvent: false });
             }
         });
 

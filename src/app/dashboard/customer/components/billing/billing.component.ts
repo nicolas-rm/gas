@@ -1,11 +1,21 @@
-import { SelectFieldComponent, TextFieldComponent } from '@/app/components/components';
+// Angular
 import { Component, inject, effect } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { billingForm } from '@/app/dashboard/customer/components/billing/form';
-import { HotToastService } from '@ngxpert/hot-toast';
+
+// NgRx
 import { Store } from '@ngrx/store';
+
+// RxJS
 import { debounceTime } from 'rxjs/operators';
+
+// Componentes
+import { SelectFieldComponent, TextFieldComponent } from '@/app/components/components';
+
+// Config del formulario (labels, ids, etc.)
+import { billingForm } from '@/app/dashboard/customer/components/billing/form';
+
+// NgRx Billing Data
 import { BillingDataPageActions } from './ngrx/billing.actions';
 import { 
     selectBillingData, 
@@ -15,20 +25,14 @@ import {
     selectBillingDataError,
     selectBillingDataHasUnsavedChanges,
     selectBillingDataCanReset,
-    selectBillingDataOriginal,
-    selectBillingDataFormState
+    selectBillingDataOriginal
 } from './ngrx/billing.selectors';
 import { BillingData } from './ngrx/billing.models';
 
-export type BillingDataFormControl = {
-    invoiceRepresentation: FormControl<string | null>;
-    billingDays: FormControl<string | null>;
-    billingEmails: FormControl<string | null>;
-    billingFrequency: FormControl<string | null>;
-    startDate: FormControl<string | null>;
-    endDate: FormControl<string | null>;
-    automaticBilling: FormControl<string | null>;
-}
+// Toasts
+import { HotToastService } from '@ngxpert/hot-toast';
+
+type ControlsOf<T> = { [K in keyof T]: FormControl<T[K] | null> };
 
 @Component({
     selector: 'app-billing',
@@ -38,37 +42,39 @@ export type BillingDataFormControl = {
 })
 export class BillingComponent {
 
-    readonly billingData = billingForm
+    // UI metadata (labels, placeholders…)
+    readonly billingData = billingForm;
 
     readonly invoiceRepresentationOptions = [
         { label: 'CFDI', value: 'cfdi' },
         { label: 'PAPEL', value: 'papel' }
-    ]
+    ];
 
     readonly billingDaysOptions = [
         { label: 'Lunes a Domingo (L-D)', value: 'l-d' },
         { label: 'Lunes a Viernes (L-V)', value: 'l-v' },
         { label: 'Lunes a Sábado (L-S)', value: 'l-s' },
         { label: 'Sábado y Domingo (S-D)', value: 's-d' }
-    ]
+    ];
 
     readonly billingFrequencyOptions = [
         { label: 'Variada', value: 'variada' },
         { label: 'Semanal', value: 'semanal' },
         { label: 'Mensual', value: 'mensual' },
         { label: 'Quincenal', value: 'quincenal' }
-    ]
+    ];
 
     readonly automaticBillingOptions = [
         { label: 'Sí', value: 'si' },
         { label: 'No', value: 'no' }
-    ]
+    ];
 
+    // Inyecciones
     private readonly fb = inject(FormBuilder);
     private readonly toast = inject(HotToastService);
     private readonly store = inject(Store);
 
-    // NgRx signals
+    // Signals desde NgRx
     isLoading = this.store.selectSignal(selectBillingDataLoading);
     isSaving = this.store.selectSignal(selectBillingDataSaving);
     isBusy = this.store.selectSignal(selectBillingDataIsBusy);
@@ -77,21 +83,19 @@ export class BillingComponent {
     canReset = this.store.selectSignal(selectBillingDataCanReset);
     data = this.store.selectSignal(selectBillingData);
     originalData = this.store.selectSignal(selectBillingDataOriginal);
-    formState = this.store.selectSignal(selectBillingDataFormState);
 
-    billingDataForm: FormGroup<BillingDataFormControl>
+    // FormGroup tipado a partir del modelo BillingData
+    billingDataForm: FormGroup<ControlsOf<BillingData>> = this.fb.group<ControlsOf<BillingData>>({
+        invoiceRepresentation: this.fb.control<string | null>(null),
+        billingDays: this.fb.control<string | null>(null),
+        billingEmails: this.fb.control<string | null>(null),
+        billingFrequency: this.fb.control<string | null>(null),
+        startDate: this.fb.control<string | null>(null),
+        endDate: this.fb.control<string | null>(null),
+        automaticBilling: this.fb.control<string | null>(null),
+    });
 
     constructor() {
-        this.billingDataForm = this.fb.group({
-            invoiceRepresentation: ['', []],
-            billingDays: ['', []],
-            billingEmails: ['', []],
-            billingFrequency: ['', []],
-            startDate: ['', []],
-            endDate: ['', []],
-            automaticBilling: ['', []],
-        })
-
         // Store -> Form (se ejecuta cada vez que cambie el signal)
         effect(() => {
             const currentData = this.data();
@@ -105,6 +109,16 @@ export class BillingComponent {
             }
         });
 
+        // Effect para manejar estado habilitado/deshabilitado del form
+        effect(() => {
+            const busy = this.isBusy();
+            if (busy) {
+                this.billingDataForm.disable({ emitEvent: false });
+            } else {
+                this.billingDataForm.enable({ emitEvent: false });
+            }
+        });
+
         // Form -> Store (cambios del form)
         this.billingDataForm.valueChanges
             .pipe(debounceTime(300), takeUntilDestroyed())
@@ -115,7 +129,7 @@ export class BillingComponent {
             });
     }
 
-    // Cargar datos
+    // Cargar datos desde API
     loadData(customerId: string): void {
         this.store.dispatch(BillingDataPageActions.loadData({ customerId }));
     }

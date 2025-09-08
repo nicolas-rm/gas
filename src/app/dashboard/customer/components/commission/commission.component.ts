@@ -1,11 +1,21 @@
-import { SelectFieldComponent, TextFieldComponent } from '@/app/components/components';
+// Angular
 import { Component, inject, effect } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { commissionForm } from '@/app/dashboard/customer/components/commission/form';
-import { HotToastService } from '@ngxpert/hot-toast';
+
+// NgRx
 import { Store } from '@ngrx/store';
+
+// RxJS
 import { debounceTime } from 'rxjs/operators';
+
+// Componentes
+import { SelectFieldComponent, TextFieldComponent } from '@/app/components/components';
+
+// Config del formulario (labels, ids, etc.)
+import { commissionForm } from '@/app/dashboard/customer/components/commission/form';
+
+// NgRx Commission Data
 import { CommissionDataPageActions } from './ngrx/commission.actions';
 import { 
     selectCommissionData, 
@@ -15,18 +25,14 @@ import {
     selectCommissionDataError,
     selectCommissionDataHasUnsavedChanges,
     selectCommissionDataCanReset,
-    selectCommissionDataOriginal,
-    selectCommissionDataFormState
+    selectCommissionDataOriginal
 } from './ngrx/commission.selectors';
 import { CommissionData } from './ngrx/commission.models';
 
-export type CommissionDataFormControl = {
-    commissionClassification: FormControl<string | null>;
-    customerLevel: FormControl<string | null>;
-    normalPercentage: FormControl<string | null>;
-    earlyPaymentPercentage: FormControl<string | null>;
-    incomeAccountingAccount: FormControl<string | null>;
-}
+// Toasts
+import { HotToastService } from '@ngxpert/hot-toast';
+
+type ControlsOf<T> = { [K in keyof T]: FormControl<T[K] | null> };
 
 @Component({
   selector: 'app-commission',
@@ -36,25 +42,27 @@ export type CommissionDataFormControl = {
 })
 export class CommissionComponent {
 
-    readonly commissionData = commissionForm
+    // UI metadata (labels, placeholders…)
+    readonly commissionData = commissionForm;
 
     readonly commissionClassificationOptions = [
         { label: 'Comisión por Venta', value: 'venta' },
         { label: 'Comisión por Volumen', value: 'volumen' },
         { label: 'Comisión Fija', value: 'fija' }
-    ]
+    ];
 
     readonly customerLevelOptions = [
         { label: 'Nivel 1 - Premium', value: 'nivel1' },
         { label: 'Nivel 2 - Estándar', value: 'nivel2' },
         { label: 'Nivel 3 - Básico', value: 'nivel3' }
-    ]
+    ];
 
+    // Inyecciones
     private readonly fb = inject(FormBuilder);
     private readonly toast = inject(HotToastService);
     private readonly store = inject(Store);
 
-    // NgRx signals
+    // Signals desde NgRx
     isLoading = this.store.selectSignal(selectCommissionDataLoading);
     isSaving = this.store.selectSignal(selectCommissionDataSaving);
     isBusy = this.store.selectSignal(selectCommissionDataIsBusy);
@@ -63,19 +71,17 @@ export class CommissionComponent {
     canReset = this.store.selectSignal(selectCommissionDataCanReset);
     data = this.store.selectSignal(selectCommissionData);
     originalData = this.store.selectSignal(selectCommissionDataOriginal);
-    formState = this.store.selectSignal(selectCommissionDataFormState);
 
-    commissionDataForm: FormGroup<CommissionDataFormControl>
+    // FormGroup tipado a partir del modelo CommissionData
+    commissionDataForm: FormGroup<ControlsOf<CommissionData>> = this.fb.group<ControlsOf<CommissionData>>({
+        commissionClassification: this.fb.control<string | null>(null),
+        customerLevel: this.fb.control<string | null>(null),
+        normalPercentage: this.fb.control<string | null>(null),
+        earlyPaymentPercentage: this.fb.control<string | null>(null),
+        incomeAccountingAccount: this.fb.control<string | null>(null),
+    });
 
     constructor() {
-        this.commissionDataForm = this.fb.group({
-            commissionClassification: ['', []],
-            customerLevel: ['', []],
-            normalPercentage: ['', []],
-            earlyPaymentPercentage: ['', []],
-            incomeAccountingAccount: ['', []],
-        })
-
         // Store -> Form (se ejecuta cada vez que cambie el signal)
         effect(() => {
             const currentData = this.data();
@@ -89,6 +95,16 @@ export class CommissionComponent {
             }
         });
 
+        // Effect para manejar estado habilitado/deshabilitado del form
+        effect(() => {
+            const busy = this.isBusy();
+            if (busy) {
+                this.commissionDataForm.disable({ emitEvent: false });
+            } else {
+                this.commissionDataForm.enable({ emitEvent: false });
+            }
+        });
+
         // Form -> Store (cambios del form)
         this.commissionDataForm.valueChanges
             .pipe(debounceTime(300), takeUntilDestroyed())
@@ -99,7 +115,7 @@ export class CommissionComponent {
             });
     }
 
-    // Cargar datos
+    // Cargar datos desde API
     loadData(customerId: string): void {
         this.store.dispatch(CommissionDataPageActions.loadData({ customerId }));
     }
@@ -151,7 +167,7 @@ export class CommissionComponent {
         this.store.dispatch(CommissionDataPageActions.clearErrors());
     }
 
-    onSubmit() {
+    onSubmit(): void {
         this.saveData();
     }
 }

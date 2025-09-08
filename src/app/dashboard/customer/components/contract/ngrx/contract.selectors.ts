@@ -78,29 +78,6 @@ export const selectContractDataCanReset = createSelector(
 
 // (Se eliminó lastSaved: ya no existe en el estado estandarizado)
 
-// === FORM STATE SELECTOR ===
-export const selectContractDataFormState = createSelector(
-    selectContractData,
-    selectContractDataStatus,
-    selectContractDataLoading,
-    selectContractDataSaving,
-    selectContractDataError,
-    selectContractDataHasUnsavedChanges,
-    selectContractDataIsDirty,
-    selectContractDataCanSave,
-    selectContractDataCanReset,
-    (data, status, loading, saving, error, hasUnsavedChanges, isDirty, canSave, canReset) => ({
-        data,
-        status,
-        loading,
-        saving,
-        error,
-        hasUnsavedChanges,
-        isDirty,
-        canSave,
-        canReset,
-        isBusy: loading || saving
-    })
-);
+// (Removidos selectores granulares específicos de campos y agrupados no utilizados para simplificar la superficie del estado)
 
 // (Removidos selectores granulares y agrupados no utilizados para simplificar la superficie del estado)

@@ -16,8 +16,7 @@ import {
     selectContactsDataError,
     selectContactsDataHasUnsavedChanges,
     selectContactsDataCanReset,
-    selectContactsDataOriginal,
-    selectContactsDataFormState
+    selectContactsDataOriginal
 } from './ngrx/contacts.selectors';
 import { ContactsData } from './ngrx/contacts.models';
 
@@ -51,7 +50,6 @@ export class ContactsComponent {
     canReset = this.store.selectSignal(selectContactsDataCanReset);
     data = this.store.selectSignal(selectContactsData);
     originalData = this.store.selectSignal(selectContactsDataOriginal);
-    formState = this.store.selectSignal(selectContactsDataFormState);
     
     contactsForm: FormGroup;
     
@@ -75,6 +73,16 @@ export class ContactsComponent {
                 this.addContact();
                 this.contactsForm.markAsPristine();
                 this.contactsForm.markAsUntouched();
+            }
+        });
+
+        // Effect para manejar estado habilitado/deshabilitado del form
+        effect(() => {
+            const busy = this.isBusy();
+            if (busy) {
+                this.contactsForm.disable({ emitEvent: false });
+            } else {
+                this.contactsForm.enable({ emitEvent: false });
             }
         });
 

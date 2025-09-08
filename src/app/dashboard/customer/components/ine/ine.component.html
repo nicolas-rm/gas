@@ -67,15 +67,13 @@
                                     <TextField [id]="ineData.accountingKey.id" [label]="ineData.accountingKey.label"
                                         [formControlName]="ineData.accountingKey.formControlName"
                                         [placeholder]="ineData.accountingKey.placeholder"
-                                        [control]="ineDataForm.get(ineData.accountingKey.formControlName)"
-                                        [disabled]="isBusy()" />
+                                        [control]="ineDataForm.get(ineData.accountingKey.formControlName)" />
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
                                     <SelectField [id]="ineData.processType.id" [label]="ineData.processType.label"
                                         [formControlName]="ineData.processType.formControlName"
                                         [control]="ineDataForm.get(ineData.processType.formControlName)"
-                                        [options]="processTypeOptions" [placeholder]="ineData.processType.placeholder"
-                                        [disabled]="isBusy()">
+                                        [options]="processTypeOptions" [placeholder]="ineData.processType.placeholder">
                                     </SelectField>
                                 </div>
 
@@ -85,16 +83,14 @@
                                         [formControlName]="ineData.committeeType.formControlName"
                                         [control]="ineDataForm.get(ineData.committeeType.formControlName)"
                                         [options]="committeeTypeOptions"
-                                        [placeholder]="ineData.committeeType.placeholder"
-                                        [disabled]="isBusy()">
+                                        [placeholder]="ineData.committeeType.placeholder">
                                     </SelectField>
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
                                     <SelectField [id]="ineData.scope.id" [label]="ineData.scope.label"
                                         [formControlName]="ineData.scope.formControlName"
                                         [control]="ineDataForm.get(ineData.scope.formControlName)"
-                                        [options]="scopeOptions" [placeholder]="ineData.scope.placeholder"
-                                        [disabled]="isBusy()">
+                                        [options]="scopeOptions" [placeholder]="ineData.scope.placeholder">
                                     </SelectField>
                                 </div>
 
@@ -105,8 +101,7 @@
                                         [control]="ineDataForm.get(ineData.document.formControlName)"
                                         [accept]="ineData.document.accept ?? '.pdf,.jpg,.jpeg,.png,.doc,.docx'"
                                         [maxSizeMB]="ineData.document.maxSizeMB ?? 5"
-                                        [multiple]="ineData.document.multiple ?? false"
-                                        [disabled]="isBusy()">
+                                        [multiple]="ineData.document.multiple ?? false">
                                     </FileInputField>
                                 </div>
                             </div>
@@ -136,14 +131,12 @@
                                 <div class="flex gap-3">
                                     <button 
                                         type="button" 
-                                        class="btn btn-light-error"
-                                        [disabled]="isBusy()">
+                                        class="btn btn-light-error">
                                         Cancelar
                                     </button>
                                     <button 
                                         type="submit" 
-                                        class="btn"
-                                        [disabled]="isBusy()">
+                                        class="btn">
                                         @if (isSaving()) {
                                             <div class="flex items-center">
                                                 <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>

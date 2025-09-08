@@ -107,6 +107,16 @@ export class GeneralDataComponent {
             }
         });
 
+        // Effect para manejar estado habilitado/deshabilitado del form
+        effect(() => {
+            const busy = this.isBusy();
+            if (busy) {
+                this.generalDataForm.disable({ emitEvent: false });
+            } else {
+                this.generalDataForm.enable({ emitEvent: false });
+            }
+        });
+
         // Form -> Store (cambios del form)
         this.generalDataForm.valueChanges
             .pipe(debounceTime(300), takeUntilDestroyed())

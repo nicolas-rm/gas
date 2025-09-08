@@ -69,8 +69,7 @@
                                         [formControlName]="commissionData.commissionClassification.formControlName"
                                         [control]="commissionDataForm.get(commissionData.commissionClassification.formControlName)"
                                         [options]="commissionClassificationOptions"
-                                        [placeholder]="commissionData.commissionClassification.placeholder"
-                                        [disabled]="isBusy()">
+                                        [placeholder]="commissionData.commissionClassification.placeholder">
                                     </SelectField>
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
@@ -79,8 +78,7 @@
                                         [formControlName]="commissionData.customerLevel.formControlName"
                                         [control]="commissionDataForm.get(commissionData.customerLevel.formControlName)"
                                         [options]="customerLevelOptions"
-                                        [placeholder]="commissionData.customerLevel.placeholder"
-                                        [disabled]="isBusy()">
+                                        [placeholder]="commissionData.customerLevel.placeholder">
                                     </SelectField>
                                 </div>
 
@@ -90,16 +88,14 @@
                                         [label]="commissionData.normalPercentage.label"
                                         [formControlName]="commissionData.normalPercentage.formControlName"
                                         [placeholder]="commissionData.normalPercentage.placeholder"
-                                        [control]="commissionDataForm.get(commissionData.normalPercentage.formControlName)"
-                                        [disabled]="isBusy()" />
+                                        [control]="commissionDataForm.get(commissionData.normalPercentage.formControlName)" />
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
                                     <TextField [id]="commissionData.earlyPaymentPercentage.id"
                                         [label]="commissionData.earlyPaymentPercentage.label"
                                         [formControlName]="commissionData.earlyPaymentPercentage.formControlName"
                                         [placeholder]="commissionData.earlyPaymentPercentage.placeholder"
-                                        [control]="commissionDataForm.get(commissionData.earlyPaymentPercentage.formControlName)"
-                                        [disabled]="isBusy()" />
+                                        [control]="commissionDataForm.get(commissionData.earlyPaymentPercentage.formControlName)" />
                                 </div>
 
                                 <!-- Tercera fila: Cuenta Contable -->
@@ -108,8 +104,7 @@
                                         [label]="commissionData.incomeAccountingAccount.label"
                                         [formControlName]="commissionData.incomeAccountingAccount.formControlName"
                                         [placeholder]="commissionData.incomeAccountingAccount.placeholder"
-                                        [control]="commissionDataForm.get(commissionData.incomeAccountingAccount.formControlName)"
-                                        [disabled]="isBusy()" />
+                                        [control]="commissionDataForm.get(commissionData.incomeAccountingAccount.formControlName)" />
                                 </div>
                             </div>
 
@@ -138,14 +133,12 @@
                                 <div class="flex gap-3">
                                     <button 
                                         type="button" 
-                                        class="btn btn-light-error"
-                                        [disabled]="isBusy()">
+                                        class="btn btn-light-error">
                                         Cancelar
                                     </button>
                                     <button 
                                         type="submit" 
-                                        class="btn"
-                                        [disabled]="isBusy()">
+                                        class="btn">
                                         @if (isSaving()) {
                                             <div class="flex items-center">
                                                 <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>

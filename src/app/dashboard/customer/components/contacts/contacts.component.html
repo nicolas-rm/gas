@@ -72,7 +72,6 @@
                                         <button type="button" 
                                                 *ngIf="canRemoveContact()" 
                                                 (click)="removeContact(i)"
-                                                [disabled]="isBusy()"
                                                 class="btn btn-sm btn-light-error">
                                             <i class="ti ti-trash text-base"></i>
                                             Eliminar
@@ -88,8 +87,7 @@
                                                 [label]="contactData.name.label"
                                                 [formControlName]="contactData.name.formControlName"
                                                 [placeholder]="contactData.name.placeholder"
-                                                [control]="contact.get(contactData.name.formControlName)"
-                                                [disabled]="isBusy()" />
+                                                [control]="contact.get(contactData.name.formControlName)" />
                                         </div>
                                         <div class="lg:col-span-6 col-span-12">
                                             <TextField 
@@ -97,8 +95,7 @@
                                                 [label]="contactData.position.label"
                                                 [formControlName]="contactData.position.formControlName"
                                                 [placeholder]="contactData.position.placeholder"
-                                                [control]="contact.get(contactData.position.formControlName)"
-                                                [disabled]="isBusy()" />
+                                                [control]="contact.get(contactData.position.formControlName)" />
                                         </div>
                                         
                                         <!-- Segunda fila: Teléfono y Correo Electrónico -->
@@ -108,8 +105,7 @@
                                                 [label]="contactData.phone.label"
                                                 [formControlName]="contactData.phone.formControlName"
                                                 [placeholder]="contactData.phone.placeholder"
-                                                [control]="contact.get(contactData.phone.formControlName)"
-                                                [disabled]="isBusy()" />
+                                                [control]="contact.get(contactData.phone.formControlName)" />
                                         </div>
                                         <div class="lg:col-span-6 col-span-12">
                                             <TextField 
@@ -117,8 +113,7 @@
                                                 [label]="contactData.email.label"
                                                 [formControlName]="contactData.email.formControlName"
                                                 [placeholder]="contactData.email.placeholder"
-                                                [control]="contact.get(contactData.email.formControlName)"
-                                                [disabled]="isBusy()" />
+                                                [control]="contact.get(contactData.email.formControlName)" />
                                         </div>
                                     </div>
                                 </div>
@@ -128,7 +123,6 @@
                             <div class="mb-6" *ngIf="canAddContact()">
                                 <button type="button" 
                                         (click)="addContact()"
-                                        [disabled]="isBusy()"
                                         class="btn btn-light-primary">
                                     <i class="ti ti-plus text-base"></i>
                                     Agregar Contacto
@@ -160,14 +154,12 @@
                                 <div class="flex gap-3">
                                     <button 
                                         type="button" 
-                                        class="btn btn-light-error"
-                                        [disabled]="isBusy()">
+                                        class="btn btn-light-error">
                                         Cancelar
                                     </button>
                                     <button 
                                         type="submit" 
-                                        class="btn"
-                                        [disabled]="isBusy()">
+                                        class="btn">
                                         @if (isSaving()) {
                                             <div class="flex items-center">
                                                 <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>

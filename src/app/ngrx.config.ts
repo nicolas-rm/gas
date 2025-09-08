@@ -60,7 +60,7 @@ export const ngrxProviders = [
     // States
     provideState('authentication', authenticationReducer),
     provideState('generalData', generalDataReducer),
-    provideState('contacts', contactsDataReducer),
+    provideState('contactsData', contactsDataReducer),
     provideState('creditRequestData', creditRequestDataReducer),
     provideState('ineData', ineDataReducer),
     provideState('saleData', saleDataReducer),

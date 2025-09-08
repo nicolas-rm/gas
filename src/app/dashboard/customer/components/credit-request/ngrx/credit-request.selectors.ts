@@ -77,28 +77,4 @@ export const selectCreditRequestDataCanReset = createSelector(
 );
 
 // === FORM STATE SELECTOR ===
-export const selectCreditRequestDataFormState = createSelector(
-    selectCreditRequestData,
-    selectCreditRequestDataStatus,
-    selectCreditRequestDataLoading,
-    selectCreditRequestDataSaving,
-    selectCreditRequestDataError,
-    selectCreditRequestDataHasUnsavedChanges,
-    selectCreditRequestDataIsDirty,
-    selectCreditRequestDataCanSave,
-    selectCreditRequestDataCanReset,
-    (data, status, loading, saving, error, hasUnsavedChanges, isDirty, canSave, canReset) => ({
-        data,
-        status,
-        loading,
-        saving,
-        error,
-        hasUnsavedChanges,
-        isDirty,
-        canSave,
-        canReset,
-        isBusy: loading || saving
-    })
-);
-
 // (Removidos selectores granulares específicos de campos y agrupados no utilizados para simplificar la superficie del estado)

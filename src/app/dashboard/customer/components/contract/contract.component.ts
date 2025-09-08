@@ -1,11 +1,21 @@
-import { SelectFieldComponent, TextFieldComponent } from '@/app/components/components';
+// Angular
 import { Component, inject, effect } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { contractForm } from '@/app/dashboard/customer/components/contract/form';
-import { HotToastService } from '@ngxpert/hot-toast';
+
+// NgRx
 import { Store } from '@ngrx/store';
+
+// RxJS
 import { debounceTime } from 'rxjs/operators';
+
+// Componentes
+import { SelectFieldComponent, TextFieldComponent } from '@/app/components/components';
+
+// Config del formulario (labels, ids, etc.)
+import { contractForm } from '@/app/dashboard/customer/components/contract/form';
+
+// NgRx Contract Data
 import { ContractDataPageActions } from './ngrx/contract.actions';
 import { 
     selectContractData, 
@@ -15,24 +25,14 @@ import {
     selectContractDataError,
     selectContractDataHasUnsavedChanges,
     selectContractDataCanReset,
-    selectContractDataOriginal,
-    selectContractDataFormState
+    selectContractDataOriginal
 } from './ngrx/contract.selectors';
 import { ContractData } from './ngrx/contract.models';
 
-export type ContractDataFormControl = {
-    printName: FormControl<string | null>;
-    adminFee: FormControl<string | null>;
-    cardIssueFee: FormControl<string | null>;
-    reportsFee: FormControl<string | null>;
-    accountingAccount: FormControl<string | null>;
-    cfdiUsage: FormControl<string | null>;
-    type: FormControl<string | null>;
-    loyalty: FormControl<string | null>;
-    percentage: FormControl<string | null>;
-    rfcOrderingAccount: FormControl<string | null>;
-    bank: FormControl<string | null>;
-}
+// Toasts
+import { HotToastService } from '@ngxpert/hot-toast';
+
+type ControlsOf<T> = { [K in keyof T]: FormControl<T[K] | null> };
 
 @Component({
   selector: 'app-contract',
@@ -41,6 +41,9 @@ export type ContractDataFormControl = {
   styleUrl: './contract.component.css'
 })
 export class ContractComponent {
+
+    // UI metadata (labels, placeholders…)
+    readonly contractData = contractForm;
     
     readonly cfdiUsageOptions = [
         { label: 'G01 - Adquisición de mercancías', value: 'G01' },
@@ -48,21 +51,21 @@ export class ContractComponent {
         { label: 'G03 - Gastos en general', value: 'G03' },
         { label: 'I01 - Construcciones', value: 'I01' },
         { label: 'I02 - Mobiliario y equipo de oficina por inversiones', value: 'I02' }
-    ]
+    ];
     
     readonly typeOptions = [
         { label: 'Corporativo', value: 'corporativo' },
         { label: 'Individual', value: 'individual' },
         { label: 'Gobierno', value: 'gobierno' },
         { label: 'Sin fines de lucro', value: 'sin_fines_lucro' }
-    ]
+    ];
     
     readonly loyaltyOptions = [
         { label: 'Programa Básico', value: 'basico' },
         { label: 'Programa Premium', value: 'premium' },
         { label: 'Programa VIP', value: 'vip' },
         { label: 'Sin programa', value: 'ninguno' }
-    ]
+    ];
     
     readonly bankOptions = [
         { label: 'BBVA México', value: 'bbva' },
@@ -71,15 +74,14 @@ export class ContractComponent {
         { label: 'Banorte', value: 'banorte' },
         { label: 'HSBC México', value: 'hsbc' },
         { label: 'Scotiabank México', value: 'scotiabank' }
-    ]
+    ];
 
-    readonly contractData = contractForm
-
+    // Inyecciones
     private readonly fb = inject(FormBuilder);
     private readonly toast = inject(HotToastService);
     private readonly store = inject(Store);
 
-    // NgRx signals
+    // Signals desde NgRx
     isLoading = this.store.selectSignal(selectContractDataLoading);
     isSaving = this.store.selectSignal(selectContractDataSaving);
     isBusy = this.store.selectSignal(selectContractDataIsBusy);
@@ -88,25 +90,23 @@ export class ContractComponent {
     canReset = this.store.selectSignal(selectContractDataCanReset);
     data = this.store.selectSignal(selectContractData);
     originalData = this.store.selectSignal(selectContractDataOriginal);
-    formState = this.store.selectSignal(selectContractDataFormState);
 
-    contractDataForm: FormGroup<ContractDataFormControl>
+    // FormGroup tipado a partir del modelo ContractData
+    contractDataForm: FormGroup<ControlsOf<ContractData>> = this.fb.group<ControlsOf<ContractData>>({
+        printName: this.fb.control<string | null>(null),
+        adminFee: this.fb.control<string | null>(null),
+        cardIssueFee: this.fb.control<string | null>(null),
+        reportsFee: this.fb.control<string | null>(null),
+        accountingAccount: this.fb.control<string | null>(null),
+        cfdiUsage: this.fb.control<string | null>(null),
+        type: this.fb.control<string | null>(null),
+        loyalty: this.fb.control<string | null>(null),
+        percentage: this.fb.control<string | null>(null),
+        rfcOrderingAccount: this.fb.control<string | null>(null),
+        bank: this.fb.control<string | null>(null),
+    });
 
     constructor() {
-        this.contractDataForm = this.fb.group({
-            printName: ['', []],
-            adminFee: ['', []],
-            cardIssueFee: ['', []],
-            reportsFee: ['', []],
-            accountingAccount: ['', []],
-            cfdiUsage: ['', []],
-            type: ['', []],
-            loyalty: ['', []],
-            percentage: ['', []],
-            rfcOrderingAccount: ['', []],
-            bank: ['', []],
-        })
-
         // Store -> Form (se ejecuta cada vez que cambie el signal)
         effect(() => {
             const currentData = this.data();
@@ -120,6 +120,16 @@ export class ContractComponent {
             }
         });
 
+        // Effect para manejar estado habilitado/deshabilitado del form
+        effect(() => {
+            const busy = this.isBusy();
+            if (busy) {
+                this.contractDataForm.disable({ emitEvent: false });
+            } else {
+                this.contractDataForm.enable({ emitEvent: false });
+            }
+        });
+
         // Form -> Store (cambios del form)
         this.contractDataForm.valueChanges
             .pipe(debounceTime(300), takeUntilDestroyed())
@@ -130,7 +140,7 @@ export class ContractComponent {
             });
     }
 
-    // Cargar datos
+    // Cargar datos desde API
     loadData(customerId: string): void {
         this.store.dispatch(ContractDataPageActions.loadData({ customerId }));
     }
@@ -182,7 +192,7 @@ export class ContractComponent {
         this.store.dispatch(ContractDataPageActions.clearErrors());
     }
 
-    onSubmit() {
+    onSubmit(): void {
         this.saveData();
     }
 }

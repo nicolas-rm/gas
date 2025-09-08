@@ -77,28 +77,4 @@ export const selectContactsDataCanReset = createSelector(
 );
 
 // === FORM STATE SELECTOR ===
-export const selectContactsDataFormState = createSelector(
-    selectContactsData,
-    selectContactsDataStatus,
-    selectContactsDataLoading,
-    selectContactsDataSaving,
-    selectContactsDataError,
-    selectContactsDataHasUnsavedChanges,
-    selectContactsDataIsDirty,
-    selectContactsDataCanSave,
-    selectContactsDataCanReset,
-    (data, status, loading, saving, error, hasUnsavedChanges, isDirty, canSave, canReset) => ({
-        data,
-        status,
-        loading,
-        saving,
-        error,
-        hasUnsavedChanges,
-        isDirty,
-        canSave,
-        canReset,
-        isBusy: loading || saving
-    })
-);
-
 // (Removidos selectores granulares específicos de campos y agrupados no utilizados para simplificar la superficie del estado)

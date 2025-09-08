@@ -16,8 +16,7 @@ import {
     selectIneDataError,
     selectIneDataHasUnsavedChanges,
     selectIneDataCanReset,
-    selectIneDataOriginal,
-    selectIneDataFormState
+    selectIneDataOriginal
 } from './ngrx/ine.selectors';
 import { IneData } from './ngrx/ine.models';
 
@@ -73,7 +72,6 @@ export class IneComponent {
     canReset = this.store.selectSignal(selectIneDataCanReset);
     data = this.store.selectSignal(selectIneData);
     originalData = this.store.selectSignal(selectIneDataOriginal);
-    formState = this.store.selectSignal(selectIneDataFormState);
 
     ineDataForm: FormGroup<IneDataFormControl>
 
@@ -96,6 +94,16 @@ export class IneComponent {
                 this.ineDataForm.reset({}, { emitEvent: false });
                 this.ineDataForm.markAsPristine();
                 this.ineDataForm.markAsUntouched();
+            }
+        });
+
+        // Effect para manejar estado habilitado/deshabilitado del form
+        effect(() => {
+            const busy = this.isBusy();
+            if (busy) {
+                this.ineDataForm.disable({ emitEvent: false });
+            } else {
+                this.ineDataForm.enable({ emitEvent: false });
             }
         });
 
