@@ -7,7 +7,7 @@ import { creditRequestForm } from '@/app/dashboard/customer/components/credit-re
 import { CommonModule } from '@angular/common';
 import { HotToastService } from '@ngxpert/hot-toast';
 import { Store } from '@ngrx/store';
-import { debounceTime, distinctUntilChanged, filter, map, skip } from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 import { CreditRequestDataPageActions } from './ngrx/credit-request.actions';
 import { 
     selectCreditRequestData, 
@@ -60,73 +60,28 @@ export class CreditRequestComponent {
     data = this.store.selectSignal(selectCreditRequestData);
     originalData = this.store.selectSignal(selectCreditRequestDataOriginal);
 
-    creditRequestForm: FormGroup<CreditRequestDataFormControl>;
-
-    // Control de hidratación / inicialización
-    private hydrating = false;
-
-    // ===== Normalización / utilidades =====
-    private toStr = (v: any) => (v == null ? '' : String(v).trim());
-    private isEmptyRef = (r: any) => !r || (!this.toStr(r.name) && !this.toStr(r.position) && !this.toStr(r.phone) && !this.toStr(r.email));
-
-    private normalize = (d: CreditRequestData | null | undefined): CreditRequestData => ({
-        legalRepresentative: d?.legalRepresentative?.trim() || null,
-        documentsReceiver: d?.documentsReceiver?.trim() || null,
-        creditApplicationDocument: d?.creditApplicationDocument || null,
-        references: (d?.references || [])
-            .filter(r => !this.isEmptyRef(r))
-            .map(r => ({
-                name: r?.name ?? null,
-                position: r?.position ?? null,
-                phone: r?.phone ?? null,
-                email: r?.email ?? null,
-            }))
+    creditRequestForm: FormGroup<CreditRequestDataFormControl> = this.fb.group<CreditRequestDataFormControl>({
+        legalRepresentative: this.fb.control<string | null>(null),
+        documentsReceiver: this.fb.control<string | null>(null),
+        creditApplicationDocument: this.fb.control<File | File[] | null>(null),
+        references: this.fb.array<FormGroup<ReferenceDataFormControl>>([])
     });
 
-    private deepEq = (a: any, b: any) => JSON.stringify(a) === JSON.stringify(b);
-
     constructor() {
-        this.creditRequestForm = this.fb.group<CreditRequestDataFormControl>({
-            legalRepresentative: this.fb.control<string | null>(null),
-            documentsReceiver: this.fb.control<string | null>(null),
-            creditApplicationDocument: this.fb.control<File | File[] | null>(null),
-            references: this.fb.array<FormGroup<ReferenceDataFormControl>>([])
-        });
-        // Añadir fila inicial silenciosa de referencia
-        this.addBlankReferenceSilent();
-
-        // Store -> Form (reactivo al store)
+        // Store -> Form (se ejecuta cada vez que cambie el signal)
         effect(() => {
-            const currentData = this.data();
-            if (currentData) {
-                this.hydrating = true;
-                try {
-                    const norm = this.normalize(currentData);
-                    this.rebuildReferences(norm.references);
-                    this.creditRequestForm.patchValue({
-                        legalRepresentative: norm.legalRepresentative,
-                        documentsReceiver: norm.documentsReceiver,
-                        creditApplicationDocument: norm.creditApplicationDocument
-                    }, { emitEvent: false });
-                    this.creditRequestForm.markAsPristine();
-                } finally {
-                    this.hydrating = false;
-                }
+            const d = this.data();
+            if (d) {
+                this.creditRequestForm.patchValue(d, { emitEvent: false });
             } else {
-                this.hydrating = true;
-                try {
-                    this.creditRequestForm.reset({}, { emitEvent: false });
-                    this.references.clear();
-                    this.addBlankReferenceSilent();
-                    this.creditRequestForm.markAsPristine();
-                    this.creditRequestForm.markAsUntouched();
-                } finally {
-                    this.hydrating = false;
-                }
+                // Soporte para time-travel / reset a estado inicial (create)
+                this.creditRequestForm.reset({}, { emitEvent: false });
+                this.creditRequestForm.markAsPristine();
+                this.creditRequestForm.markAsUntouched();
             }
         });
 
-        // Effect habilitar / deshabilitar
+        // Effect para manejar estado habilitado/deshabilitado del form
         effect(() => {
             const busy = this.isBusy();
             if (busy) {
@@ -136,26 +91,14 @@ export class CreditRequestComponent {
             }
         });
 
-        this.wireFormChanges();
-    }
-
-    private wireFormChanges() {
-        this.creditRequestForm.valueChanges.pipe(
-            skip(1),
-            debounceTime(300),
-            filter(() => !this.hydrating),
-            map(() => this.normalize(this.creditRequestForm.getRawValue() as CreditRequestData)),
-            distinctUntilChanged((a, b) => this.deepEq(a, b)),
-            takeUntilDestroyed()
-        ).subscribe(value => {
-            this.store.dispatch(CreditRequestDataPageActions.setData({ data: value }));
-            const orig = this.normalize(this.originalData() ?? { legalRepresentative: null, documentsReceiver: null, creditApplicationDocument: null, references: [] });
-            if (!this.deepEq(value, orig)) {
+        // Form -> Store (cambios del form)
+        this.creditRequestForm.valueChanges
+            .pipe(debounceTime(300), takeUntilDestroyed())
+            .subscribe(() => {
+                const data = this.creditRequestForm.getRawValue() as CreditRequestData;
+                this.store.dispatch(CreditRequestDataPageActions.setData({ data }));
                 this.store.dispatch(CreditRequestDataPageActions.markAsDirty());
-            } else {
-                this.store.dispatch(CreditRequestDataPageActions.markAsPristine());
-            }
-        });
+            });
     }
 
     get references(): FormArray<FormGroup<ReferenceDataFormControl>> {
@@ -177,33 +120,6 @@ export class CreditRequestComponent {
             phone: this.fb.control<string | null>(value?.phone ?? null),
             email: this.fb.control<string | null>(value?.email ?? null),
         });
-    }
-
-    private addBlankReferenceSilent(): void {
-        this.hydrating = true;
-        try {
-            if (this.references.length === 0) {
-                this.references.push(this.createReferenceFormGroup());
-                this.creditRequestForm.updateValueAndValidity({ emitEvent: false });
-                this.creditRequestForm.markAsPristine();
-            }
-        } finally {
-            this.hydrating = false;
-        }
-    }
-
-    private rebuildReferences(refs: ReferenceData[]): void {
-        const arr = this.references;
-        if (typeof (arr as any).clear === 'function') {
-            (arr as any).clear({ emitEvent: false });
-        } else {
-            while (arr.length) arr.removeAt(arr.length - 1, { emitEvent: false } as any);
-        }
-        if (refs.length === 0) {
-            arr.push(this.createReferenceFormGroup(), { emitEvent: false });
-        } else {
-            refs.forEach(r => arr.push(this.createReferenceFormGroup(r), { emitEvent: false }));
-        }
     }
 
     addReference(): void {
@@ -230,16 +146,14 @@ export class CreditRequestComponent {
     // Guardar
     saveData(customerId?: string): void {
         if (!this.assertValid()) return;
-        const data = this.normalize(this.creditRequestForm.getRawValue() as CreditRequestData);
+        const data = this.creditRequestForm.getRawValue() as CreditRequestData;
         this.store.dispatch(
             CreditRequestDataPageActions.saveData({
                 customerId: customerId ?? 'temp',
                 data
             })
         );
-    }
-
-    // Validación rápida con toast
+    }    // Validación rápida con toast
     private assertValid(): boolean {
         if (this.creditRequestForm.valid) return true;
         this.toast.error('Formulario inválido. Revisa los campos requeridos.');
@@ -250,36 +164,17 @@ export class CreditRequestComponent {
     // Acciones varias
     resetForm(): void {
         this.store.dispatch(CreditRequestDataPageActions.resetForm());
-        this.hydrating = true;
-        try {
-            this.creditRequestForm.reset({}, { emitEvent: false });
-            this.references.clear();
-            this.addBlankReferenceSilent();
-            this.creditRequestForm.markAsPristine();
-            this.creditRequestForm.markAsUntouched();
-        } finally {
-            this.hydrating = false;
-        }
+        this.creditRequestForm.reset({}, { emitEvent: false }); // Evita que se dispare valueChanges
+        this.creditRequestForm.markAsPristine(); // Marca el form como pristine
+        this.creditRequestForm.markAsUntouched();
     }
 
     // Restablecer a datos originales (crear: vacío, actualizar: datos cargados)
     resetToOriginal(): void {
-        const orig = this.normalize(this.originalData() ?? { legalRepresentative: null, documentsReceiver: null, creditApplicationDocument: null, references: [] });
-        this.hydrating = true;
-        try {
-            this.rebuildReferences(orig.references);
-            this.creditRequestForm.patchValue({
-                legalRepresentative: orig.legalRepresentative,
-                documentsReceiver: orig.documentsReceiver,
-                creditApplicationDocument: orig.creditApplicationDocument
-            }, { emitEvent: false });
-            this.creditRequestForm.markAsPristine();
-            this.creditRequestForm.markAsUntouched();
-            this.store.dispatch(CreditRequestDataPageActions.setData({ data: orig }));
-            this.store.dispatch(CreditRequestDataPageActions.markAsPristine());
-        } finally {
-            this.hydrating = false;
-        }
+        this.store.dispatch(CreditRequestDataPageActions.resetToOriginal());
+        // El efecto se encargará de actualizar el formulario con los datos originales
+        this.creditRequestForm.markAsPristine();
+        this.creditRequestForm.markAsUntouched();
     }
 
     // Marcar como pristine (sin cambios)

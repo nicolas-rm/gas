@@ -20,6 +20,7 @@ export const creditRequestDataReducer = createReducer(
             originalData: data, // Guardar datos originales al cargar
             status: 'idle',
             loading: false,
+            saving: false,
             error: null,
             hasUnsavedChanges: false,
             isDirty: false
@@ -35,22 +36,15 @@ export const creditRequestDataReducer = createReducer(
     
     // === SET DATA (snapshot completo) ===
     on(CreditRequestDataPageActions.setData, (state, { data }): CreditRequestDataState => {
-        const normalized = {
-            ...data,
-            references: (data.references || []).filter(r => {
-                const trim = (v: any) => (v == null ? '' : String(v).trim());
-                return trim(r.name) || trim(r.position) || trim(r.phone) || trim(r.email);
-            })
-        };
-        const withEntity = creditRequestDataAdapter.setOne(normalized, state);
+        const withEntity = creditRequestDataAdapter.setOne(data, state);
         const changed = state.originalData
-            ? JSON.stringify(state.originalData) !== JSON.stringify(normalized)
+            ? JSON.stringify(state.originalData) !== JSON.stringify(data)
             : true; // en crear: cualquier cambio = sucio
 
         return {
             ...state,
             ...withEntity,
-            data: normalized,
+            data: data,
             hasUnsavedChanges: changed,
             isDirty: changed,
         };

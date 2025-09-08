@@ -13,20 +13,6 @@ export const contactsDataAdapter: EntityAdapter<ContactsData> = createEntityAdap
     selectId: (data) => data.contacts[0]?.name || 'contacts-data'
 });
 
-// ===== Normalización de datos de contacts =====
-const toStr = (v: any) => (v == null ? '' : String(v).trim());
-const isEmptyContact = (c: ContactData | null | undefined) => !c || (!toStr(c.name) && !toStr(c.position) && !toStr(c.phone) && !toStr(c.email));
-const normalize = (d: ContactsData | null | undefined): ContactsData => ({
-    contacts: (d?.contacts || [])
-        .filter(c => !isEmptyContact(c))
-        .map(c => ({
-            name: c?.name ?? null,
-            position: c?.position ?? null,
-            phone: c?.phone ?? null,
-            email: c?.email ?? null,
-        }))
-});
-
 // Estado inicial del slice de contacts
 export const initialState: ContactsDataState = contactsDataAdapter.getInitialState(initialContactsDataState);
 
@@ -45,13 +31,12 @@ export const contactsDataReducer = createReducer(
 
     // Carga exitosa: guarda datos, actualiza status, resetea flags
     on(ContactsDataApiActions.loadDataSuccess, (state, { data }) => {
-        const norm = normalize(data);
-        const withEntity = contactsDataAdapter.setOne(norm, state);
+        const withEntity = contactsDataAdapter.setOne(data, state);
         
         return {
             ...withEntity,
-            data: norm,
-            originalData: norm, // Guardar los datos originales al cargar
+            data: data,
+            originalData: data, // Guardar los datos originales al cargar
             status: 'idle' as const,
             loading: false,
             saving: false,
@@ -71,16 +56,15 @@ export const contactsDataReducer = createReducer(
 
     // Establecer snapshot completo
     on(ContactsDataPageActions.setData, (state, { data }) => {
-        const norm = normalize(data);
-        const withEntity = contactsDataAdapter.setOne(norm, state);
+        const withEntity = contactsDataAdapter.setOne(data, state);
         const changed = state.originalData
-            ? JSON.stringify(state.originalData) !== JSON.stringify(norm)
+            ? JSON.stringify(state.originalData) !== JSON.stringify(data)
             : true; // en crear: cualquier cambio = sucio
 
         return {
             ...state,
             ...withEntity,
-            data: norm,
+            data: data,
             hasUnsavedChanges: changed,
             isDirty: changed,
         };
