@@ -19,7 +19,7 @@ import {
     selectCreditRequestDataCanReset,
     selectCreditRequestDataOriginal
 } from './ngrx/credit-request.selectors';
-import { CreditRequestData } from './ngrx/credit-request.models';
+import { CreditRequestData, ReferenceData } from './ngrx/credit-request.models';
 
 export type CreditRequestDataFormControl = {
     legalRepresentative: FormControl<string | null>;
@@ -73,6 +73,14 @@ export class CreditRequestComponent {
         legalRepresentative: d?.legalRepresentative?.trim() || null,
         documentsReceiver: d?.documentsReceiver?.trim() || null,
         creditApplicationDocument: d?.creditApplicationDocument || null,
+        references: (d?.references || [])
+            .filter(r => !this.isEmptyRef(r))
+            .map(r => ({
+                name: r?.name ?? null,
+                position: r?.position ?? null,
+                phone: r?.phone ?? null,
+                email: r?.email ?? null,
+            }))
     });
 
     private deepEq = (a: any, b: any) => JSON.stringify(a) === JSON.stringify(b);
@@ -84,8 +92,8 @@ export class CreditRequestComponent {
             creditApplicationDocument: this.fb.control<File | File[] | null>(null),
             references: this.fb.array<FormGroup<ReferenceDataFormControl>>([])
         });
-
-        // Fila inicial silenciosa (referencias placeholder si decides agregar luego) - por ahora no hay en el estado
+        // Añadir fila inicial silenciosa de referencia
+        this.addBlankReferenceSilent();
 
         // Store -> Form (reactivo al store)
         effect(() => {
@@ -94,7 +102,12 @@ export class CreditRequestComponent {
                 this.hydrating = true;
                 try {
                     const norm = this.normalize(currentData);
-                    this.creditRequestForm.patchValue(norm, { emitEvent: false });
+                    this.rebuildReferences(norm.references);
+                    this.creditRequestForm.patchValue({
+                        legalRepresentative: norm.legalRepresentative,
+                        documentsReceiver: norm.documentsReceiver,
+                        creditApplicationDocument: norm.creditApplicationDocument
+                    }, { emitEvent: false });
                     this.creditRequestForm.markAsPristine();
                 } finally {
                     this.hydrating = false;
@@ -103,6 +116,8 @@ export class CreditRequestComponent {
                 this.hydrating = true;
                 try {
                     this.creditRequestForm.reset({}, { emitEvent: false });
+                    this.references.clear();
+                    this.addBlankReferenceSilent();
                     this.creditRequestForm.markAsPristine();
                     this.creditRequestForm.markAsUntouched();
                 } finally {
@@ -134,7 +149,7 @@ export class CreditRequestComponent {
             takeUntilDestroyed()
         ).subscribe(value => {
             this.store.dispatch(CreditRequestDataPageActions.setData({ data: value }));
-            const orig = this.normalize(this.originalData() ?? { legalRepresentative: null, documentsReceiver: null, creditApplicationDocument: null });
+            const orig = this.normalize(this.originalData() ?? { legalRepresentative: null, documentsReceiver: null, creditApplicationDocument: null, references: [] });
             if (!this.deepEq(value, orig)) {
                 this.store.dispatch(CreditRequestDataPageActions.markAsDirty());
             } else {
@@ -151,13 +166,44 @@ export class CreditRequestComponent {
         return this.references.length < this.maxReferences;
     }
 
-    createReferenceFormGroup(): FormGroup<ReferenceDataFormControl> {
+    canRemoveReference(index: number): boolean {
+        return this.references.length > 1 && index > 0; // No eliminar la primera
+    }
+
+    createReferenceFormGroup(value?: Partial<ReferenceData>): FormGroup<ReferenceDataFormControl> {
         return this.fb.group<ReferenceDataFormControl>({
-            name: this.fb.control<string | null>(null),
-            position: this.fb.control<string | null>(null),
-            phone: this.fb.control<string | null>(null),
-            email: this.fb.control<string | null>(null),
+            name: this.fb.control<string | null>(value?.name ?? null),
+            position: this.fb.control<string | null>(value?.position ?? null),
+            phone: this.fb.control<string | null>(value?.phone ?? null),
+            email: this.fb.control<string | null>(value?.email ?? null),
         });
+    }
+
+    private addBlankReferenceSilent(): void {
+        this.hydrating = true;
+        try {
+            if (this.references.length === 0) {
+                this.references.push(this.createReferenceFormGroup());
+                this.creditRequestForm.updateValueAndValidity({ emitEvent: false });
+                this.creditRequestForm.markAsPristine();
+            }
+        } finally {
+            this.hydrating = false;
+        }
+    }
+
+    private rebuildReferences(refs: ReferenceData[]): void {
+        const arr = this.references;
+        if (typeof (arr as any).clear === 'function') {
+            (arr as any).clear({ emitEvent: false });
+        } else {
+            while (arr.length) arr.removeAt(arr.length - 1, { emitEvent: false } as any);
+        }
+        if (refs.length === 0) {
+            arr.push(this.createReferenceFormGroup(), { emitEvent: false });
+        } else {
+            refs.forEach(r => arr.push(this.createReferenceFormGroup(r), { emitEvent: false }));
+        }
     }
 
     addReference(): void {
@@ -167,7 +213,7 @@ export class CreditRequestComponent {
     }
 
     removeReference(index: number): void {
-        if (index >= 0 && index < this.references.length) {
+        if (this.canRemoveReference(index)) {
             this.references.removeAt(index);
         }
     }
@@ -184,7 +230,7 @@ export class CreditRequestComponent {
     // Guardar
     saveData(customerId?: string): void {
         if (!this.assertValid()) return;
-        const data = this.creditRequestForm.getRawValue() as CreditRequestData;
+        const data = this.normalize(this.creditRequestForm.getRawValue() as CreditRequestData);
         this.store.dispatch(
             CreditRequestDataPageActions.saveData({
                 customerId: customerId ?? 'temp',
@@ -208,6 +254,7 @@ export class CreditRequestComponent {
         try {
             this.creditRequestForm.reset({}, { emitEvent: false });
             this.references.clear();
+            this.addBlankReferenceSilent();
             this.creditRequestForm.markAsPristine();
             this.creditRequestForm.markAsUntouched();
         } finally {
@@ -217,10 +264,15 @@ export class CreditRequestComponent {
 
     // Restablecer a datos originales (crear: vacío, actualizar: datos cargados)
     resetToOriginal(): void {
-        const orig = this.normalize(this.originalData() ?? { legalRepresentative: null, documentsReceiver: null, creditApplicationDocument: null });
+        const orig = this.normalize(this.originalData() ?? { legalRepresentative: null, documentsReceiver: null, creditApplicationDocument: null, references: [] });
         this.hydrating = true;
         try {
-            this.creditRequestForm.patchValue(orig, { emitEvent: false });
+            this.rebuildReferences(orig.references);
+            this.creditRequestForm.patchValue({
+                legalRepresentative: orig.legalRepresentative,
+                documentsReceiver: orig.documentsReceiver,
+                creditApplicationDocument: orig.creditApplicationDocument
+            }, { emitEvent: false });
             this.creditRequestForm.markAsPristine();
             this.creditRequestForm.markAsUntouched();
             this.store.dispatch(CreditRequestDataPageActions.setData({ data: orig }));
@@ -250,7 +302,5 @@ export class CreditRequestComponent {
     }
 
     // Opcional: mejora performance al iterar el FormArray en el template
-    trackByIndex(index: number): number {
-        return index;
-    }
+    trackByReference = (_i: number, ctrl: FormGroup<ReferenceDataFormControl>) => ctrl;
 }

@@ -62,17 +62,17 @@
 
                         <form [formGroup]="contactsForm" class="mt-6" (ngSubmit)="onSubmit()">
                             <div formArrayName="contacts">
-                                <div *ngFor="let contact of contactsArray.controls; let i = index" 
+                                <div *ngFor="let contact of contactsArray.controls; let i = index; trackBy: trackByContact" 
                                      [formGroupName]="i" 
                                      class="mb-4">
                                     
                                     <!-- Encabezado del contacto -->
                                     <div class="flex justify-between items-center mb-4">
                                         <h6 class="text-lg font-semibold text-gray-800">Contacto {{ i + 1 }}</h6>
-                                        <button type="button" 
-                                                *ngIf="canRemoveContact()" 
-                                                (click)="removeContact(i)"
-                                                class="btn btn-sm btn-light-error">
+                    <button type="button" 
+                        *ngIf="canRemoveContact(i)" 
+                        (click)="removeContact(i)"
+                        class="btn btn-sm btn-light-error">
                                             <i class="ti ti-trash text-base"></i>
                                             Eliminar
                                         </button>

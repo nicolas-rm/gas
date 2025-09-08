@@ -87,7 +87,9 @@ export class ContactsComponent {
         effect(() => {
             const currentData = this.data();
             if (currentData) {
-                this.syncFormArrayWithData(currentData);
+                // Nuevo patrón rebuild
+                const norm = this.normalize(currentData);
+                this.rebuildContacts(norm.contacts);
             } else {
                 // Modo creación / reset total
                 this.hydrating = true;
@@ -128,30 +130,22 @@ export class ContactsComponent {
         });
     }
 
-    // Sincronizar FormArray con datos del store (silencioso, no ensucia)
-    private syncFormArrayWithData(data: ContactsData): void {
+    private rebuildContacts(contacts: ContactData[]): void {
         this.hydrating = true;
         try {
-            const norm = this.normalize(data);
-            const currentLength = this.contactsArray.length;
-            const dataLength = norm.contacts.length;
-
-            // Ajustar tamaño
-            for (let i = currentLength; i < dataLength; i++) {
-                this.contactsArray.push(this.createContactFormGroup());
+            const arr = this.contactsArray;
+            if (typeof (arr as any).clear === 'function') {
+                (arr as any).clear({ emitEvent: false });
+            } else {
+                while (arr.length) arr.removeAt(arr.length - 1, { emitEvent: false } as any);
             }
-            for (let i = currentLength - 1; i >= dataLength; i--) {
-                this.contactsArray.removeAt(i);
+            if (!contacts.length) {
+                arr.push(this.createContactFormGroup(), { emitEvent: false });
+            } else {
+                contacts.forEach(c => arr.push(this.createContactFormGroup(), { emitEvent: false }));
+                // Patch de valores ahora que tamaños coinciden
+                this.contactsForm.patchValue({ contacts }, { emitEvent: false });
             }
-
-            // Patch silencioso
-            this.contactsForm.patchValue({ contacts: norm.contacts }, { emitEvent: false });
-
-            // Si no hay contactos reales, mantener 1 fila vacía visible
-            if (norm.contacts.length === 0 && this.contactsArray.length === 0) {
-                this.contactsArray.push(this.createContactFormGroup());
-            }
-
             this.contactsForm.markAsPristine();
         } finally {
             this.hydrating = false;
@@ -201,7 +195,7 @@ export class ContactsComponent {
     }
     
     removeContact(index: number): void {
-        if (this.contactsArray.length > 1) {
+        if (this.canRemoveContact(index)) {
             this.contactsArray.removeAt(index);
         }
     }
@@ -210,8 +204,8 @@ export class ContactsComponent {
         return this.contactsArray.length < this.maxContacts;
     }
     
-    canRemoveContact(): boolean {
-        return this.contactsArray.length > 1;
+    canRemoveContact(index: number): boolean {
+        return this.contactsArray.length > 1 && index > 0; // nunca eliminar el primero
     }
 
     // Cargar datos
@@ -242,17 +236,15 @@ export class ContactsComponent {
     // Acciones varias
     resetForm(): void {
         this.store.dispatch(ContactsDataPageActions.resetForm());
-        this.contactsArray.clear();
-        this.addBlankContactSilent();
+        this.rebuildContacts([]); // vacía y deja una fila
         this.contactsForm.markAsPristine();
         this.contactsForm.markAsUntouched();
     }
 
     // Restablecer a datos originales (crear: vacío, actualizar: datos cargados)
     resetToOriginal(): void {
-        // Restauración silenciosa manual para asegurar coherencia con normalize
         const orig = this.normalize(this.originalData() ?? { contacts: [] });
-        this.syncFormArrayWithData(orig);
+        this.rebuildContacts(orig.contacts);
         this.store.dispatch(ContactsDataPageActions.setData({ data: orig }));
         this.store.dispatch(ContactsDataPageActions.markAsPristine());
         this.contactsForm.markAsPristine();
@@ -273,4 +265,6 @@ export class ContactsComponent {
     onSubmit(): void {
         this.saveData();
     }
+
+    trackByContact = (_i: number, ctrl: any) => ctrl;
 }

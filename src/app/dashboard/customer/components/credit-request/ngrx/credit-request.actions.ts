@@ -12,10 +12,7 @@ export const CreditRequestDataPageActions = createActionGroup({
     events: {
         // Cargar datos
         'Load Data': props<{ customerId: string }>(),
-
-        // Actualizar campos
-        'Update Field': props<{ field: keyof CreditRequestData; value: string | null }>(),
-        'Update Multiple Fields': props<{ updates: Partial<CreditRequestData> }>(),
+        // Establecer snapshot completo (alineado con general-data)
         'Set Data': props<{ data: CreditRequestData }>(),
 
         // Guardar

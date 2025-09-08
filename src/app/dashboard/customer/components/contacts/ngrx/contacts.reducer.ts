@@ -5,12 +5,26 @@ import { EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 // Estados propios
 import { ContactsDataState, initialContactsDataState } from '@/dashboard/customer/components/contacts/ngrx/contacts.state';
 import { ContactsDataPageActions, ContactsDataApiActions } from '@/dashboard/customer/components/contacts/ngrx/contacts.actions';
-import { ContactsData } from '@/dashboard/customer/components/contacts/ngrx/contacts.models';
+import { ContactsData, ContactData } from '@/dashboard/customer/components/contacts/ngrx/contacts.models';
 
 // Adapter para manejar entidades
 export const contactsDataAdapter: EntityAdapter<ContactsData> = createEntityAdapter<ContactsData>({
     // Función para seleccionar el ID de la entidad
     selectId: (data) => data.contacts[0]?.name || 'contacts-data'
+});
+
+// ===== Normalización de datos de contacts =====
+const toStr = (v: any) => (v == null ? '' : String(v).trim());
+const isEmptyContact = (c: ContactData | null | undefined) => !c || (!toStr(c.name) && !toStr(c.position) && !toStr(c.phone) && !toStr(c.email));
+const normalize = (d: ContactsData | null | undefined): ContactsData => ({
+    contacts: (d?.contacts || [])
+        .filter(c => !isEmptyContact(c))
+        .map(c => ({
+            name: c?.name ?? null,
+            position: c?.position ?? null,
+            phone: c?.phone ?? null,
+            email: c?.email ?? null,
+        }))
 });
 
 // Estado inicial del slice de contacts
@@ -31,12 +45,13 @@ export const contactsDataReducer = createReducer(
 
     // Carga exitosa: guarda datos, actualiza status, resetea flags
     on(ContactsDataApiActions.loadDataSuccess, (state, { data }) => {
-        const withEntity = contactsDataAdapter.setOne(data, state);
+        const norm = normalize(data);
+        const withEntity = contactsDataAdapter.setOne(norm, state);
         
         return {
             ...withEntity,
-            data,
-            originalData: data, // Guardar los datos originales al cargar
+            data: norm,
+            originalData: norm, // Guardar los datos originales al cargar
             status: 'idle' as const,
             loading: false,
             saving: false,
@@ -54,53 +69,18 @@ export const contactsDataReducer = createReducer(
         error: error.message
     })),
 
-    // === UPDATE FIELDS ===
-    // Actualizar campo específico
-    on(ContactsDataPageActions.updateField, (state, { field, value }) => {
-        const currentData = state.data || { contacts: [] };
-        // Para contacts, el único field válido es 'contacts' que es un array
-        if (field === 'contacts' && Array.isArray(value)) {
-            const updatedData = {
-                ...currentData,
-                contacts: value
-            };
-            const withEntity = contactsDataAdapter.setOne(updatedData, state);
-            
-            return {
-                ...withEntity,
-                data: updatedData,
-            };
-        }
-        return state;
-    }),
-
-    // Actualizar múltiples campos
-    on(ContactsDataPageActions.updateMultipleFields, (state, { updates }) => {
-        const currentData = state.data || { contacts: [] };
-        const updatedData = {
-            ...currentData,
-            ...updates
-        };
-        const withEntity = contactsDataAdapter.setOne(updatedData, state);
-        
-        return {
-            ...withEntity,
-            data: updatedData,
-        };
-    }),
-
-    // Establecer datos completos
+    // Establecer snapshot completo
     on(ContactsDataPageActions.setData, (state, { data }) => {
-        const withEntity = contactsDataAdapter.setOne(data, state);
+        const norm = normalize(data);
+        const withEntity = contactsDataAdapter.setOne(norm, state);
         const changed = state.originalData
-            ? JSON.stringify(state.originalData) !== JSON.stringify(data)
+            ? JSON.stringify(state.originalData) !== JSON.stringify(norm)
             : true; // en crear: cualquier cambio = sucio
 
         return {
             ...state,
             ...withEntity,
-            data,
-            // NO tocar originalData aquí
+            data: norm,
             hasUnsavedChanges: changed,
             isDirty: changed,
         };

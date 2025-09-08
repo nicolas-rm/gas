@@ -12,10 +12,7 @@ export const ContactsDataPageActions = createActionGroup({
     events: {
         // Cargar datos
         'Load Data': props<{ customerId: string }>(),
-
-        // Actualizar campos
-        'Update Field': props<{ field: keyof ContactsData; value: string | null }>(),
-        'Update Multiple Fields': props<{ updates: Partial<ContactsData> }>(),
+        // Establecer snapshot completo
         'Set Data': props<{ data: ContactsData }>(),
 
         // Guardar

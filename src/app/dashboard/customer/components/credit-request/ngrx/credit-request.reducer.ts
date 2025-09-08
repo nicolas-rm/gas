@@ -33,37 +33,24 @@ export const creditRequestDataReducer = createReducer(
         error: error.message
     })),
     
-    // === UPDATE FIELD ===
-    on(CreditRequestDataPageActions.updateField, (state, { field, value }): CreditRequestDataState => {
-        const currentData = state.data || {
-            legalRepresentative: null,
-            documentsReceiver: null,
-            creditApplicationDocument: null
-        };
-        const updatedData = {
-            ...currentData,
-            [field]: value
-        };
-        
-        return creditRequestDataAdapter.setOne(updatedData, {
-            ...state,
-            data: updatedData,
-            error: null
-        });
-    }),
-    
-    // === SET DATA ===
+    // === SET DATA (snapshot completo) ===
     on(CreditRequestDataPageActions.setData, (state, { data }): CreditRequestDataState => {
-        const withEntity = creditRequestDataAdapter.setOne(data, state);
+        const normalized = {
+            ...data,
+            references: (data.references || []).filter(r => {
+                const trim = (v: any) => (v == null ? '' : String(v).trim());
+                return trim(r.name) || trim(r.position) || trim(r.phone) || trim(r.email);
+            })
+        };
+        const withEntity = creditRequestDataAdapter.setOne(normalized, state);
         const changed = state.originalData
-            ? JSON.stringify(state.originalData) !== JSON.stringify(data)
+            ? JSON.stringify(state.originalData) !== JSON.stringify(normalized)
             : true; // en crear: cualquier cambio = sucio
 
         return {
             ...state,
             ...withEntity,
-            data,
-            // NO tocar originalData aquí
+            data: normalized,
             hasUnsavedChanges: changed,
             isDirty: changed,
         };

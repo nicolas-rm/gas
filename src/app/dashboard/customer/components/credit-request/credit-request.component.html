@@ -107,14 +107,15 @@
                                 </div>
 
                                 <div formArrayName="references">
-                                    <div *ngFor="let reference of references.controls; let i = index; trackBy: trackByIndex"
+                                    <div *ngFor="let reference of references.controls; let i = index; trackBy: trackByReference"
                                         [formGroupName]="i" class="mb-4">
 
                                         <!-- Encabezado de la referencia -->
                                         <div class="flex justify-between items-center mb-4">
                                             <h6 class="text-lg font-semibold text-gray-800">Referencia {{ i + 1 }}</h6>
                                             <button type="button" (click)="removeReference(i)"
-                                                class="btn btn-sm btn-light-error">
+                                                class="btn btn-sm btn-light-error"
+                                                *ngIf="canRemoveReference(i)">
                                                 <i class="ti ti-trash text-base"></i>
                                                 Eliminar
                                             </button>
