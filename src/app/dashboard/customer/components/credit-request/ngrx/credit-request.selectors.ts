@@ -72,9 +72,8 @@ export const selectCreditRequestDataCanSave = createSelector(
 export const selectCreditRequestDataCanReset = createSelector(
     selectCreditRequestDataHasUnsavedChanges,
     selectCreditRequestDataIsBusy,
-    selectCreditRequestDataOriginal,
-    (hasUnsavedChanges: boolean, isBusy: boolean, original: CreditRequestData | null) =>
-        !isBusy && (hasUnsavedChanges || !!original)
+    (hasUnsavedChanges: boolean, isBusy: boolean) =>
+        hasUnsavedChanges && !isBusy
 );
 
 // === FORM STATE SELECTOR ===

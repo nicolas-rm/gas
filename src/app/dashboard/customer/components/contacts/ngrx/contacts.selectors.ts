@@ -72,9 +72,8 @@ export const selectContactsDataCanSave = createSelector(
 export const selectContactsDataCanReset = createSelector(
     selectContactsDataHasUnsavedChanges,
     selectContactsDataIsBusy,
-    selectContactsDataOriginal,
-    (hasUnsavedChanges: boolean, isBusy: boolean, original: ContactsData | null) =>
-        !isBusy && (hasUnsavedChanges || !!original)
+    (hasUnsavedChanges: boolean, isBusy: boolean) =>
+        hasUnsavedChanges && !isBusy
 );
 
 // === FORM STATE SELECTOR ===
