@@ -249,3 +249,8 @@
     font-size: 0.875rem;
     color: #6c757d;
 }
+
+/* Clase para ocultar el asterisco manteniendo el espacio (alineación) */
+.invisible {
+    visibility: hidden;
+}

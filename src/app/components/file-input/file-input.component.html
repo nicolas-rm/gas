@@ -3,7 +3,7 @@
     <!-- Label -->
     <label *ngIf="label" [for]="id" class="block text-sm font-semibold text-gray-900 dark:text-white">
         {{ label }}
-        <span *ngIf="isRequired" class="text-red-500">*</span>
+        <span class="text-red-500" [class.invisible]="!isRequired">*</span>
     </label>
 
     <!-- Dropzone -->

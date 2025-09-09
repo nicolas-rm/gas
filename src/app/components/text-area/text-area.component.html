@@ -3,7 +3,7 @@
     <!-- Label con indicador de requerido -->
     <label *ngIf="label" [for]="id" class="block mb-1 text-sm font-semibold text-gray-900 dark:text-white">
         {{ label }}
-        <span *ngIf="isRequired" class="text-red-500 text-lg">*</span>
+        <span class="text-red-500 text-lg" [class.invisible]="!isRequired">*</span>
     </label>
 
     <!-- Contenedor relativo para el textarea -->

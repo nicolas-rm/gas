@@ -92,3 +92,8 @@ textarea:-webkit-autofill:active {
 .resize-vertical {
     resize: vertical;
 }
+
+/* Clase para ocultar el asterisco manteniendo el espacio (alineación) */
+.invisible {
+    visibility: hidden;
+}

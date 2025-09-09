@@ -12,7 +12,7 @@
         />
         <label class="ml-2 text-sm font-medium text-gray-900 dark:text-white" [for]="id">
             {{ label }}
-            <span *ngIf="isRequired" class="text-red-500 ml-1">*</span>
+            <span class="text-red-500 ml-1" [class.invisible]="!isRequired">*</span>
         </label>
     </div>
 
