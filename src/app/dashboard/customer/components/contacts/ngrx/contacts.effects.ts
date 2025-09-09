@@ -3,16 +3,14 @@ import { inject } from '@angular/core';
 
 // NgRx
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { Store } from '@ngrx/store';
 
 // RxJS
-import { of, timer } from 'rxjs';
-import { catchError, exhaustMap, map, withLatestFrom } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { catchError, exhaustMap, map } from 'rxjs/operators';
 
 // Servicios y modelos propios
-import { CustomerService } from '../../../customer.service';
-import { ContactsDataPageActions, ContactsDataApiActions } from './contacts.actions';
-import { selectContactsData } from './contacts.selectors';
+import { CustomerService } from '@/dashboard/customer/customer.service';
+import { ContactsPageActions, ContactsApiActions } from '@/dashboard/customer/components/contacts/ngrx/contacts.actions';
 
 // Librerías externas
 import { HotToastService } from '@ngxpert/hot-toast';
@@ -23,24 +21,19 @@ import { HotToastService } from '@ngxpert/hot-toast';
 export const loadContactsDataEffect = createEffect(
     (actions$ = inject(Actions), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
         actions$.pipe(
-            ofType(ContactsDataPageActions.loadData),
+            ofType(ContactsPageActions.loadData),
             exhaustMap(({ customerId }) => {
-                // Agregar pequeño delay para evitar conflictos de toast
-                return timer(100).pipe(
-                    exhaustMap(() => {
-                        const toastRef = toast.loading('Cargando datos de contactos...');
-                        return customerService.getCustomerSection(customerId, 'contactsData').pipe(
-                            map(data => {
-                                toastRef.close();
-                                toast.success('Datos de contactos cargados exitosamente');
-                                return ContactsDataApiActions.loadDataSuccess({ data });
-                            }),
-                            catchError(error => {
-                                toastRef.close();
-                                toast.error(error); // El error ya viene procesado del service
-                                return of(ContactsDataApiActions.loadDataFailure({ error }));
-                            })
-                        );
+                const toastRef = toast.loading('Cargando contactos...');
+                return customerService.getCustomerSection(customerId, 'contactsData').pipe(
+                    map(data => {
+                        toastRef.close();
+                        toast.success('Contactos cargados exitosamente');
+                        return ContactsApiActions.loadDataSuccess({ data });
+                    }),
+                    catchError(error => {
+                        toastRef.close();
+                        toast.error(error);
+                        return of(ContactsApiActions.loadDataFailure({ error }));
                     })
                 );
             })
@@ -50,53 +43,36 @@ export const loadContactsDataEffect = createEffect(
 
 /**
  * Effect: Save Contacts Data
- * Maneja el guardado de datos de contactos con datos proporcionados o del store
+ * Maneja el guardado de contactos con datos proporcionados o del store
  */
 export const saveContactsDataEffect = createEffect(
-    (actions$ = inject(Actions), store = inject(Store), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
+    (actions$ = inject(Actions), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
         actions$.pipe(
-            ofType(ContactsDataPageActions.saveData),
-            withLatestFrom(store.select(selectContactsData)),
-            exhaustMap(([action, currentData]) => {
-                // Si no se proporcionan datos en la acción, usar los del store
-                const dataToSave = action.data || currentData;
-                if (!dataToSave) {
-                    const errorMessage = 'No hay datos de contactos para guardar';
-                    toast.error(errorMessage);
-                    return of(ContactsDataApiActions.saveDataFailure({
-                        error: { message: errorMessage }
-                    }));
-                }
-
-                // Agregar pequeño delay para evitar conflictos de toast
-                return timer(100).pipe(
-                    exhaustMap(() => {
-                        const toastRef = toast.loading('Guardando datos de contactos...');
-
-                        return customerService.saveSection({
-                            section: 'contactsData',
-                            customerId: action.customerId,
-                            data: dataToSave
-                        }).pipe(
-                            map(response => {
-                                toastRef.close();
-                                toast.success('Datos de contactos guardados exitosamente');
-                                const contactsResponse = {
-                                    success: response.success,
-                                    data: response.data.contactsData,
-                                    message: response.message
-                                };
-                                return ContactsDataApiActions.saveDataSuccess({
-                                    data: response.data.contactsData,
-                                    response: contactsResponse
-                                });
-                            }),
-                            catchError(error => {
-                                toastRef.close();
-                                toast.error(error); // El error ya viene procesado del service
-                                return of(ContactsDataApiActions.saveDataFailure({ error }));
-                            })
-                        );
+            ofType(ContactsPageActions.saveData),
+            exhaustMap(action => {
+                const toastRef = toast.loading('Guardando contactos...');
+                return customerService.saveSection({
+                    section: 'contactsData',
+                    customerId: action.customerId,
+                    data: action.data
+                }).pipe(
+                    map(response => {
+                        toastRef.close();
+                        toast.success('Contactos guardados exitosamente');
+                        const contactsResponse = {
+                            success: response.success,
+                            data: response.data.contactsData,
+                            message: response.message
+                        };
+                        return ContactsApiActions.saveDataSuccess({
+                            data: response.data.contactsData,
+                            response: contactsResponse
+                        });
+                    }),
+                    catchError(error => {
+                        toastRef.close();
+                        toast.error(error);
+                        return of(ContactsApiActions.saveDataFailure({ error }));
                     })
                 );
             })

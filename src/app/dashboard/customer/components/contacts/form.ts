@@ -1,4 +1,4 @@
-// Formulario de Contacto — discriminantes estrictos
+// Interfaces, constantes y types del formulario de Contactos
 import { TextFieldType, TextFieldInterface } from "@/components/text-field/text-field.component";
 import { SelectFieldInterface } from "@/components/select/select.component";
 
@@ -49,8 +49,7 @@ export const contactForm: ContactForm = {
         formControlName: 'phone',
         placeholder: 'Teléfono del contacto',
         control: 'text',
-        type: 'tel', // si tu TextFieldType no tiene 'tel', deja 'text'
-        // mask: 'phone' as any,
+        type: 'text',
     },
     email: {
         id: 'email',
@@ -58,13 +57,6 @@ export const contactForm: ContactForm = {
         formControlName: 'email',
         placeholder: 'Correo electrónico del contacto',
         control: 'text',
-        type: 'email', // valida formato email si tu componente lo soporta
+        type: 'text',
     },
 };
-
-/** ---------------------------------------
- *  (Opcional) Utilidades derivadas
- *  ---------------------------------------
- *  export type ContactField = ContactForm[ContactDataKeys];
- *  export const contactOrder: ContactDataKeys[] = ['name','position','phone','email'];
- */

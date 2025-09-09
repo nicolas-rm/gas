@@ -1,6 +1,20 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { ContactsDataState } from './contacts.state';
-import { ContactsData } from './contacts.models';
+import { ContactsData, ContactData } from './contacts.models';
+
+// === HELPERS PARA NORMALIZACIÓN ===
+export const isEmptyContact = (contact?: ContactData | null): boolean => {
+    if (!contact) return true;
+    const trim = (value: unknown) => typeof value === 'string' ? value.trim() : value;
+    return [contact.name, contact.position, contact.phone, contact.email]
+        .map(trim)
+        .every(value => !value);
+};
+
+export const normalizeContactsData = (data?: ContactsData | null): ContactsData => {
+    const contacts = (data?.contacts ?? []).filter(contact => !isEmptyContact(contact));
+    return { contacts };
+};
 
 // Feature selector
 export const selectContactsDataState = createFeatureSelector<ContactsDataState>('contactsData');
@@ -49,10 +63,24 @@ export const selectContactsDataError = createSelector(
     (state: ContactsDataState) => state.error
 );
 
+// === NORMALIZED DATA SELECTORS ===
+export const selectContactsDataNormalized = createSelector(
+    selectContactsData,
+    (data) => normalizeContactsData(data)
+);
+
+export const selectContactsDataOriginalNormalized = createSelector(
+    selectContactsDataOriginal,
+    (data) => normalizeContactsData(data)
+);
+
 // === CHANGE TRACKING SELECTORS ===
 export const selectContactsDataHasUnsavedChanges = createSelector(
-    selectContactsDataState,
-    (state: ContactsDataState) => state.hasUnsavedChanges
+    selectContactsDataNormalized,
+    selectContactsDataOriginalNormalized,
+    (current, original) => {
+        return JSON.stringify(current) !== JSON.stringify(original);
+    }
 );
 
 export const selectContactsDataIsDirty = createSelector(

@@ -1,48 +1,65 @@
-import { TextFieldComponent } from '@/app/components/components';
-import { Component, inject, effect } from '@angular/core';
+// Angular
+import { Component, ChangeDetectionStrategy, inject, effect } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { contactForm } from '@/app/dashboard/customer/components/contacts/form';
-import { CommonModule } from '@angular/common';
-import { HotToastService } from '@ngxpert/hot-toast';
+
+// NgRx
 import { Store } from '@ngrx/store';
+
+// RxJS
 import { debounceTime } from 'rxjs/operators';
-import { ContactsDataPageActions } from './ngrx/contacts.actions';
-import { 
-    selectContactsData, 
-    selectContactsDataLoading, 
-    selectContactsDataSaving, 
+
+// Componentes
+import { TextFieldComponent } from '@/app/components/components';
+
+// Config del formulario (labels, ids, etc.)
+import { contactForm } from '@/app/dashboard/customer/components/contacts/form';
+
+// NgRx Contacts
+import { ContactsPageActions } from '@/dashboard/customer/components/contacts/ngrx/contacts.actions';
+import {
+    selectContactsData,
+    selectContactsDataOriginal,
     selectContactsDataIsBusy,
+    selectContactsDataLoading,
+    selectContactsDataSaving,
     selectContactsDataError,
     selectContactsDataHasUnsavedChanges,
     selectContactsDataCanReset,
-    selectContactsDataOriginal
-} from './ngrx/contacts.selectors';
-import { ContactsData } from './ngrx/contacts.models';
-import { ContactData } from './ngrx/contacts.models';
+    isEmptyContact
+} from '@/dashboard/customer/components/contacts/ngrx/contacts.selectors';
+import { ContactsData, ContactData } from '@/dashboard/customer/components/contacts/ngrx/contacts.models';
 
-export type ContactFormControl = {
-    name: FormControl<string | null>;
-    position: FormControl<string | null>;
-    phone: FormControl<string | null>;
-    email: FormControl<string | null>;
-}
+// Validadores
+import { ReactiveValidators } from '@/app/utils/validators/ReactiveValidators';
+
+// Toasts
+import { HotToastService } from '@ngxpert/hot-toast';
+
+type ControlsOf<T> = { [K in keyof T]: FormControl<T[K] | null> };
+export type ContactFormControl = ControlsOf<ContactData>;
 
 @Component({
     selector: 'app-contacts',
+    standalone: true,
     imports: [CommonModule, ReactiveFormsModule, TextFieldComponent],
     templateUrl: './contacts.component.html',
-    styleUrl: './contacts.component.css'
+    styleUrl: './contacts.component.css',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContactsComponent {
+
+    // UI metadata (labels, placeholders…)
     readonly contactData = contactForm;
     readonly maxContacts = 3;
-    
+
+    // Inyecciones
     private readonly fb = inject(FormBuilder);
     private readonly toast = inject(HotToastService);
     private readonly store = inject(Store);
-    
-    // NgRx signals
+
+    // Signals desde NgRx
     isLoading = this.store.selectSignal(selectContactsDataLoading);
     isSaving = this.store.selectSignal(selectContactsDataSaving);
     isBusy = this.store.selectSignal(selectContactsDataIsBusy);
@@ -51,7 +68,8 @@ export class ContactsComponent {
     canReset = this.store.selectSignal(selectContactsDataCanReset);
     data = this.store.selectSignal(selectContactsData);
     originalData = this.store.selectSignal(selectContactsDataOriginal);
-    
+
+    // FormGroup tipado (FormArray requiere tipado menos estricto para Angular)
     contactsForm: FormGroup = this.fb.group({
         contacts: this.fb.array([])
     });
@@ -60,11 +78,17 @@ export class ContactsComponent {
         // Store -> Form (se ejecuta cada vez que cambie el signal)
         effect(() => {
             const d = this.data();
-            if (d) {
-                this.contactsForm.patchValue(d, { emitEvent: false });
+            if (d && Array.isArray(d.contacts)) {
+                // Sincroniza el array de contactos
+                const arr = this.contactsForm.get('contacts') as FormArray;
+                arr.clear();
+                d.contacts.forEach(contact => {
+                    arr.push(this.createContactFormGroup(contact));
+                });
             } else {
                 // Soporte para time-travel / reset a estado inicial (create)
                 this.contactsForm.reset({}, { emitEvent: false });
+                (this.contactsForm.get('contacts') as FormArray).clear();
                 this.contactsForm.markAsPristine();
                 this.contactsForm.markAsUntouched();
             }
@@ -84,58 +108,69 @@ export class ContactsComponent {
         this.contactsForm.valueChanges
             .pipe(debounceTime(300), takeUntilDestroyed())
             .subscribe(() => {
-                const data = this.contactsForm.getRawValue() as ContactsData;
-                this.store.dispatch(ContactsDataPageActions.setData({ data }));
-                this.store.dispatch(ContactsDataPageActions.markAsDirty());
+                const arr = this.contactsForm.get('contacts') as FormArray;
+                const contacts: ContactData[] = arr.controls.map((ctrl: any) => ctrl.getRawValue() as ContactData);
+                this.store.dispatch(ContactsPageActions.setData({ data: { contacts } }));
+                this.store.dispatch(ContactsPageActions.markAsDirty());
             });
     }
-    
+
+    // === Getters ===
     get contactsArray(): FormArray {
         return this.contactsForm.get('contacts') as FormArray;
     }
-    
-    createContactFormGroup(): FormGroup<ContactFormControl> {
+
+    // === Métodos de contacto ===
+    createContactFormGroup(contact?: ContactData): FormGroup<ContactFormControl> {
         return this.fb.group({
-            name: ['', []],
-            position: ['', []],
-            phone: ['', []],
-            email: ['', []]
+            name: this.fb.control<string | null>(contact?.name ?? '', [ReactiveValidators.required]),
+            position: this.fb.control<string | null>(contact?.position ?? '', []),
+            phone: this.fb.control<string | null>(contact?.phone ?? '', [ReactiveValidators.required]),
+            email: this.fb.control<string | null>(contact?.email ?? '', [ReactiveValidators.required, ReactiveValidators.email])
         });
     }
 
     addContact(): void {
         if (this.contactsArray.length < this.maxContacts) {
-            this.contactsArray.push(this.createContactFormGroup());
+            // Agregar contacto sin emitir evento para evitar marcar como dirty
+            this.contactsArray.push(this.createContactFormGroup(), { emitEvent: false });
         }
     }
-    
+
     removeContact(index: number): void {
         if (this.canRemoveContact(index)) {
-            this.contactsArray.removeAt(index);
+            // Verificar si el contacto está vacío para decidir si emitir evento
+            const contactValue = this.contactsArray.at(index)?.getRawValue() as ContactData;
+            const isDraft = isEmptyContact(contactValue);
+            this.contactsArray.removeAt(index, { emitEvent: !isDraft });
         }
     }
-    
+
     canAddContact(): boolean {
         return this.contactsArray.length < this.maxContacts;
     }
-    
+
     canRemoveContact(index: number): boolean {
         return this.contactsArray.length > 1 && index > 0; // nunca eliminar el primero
     }
 
-    // Cargar datos
+    // === Acciones principales ===
+    // Cargar datos desde API
     loadData(customerId: string): void {
-        this.store.dispatch(ContactsDataPageActions.loadData({ customerId }));
+        this.store.dispatch(ContactsPageActions.loadData({ customerId }));
     }
 
     // Guardar
     saveData(customerId?: string): void {
         if (!this.assertValid()) return;
-        const data = this.contactsForm.getRawValue() as ContactsData;
+        const allContacts: ContactData[] = this.contactsArray.controls.map((ctrl: any) => ctrl.getRawValue() as ContactData);
+        // Filtrar contactos vacíos antes de guardar
+        const contacts = allContacts.filter(contact => !isEmptyContact(contact));
+        
         this.store.dispatch(
-            ContactsDataPageActions.saveData({
+            ContactsPageActions.saveData({
                 customerId: customerId ?? 'temp',
-                data
+                data: { contacts }
             })
         );
     }
@@ -148,17 +183,18 @@ export class ContactsComponent {
         return false;
     }
 
-    // Acciones varias
+    // === Acciones varias ===
     resetForm(): void {
-        this.store.dispatch(ContactsDataPageActions.resetForm());
+        this.store.dispatch(ContactsPageActions.resetForm());
         this.contactsForm.reset({}, { emitEvent: false }); // Evita que se dispare valueChanges
         this.contactsForm.markAsPristine(); // Marca el form como pristine
         this.contactsForm.markAsUntouched();
+        this.contactsArray.clear();
     }
 
     // Restablecer a datos originales (crear: vacío, actualizar: datos cargados)
     resetToOriginal(): void {
-        this.store.dispatch(ContactsDataPageActions.resetToOriginal());
+        this.store.dispatch(ContactsPageActions.resetToOriginal());
         // El efecto se encargará de actualizar el formulario con los datos originales
         this.contactsForm.markAsPristine();
         this.contactsForm.markAsUntouched();
@@ -166,13 +202,13 @@ export class ContactsComponent {
 
     // Marcar como pristine (sin cambios)
     markAsPristine(): void {
-        this.store.dispatch(ContactsDataPageActions.markAsPristine());
+        this.store.dispatch(ContactsPageActions.markAsPristine());
         this.contactsForm.markAsPristine();
     }
 
     // Limpiar errores
     clearErrors(): void {
-        this.store.dispatch(ContactsDataPageActions.clearErrors());
+        this.store.dispatch(ContactsPageActions.clearErrors());
     }
 
     onSubmit(): void {

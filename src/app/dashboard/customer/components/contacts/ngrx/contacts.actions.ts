@@ -7,8 +7,8 @@ import {
 } from './contacts.models';
 
 // Acciones de UI
-export const ContactsDataPageActions = createActionGroup({
-    source: 'Contacts Data Page',
+export const ContactsPageActions = createActionGroup({
+    source: 'Contacts Page',
     events: {
         // Cargar datos
         'Load Data': props<{ customerId: string }>(),
@@ -28,8 +28,8 @@ export const ContactsDataPageActions = createActionGroup({
 });
 
 // Acciones de API
-export const ContactsDataApiActions = createActionGroup({
-    source: 'Contacts Data API',
+export const ContactsApiActions = createActionGroup({
+    source: 'Contacts API',
     events: {
         // Load
         'Load Data Success': props<{ data: ContactsData }>(),

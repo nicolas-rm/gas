@@ -4,58 +4,52 @@ import { EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 
 // Estados propios
 import { ContactsDataState, initialContactsDataState } from '@/dashboard/customer/components/contacts/ngrx/contacts.state';
-import { ContactsDataPageActions, ContactsDataApiActions } from '@/dashboard/customer/components/contacts/ngrx/contacts.actions';
-import { ContactsData, ContactData } from '@/dashboard/customer/components/contacts/ngrx/contacts.models';
+import { ContactsPageActions, ContactsApiActions } from '@/dashboard/customer/components/contacts/ngrx/contacts.actions';
+import { ContactsData } from '@/dashboard/customer/components/contacts/ngrx/contacts.models';
 
-// Adapter para manejar entidades
+// Entity Adapter para manejar colecciones si fuera necesario en el futuro
 export const contactsDataAdapter: EntityAdapter<ContactsData> = createEntityAdapter<ContactsData>({
-    // Función para seleccionar el ID de la entidad
-    selectId: (data) => data.contacts[0]?.name || 'contacts-data'
+    selectId: (data: ContactsData) => data.contacts[0]?.name || 'temp-id',
+    sortComparer: false,
 });
 
-// Estado inicial del slice de contacts
-export const initialState: ContactsDataState = contactsDataAdapter.getInitialState(initialContactsDataState);
-
-// Reducer principal para contacts data
-export const contactsDataReducer = createReducer(
-    initialState,
+export const contactsDataReducer = createReducer<ContactsDataState>(
+    contactsDataAdapter.getInitialState(initialContactsDataState),
 
     // === LOAD DATA ===
-    // Iniciar carga (loading=true, resetea error)
-    on(ContactsDataPageActions.loadData, state => ({
+    on(ContactsPageActions.loadData, (state: ContactsDataState) => ({
         ...state,
         status: 'loading' as const,
         loading: true,
-        error: null
+        error: null,
     })),
 
-    // Carga exitosa: guarda datos, actualiza status, resetea flags
-    on(ContactsDataApiActions.loadDataSuccess, (state, { data }) => {
+    on(ContactsApiActions.loadDataSuccess, (state: ContactsDataState, { data }) => {
         const withEntity = contactsDataAdapter.setOne(data, state);
-        
+
         return {
+            ...state,
             ...withEntity,
-            data: data,
+            data,
             originalData: data, // Guardar los datos originales al cargar
             status: 'idle' as const,
             loading: false,
             saving: false,
             error: null,
             hasUnsavedChanges: false,
-            isDirty: false
+            isDirty: false,
         };
     }),
 
-    // Carga fallida: actualiza error, status "error"
-    on(ContactsDataApiActions.loadDataFailure, (state, { error }) => ({
+    on(ContactsApiActions.loadDataFailure, (state: ContactsDataState, { error }) => ({
         ...state,
         status: 'error' as const,
         loading: false,
-        error: error.message
+        error: error.message,
     })),
 
-    // Establecer snapshot completo
-    on(ContactsDataPageActions.setData, (state, { data }) => {
+    // (Eliminadas acciones granulares updateField / updateMultipleFields)
+    on(ContactsPageActions.setData, (state, { data }) => {
         const withEntity = contactsDataAdapter.setOne(data, state);
         const changed = state.originalData
             ? JSON.stringify(state.originalData) !== JSON.stringify(data)
@@ -64,26 +58,26 @@ export const contactsDataReducer = createReducer(
         return {
             ...state,
             ...withEntity,
-            data: data,
+            data,
+            // NO tocar originalData aquí
             hasUnsavedChanges: changed,
             isDirty: changed,
         };
     }),
 
     // === SAVE DATA ===
-    // Iniciar guardado (saving=true, resetea error)
-    on(ContactsDataPageActions.saveData, state => ({
+    on(ContactsPageActions.saveData, (state: ContactsDataState) => ({
         ...state,
         status: 'saving' as const,
         saving: true,
-        error: null
+        error: null,
     })),
 
-    // Guardado exitoso: actualiza datos, status "saved"
-    on(ContactsDataApiActions.saveDataSuccess, (state, { data }) => {
+    on(ContactsApiActions.saveDataSuccess, (state: ContactsDataState, { data }) => {
         const withEntity = contactsDataAdapter.setOne(data, state);
-        
+
         return {
+            ...state,
             ...withEntity,
             data,
             originalData: data, // Actualizar datos originales después de guardar exitosamente
@@ -92,26 +86,26 @@ export const contactsDataReducer = createReducer(
             saving: false,
             error: null,
             hasUnsavedChanges: false,
-            isDirty: false
+            isDirty: false,
         };
     }),
 
-    // Guardado fallido: actualiza error, status "error"
-    on(ContactsDataApiActions.saveDataFailure, (state, { error }) => ({
+    on(ContactsApiActions.saveDataFailure, (state: ContactsDataState, { error }) => ({
         ...state,
         status: 'error' as const,
         saving: false,
-        error: error.message
+        error: error.message,
     })),
 
     // === RESET Y LIMPIEZA ===
-    // Resetear formulario (limpia todo el estado)
-    on(ContactsDataPageActions.resetForm, () => {
+    // Resetear formulario completamente (volver al estado inicial)
+    on(ContactsPageActions.resetForm, () => {
         // Limpia completamente el adapter y restablece el estado extendido
         const base = contactsDataAdapter.getInitialState(initialContactsDataState);
         const cleared = contactsDataAdapter.removeAll(base);
         return {
             ...cleared,
+            // Las props custom ya están en initialContactsDataState
             error: null,
             data: null,
             originalData: null,
@@ -124,40 +118,46 @@ export const contactsDataReducer = createReducer(
     }),
 
     // Restablecer a datos originales (crear: campos vacíos, actualizar: datos cargados)
-    on(ContactsDataPageActions.resetToOriginal, (state) => {
+    on(ContactsPageActions.resetToOriginal, (state: ContactsDataState) => {
         const dataToRestore = state.originalData || { contacts: [] };
-        const withEntity = contactsDataAdapter.setOne(dataToRestore, state);
+        const prevId = state.data ? (state.data.contacts[0]?.name || 'temp-id') : null;
+        const restoreId = dataToRestore.contacts[0]?.name || 'temp-id';
+        let working = state.originalData ? state : contactsDataAdapter.removeAll(state);
+        if (prevId && prevId !== restoreId) {
+            working = contactsDataAdapter.removeOne(prevId, working);
+        }
+        const withEntity = contactsDataAdapter.setOne(dataToRestore, working);
 
         return {
             ...state,
             ...withEntity,
             data: dataToRestore,
             originalData: state.originalData,
+            status: state.status,
+            loading: state.loading,
+            saving: state.saving,
             error: null,
             hasUnsavedChanges: false,
             isDirty: false,
         };
     }),
 
-    // Limpiar errores
-    on(ContactsDataPageActions.clearErrors, state => ({
+    on(ContactsPageActions.clearErrors, (state: ContactsDataState) => ({
         ...state,
         error: null,
         status: state.status === 'error' ? 'idle' : state.status
     })),
 
-    // Marcar como pristine
-    on(ContactsDataPageActions.markAsPristine, state => ({
+    on(ContactsPageActions.markAsPristine, (state: ContactsDataState) => ({
         ...state,
         hasUnsavedChanges: false,
-        isDirty: false
+        isDirty: false,
     })),
 
-    // Marcar como dirty
-    on(ContactsDataPageActions.markAsDirty, state => ({
+    on(ContactsPageActions.markAsDirty, (state: ContactsDataState) => ({
         ...state,
         hasUnsavedChanges: true,
-        isDirty: true
+        isDirty: true,
     }))
 );
 
