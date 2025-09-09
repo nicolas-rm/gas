@@ -1,5 +1,5 @@
 import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
-import { IneData } from './ine.models';
+import { IneData } from '@/dashboard/customer/components/ine/ngrx/ine.models';
 
 // Estados operacionales específicos siguiendo el estándar de general-data
 export type IneDataStatus = 'idle' | 'loading' | 'saving' | 'saved' | 'error';

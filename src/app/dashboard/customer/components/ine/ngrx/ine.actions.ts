@@ -4,7 +4,7 @@ import {
     SaveIneDataRequest,
     IneDataError,
     IneDataResponse
-} from './ine.models';
+} from '@/dashboard/customer/components/ine/ngrx/ine.models';
 
 // Acciones de UI
 export const IneDataPageActions = createActionGroup({
@@ -13,9 +13,7 @@ export const IneDataPageActions = createActionGroup({
         // Cargar datos
         'Load Data': props<{ customerId: string }>(),
 
-        // Actualizar campos
-        'Update Field': props<{ field: keyof IneData; value: string | null }>(),
-        'Update Multiple Fields': props<{ updates: Partial<IneData> }>(),
+        // Establecer snapshot completo del formulario
         'Set Data': props<{ data: IneData }>(),
 
         // Guardar

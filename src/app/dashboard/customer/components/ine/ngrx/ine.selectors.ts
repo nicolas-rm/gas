@@ -1,8 +1,8 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { IneDataState } from './ine.state';
-import { IneData } from './ine.models';
+import { IneDataState } from '@/dashboard/customer/components/ine/ngrx/ine.state';
+import { IneData } from '@/dashboard/customer/components/ine/ngrx/ine.models';
 
-// Feature selector
+// Feature selector para el state del componente
 export const selectIneDataState = createFeatureSelector<IneDataState>('ineData');
 
 // === DATA SELECTORS ===
@@ -49,6 +49,11 @@ export const selectIneDataError = createSelector(
     (state: IneDataState) => state.error
 );
 
+export const selectIneDataHasError = createSelector(
+    selectIneDataError,
+    (error: string | null) => !!error
+);
+
 // === CHANGE TRACKING SELECTORS ===
 export const selectIneDataHasUnsavedChanges = createSelector(
     selectIneDataState,
@@ -76,5 +81,32 @@ export const selectIneDataCanReset = createSelector(
         hasUnsavedChanges && !isBusy
 );
 
-// === FORM STATE SELECTOR ===
-// (Removidos selectores granulares específicos de campos y agrupados no utilizados para simplificar la superficie del estado)
+export const selectIneDataIsValid = createSelector(
+    selectIneData,
+    (data: IneData | null) => {
+        if (!data) return false;
+        // Lógica de validación básica aquí si es necesaria
+        return true;
+    }
+);
+
+// === FORM STATE SELECTORS ===
+export const selectIneDataFormState = createSelector(
+    selectIneData,
+    selectIneDataLoading,
+    selectIneDataSaving,
+    selectIneDataError,
+    selectIneDataHasUnsavedChanges,
+    selectIneDataIsDirty,
+    (data, loading, saving, error, hasUnsavedChanges, isDirty) => ({
+        data,
+        loading,
+        saving,
+        error,
+        hasUnsavedChanges,
+        isDirty,
+        isBusy: loading || saving,
+        canSave: !loading && !saving && !error && hasUnsavedChanges,
+        canReset: hasUnsavedChanges && !loading && !saving
+    })
+);

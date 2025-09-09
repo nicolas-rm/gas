@@ -1,13 +1,27 @@
-import { SelectFieldComponent, TextFieldComponent } from '@/app/components/components';
-import { FileInputFieldComponent } from '@/components/file-input/file-input.component';
-import { Component, inject, effect } from '@angular/core';
+// Angular
+import { Component, inject, effect, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ineForm } from '@/app/dashboard/customer/components/ine/form';
-import { HotToastService } from '@ngxpert/hot-toast';
+import { CommonModule } from '@angular/common';
+
+// NgRx
 import { Store } from '@ngrx/store';
+
+// RxJS
 import { debounceTime } from 'rxjs/operators';
-import { IneDataPageActions } from './ngrx/ine.actions';
+
+// Componentes
+import { SelectFieldComponent, TextFieldComponent } from '@/app/components/components';
+import { FileInputFieldComponent } from '@/components/file-input/file-input.component';
+
+// Validadores
+import { ReactiveValidators } from '@/app/utils/validators/ReactiveValidators';
+
+// Config del formulario (labels, ids, etc.)
+import { ineForm } from '@/app/dashboard/customer/components/ine/form';
+
+// NgRx INE Data
+import { IneDataPageActions } from '@/dashboard/customer/components/ine/ngrx/ine.actions';
 import { 
     selectIneData, 
     selectIneDataLoading, 
@@ -17,53 +31,54 @@ import {
     selectIneDataHasUnsavedChanges,
     selectIneDataCanReset,
     selectIneDataOriginal
-} from './ngrx/ine.selectors';
-import { IneData } from './ngrx/ine.models';
+} from '@/dashboard/customer/components/ine/ngrx/ine.selectors';
+import { IneData } from '@/dashboard/customer/components/ine/ngrx/ine.models';
 
-export type IneDataFormControl = {
-    accountingKey: FormControl<string | null>;
-    processType: FormControl<string | null>;
-    committeeType: FormControl<string | null>;
-    scope: FormControl<string | null>;
-    document: FormControl<File | File[] | null>;
-}
+// Toasts
+import { HotToastService } from '@ngxpert/hot-toast';
+
+type ControlsOf<T> = { [K in keyof T]: FormControl<T[K] | null> };
 
 @Component({
-  selector: 'app-ine',
-  imports: [ReactiveFormsModule, TextFieldComponent, SelectFieldComponent, FileInputFieldComponent],
-  templateUrl: './ine.component.html',
-  styleUrl: './ine.component.css'
+    selector: 'app-ine',
+    standalone: true,
+    imports: [CommonModule, ReactiveFormsModule, TextFieldComponent, SelectFieldComponent, FileInputFieldComponent],
+    templateUrl: './ine.component.html',
+    styleUrl: './ine.component.css',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class IneComponent {
 
-    readonly ineData = ineForm
+    // UI metadata (labels, placeholders…)
+    readonly ineData = ineForm;
 
     readonly processTypeOptions = [
         { label: 'Proceso Electoral', value: 'electoral' },
         { label: 'Consulta Popular', value: 'consultation' },
         { label: 'Referéndum', value: 'referendum' },
         { label: 'Revocación de Mandato', value: 'revocation' }
-    ]
+    ];
 
     readonly committeeTypeOptions = [
         { label: 'Comité Local', value: 'local' },
         { label: 'Comité Distrital', value: 'district' },
         { label: 'Comité Estatal', value: 'state' },
         { label: 'Comité Nacional', value: 'national' }
-    ]
+    ];
 
     readonly scopeOptions = [
         { label: 'Federal', value: 'federal' },
         { label: 'Estatal', value: 'state' },
         { label: 'Municipal', value: 'municipal' },
         { label: 'Local', value: 'local' }
-    ]
+    ];
 
+    // Inyecciones
     private readonly fb = inject(FormBuilder);
     private readonly toast = inject(HotToastService);
     private readonly store = inject(Store);
 
-    // NgRx signals
+    // Signals desde NgRx
     isLoading = this.store.selectSignal(selectIneDataLoading);
     isSaving = this.store.selectSignal(selectIneDataSaving);
     isBusy = this.store.selectSignal(selectIneDataIsBusy);
@@ -73,17 +88,16 @@ export class IneComponent {
     data = this.store.selectSignal(selectIneData);
     originalData = this.store.selectSignal(selectIneDataOriginal);
 
-    ineDataForm: FormGroup<IneDataFormControl>
+    // FormGroup tipado a partir del modelo IneData
+    ineDataForm: FormGroup<ControlsOf<IneData>> = this.fb.group<ControlsOf<IneData>>({
+        accountingKey: this.fb.control<string | null>(null),
+        processType: this.fb.control<string | null>(null),
+        committeeType: this.fb.control<string | null>(null),
+        scope: this.fb.control<string | null>(null),
+        document: this.fb.control<File | null>(null),
+    });
 
     constructor() {
-        this.ineDataForm = this.fb.group<IneDataFormControl>({
-            accountingKey: this.fb.control<string | null>(null),
-            processType: this.fb.control<string | null>(null),
-            committeeType: this.fb.control<string | null>(null),
-            scope: this.fb.control<string | null>(null),
-            document: this.fb.control<File | File[] | null>(null),
-        })
-
         // Store -> Form (se ejecuta cada vez que cambie el signal)
         effect(() => {
             const currentData = this.data();
@@ -117,7 +131,7 @@ export class IneComponent {
             });
     }
 
-    // Cargar datos
+    // Cargar datos desde API
     loadData(customerId: string): void {
         this.store.dispatch(IneDataPageActions.loadData({ customerId }));
     }
@@ -169,7 +183,7 @@ export class IneComponent {
         this.store.dispatch(IneDataPageActions.clearErrors());
     }
 
-    onSubmit() {
+    onSubmit(): void {
         this.saveData();
     }
 }
