@@ -31,8 +31,20 @@ import {
 } from './ngrx/credit-request.selectors';
 import { CreditRequestData, ReferenceData } from './ngrx/credit-request.models';
 
+// Validadores
+import { ReactiveValidators } from '@/app/utils/validators/ReactiveValidators';
+
 // Toasts
 import { HotToastService } from '@ngxpert/hot-toast';
+
+// === UTILIDADES ===
+const isEmptyReference = (reference?: ReferenceData | null): boolean => {
+    if (!reference) return true;
+    const trim = (value: unknown) => typeof value === 'string' ? value.trim() : value;
+    return [reference.name, reference.position, reference.phone, reference.email]
+        .map(trim)
+        .every(value => !value);
+};
 
 export type CreditRequestDataFormControl = {
     legalRepresentative: FormControl<string | null>;
@@ -86,13 +98,47 @@ export class CreditRequestComponent {
         // Store -> Form (se ejecuta cada vez que cambie el signal)
         effect(() => {
             const d = this.data();
+            const referencesArray = this.references;
+            
             if (d) {
-                this.creditRequestForm.patchValue(d, { emitEvent: false });
+                // Actualizar campos principales sin emitir eventos
+                this.creditRequestForm.patchValue({
+                    legalRepresentative: d.legalRepresentative,
+                    documentsReceiver: d.documentsReceiver,
+                    creditApplicationDocument: d.creditApplicationDocument
+                }, { emitEvent: false });
+                
+                // Manejar el FormArray de referencias
+                if (d.references && Array.isArray(d.references)) {
+                    // Solo reconstruir si la estructura es diferente
+                    const currentReferences = referencesArray.controls.map(ctrl => ctrl.getRawValue());
+                    const needsSync = currentReferences.length !== d.references.length || 
+                                     JSON.stringify(currentReferences) !== JSON.stringify(d.references);
+                    
+                    if (needsSync) {
+                        referencesArray.clear({ emitEvent: false });
+                        d.references.forEach(reference => {
+                            referencesArray.push(this.createReferenceFormGroup(reference), { emitEvent: false });
+                        });
+                    }
+                } else {
+                    // Asegurar que siempre haya al menos una referencia vacía
+                    if (referencesArray.length === 0) {
+                        referencesArray.push(this.createReferenceFormGroup(), { emitEvent: false });
+                    }
+                }
             } else {
                 // Soporte para time-travel / reset a estado inicial (create)
-                this.creditRequestForm.reset({}, { emitEvent: false });
-                this.creditRequestForm.markAsPristine();
-                this.creditRequestForm.markAsUntouched();
+                if (referencesArray.length > 0) {
+                    this.creditRequestForm.reset({}, { emitEvent: false });
+                    referencesArray.clear({ emitEvent: false });
+                    this.creditRequestForm.markAsPristine();
+                    this.creditRequestForm.markAsUntouched();
+                }
+                // Asegurar que siempre haya al menos una referencia vacía
+                if (referencesArray.length === 0) {
+                    referencesArray.push(this.createReferenceFormGroup(), { emitEvent: false });
+                }
             }
         });
 
@@ -114,6 +160,11 @@ export class CreditRequestComponent {
                 this.store.dispatch(CreditRequestDataPageActions.setData({ data }));
                 this.store.dispatch(CreditRequestDataPageActions.markAsDirty());
             });
+        
+        // Asegurar que siempre haya al menos una referencia al inicio
+        if (this.references.length === 0) {
+            this.references.push(this.createReferenceFormGroup(), { emitEvent: false });
+        }
     }
 
     get references(): FormArray<FormGroup<ReferenceDataFormControl>> {
@@ -130,22 +181,26 @@ export class CreditRequestComponent {
 
     createReferenceFormGroup(value?: Partial<ReferenceData>): FormGroup<ReferenceDataFormControl> {
         return this.fb.group<ReferenceDataFormControl>({
-            name: this.fb.control<string | null>(value?.name ?? null),
-            position: this.fb.control<string | null>(value?.position ?? null),
-            phone: this.fb.control<string | null>(value?.phone ?? null),
-            email: this.fb.control<string | null>(value?.email ?? null),
+            name: this.fb.control<string | null>(value?.name ?? '', [ReactiveValidators.required]),
+            position: this.fb.control<string | null>(value?.position ?? '', []),
+            phone: this.fb.control<string | null>(value?.phone ?? '', [ReactiveValidators.required]),
+            email: this.fb.control<string | null>(value?.email ?? '', [ReactiveValidators.required, ReactiveValidators.email]),
         });
     }
 
     addReference(): void {
         if (this.canAddReference) {
-            this.references.push(this.createReferenceFormGroup());
+            // Agregar referencia sin emitir evento para evitar marcar como dirty
+            this.references.push(this.createReferenceFormGroup(), { emitEvent: false });
         }
     }
 
     removeReference(index: number): void {
         if (this.canRemoveReference(index)) {
-            this.references.removeAt(index);
+            // Verificar si la referencia está vacía para decidir si emitir evento
+            const referenceValue = this.references.at(index)?.getRawValue() as ReferenceData;
+            const isDraft = isEmptyReference(referenceValue);
+            this.references.removeAt(index, { emitEvent: !isDraft });
         }
     }
 
@@ -161,7 +216,17 @@ export class CreditRequestComponent {
     // Guardar
     saveData(customerId?: string): void {
         if (!this.assertValid()) return;
-        const data = this.creditRequestForm.getRawValue() as CreditRequestData;
+        const formData = this.creditRequestForm.getRawValue();
+        
+        // Filtrar referencias vacías antes de guardar
+        const allReferences: ReferenceData[] = this.references.controls.map(ctrl => ctrl.getRawValue() as ReferenceData);
+        const references = allReferences.filter(reference => !isEmptyReference(reference));
+        
+        const data: CreditRequestData = {
+            ...formData,
+            references
+        } as CreditRequestData;
+        
         this.store.dispatch(
             CreditRequestDataPageActions.saveData({
                 customerId: customerId ?? 'temp',
@@ -180,6 +245,7 @@ export class CreditRequestComponent {
     resetForm(): void {
         this.store.dispatch(CreditRequestDataPageActions.resetForm());
         this.creditRequestForm.reset({}, { emitEvent: false }); // Evita que se dispare valueChanges
+        this.references.clear({ emitEvent: false });
         this.creditRequestForm.markAsPristine(); // Marca el form como pristine
         this.creditRequestForm.markAsUntouched();
     }

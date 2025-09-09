@@ -72,3 +72,8 @@ input:-webkit-autofill:active {
 .mt-2 {
     margin-top: 0.5rem;
 }
+
+/* Clase para ocultar el asterisco manteniendo el espacio (alineación) */
+.invisible {
+    visibility: hidden;
+}
