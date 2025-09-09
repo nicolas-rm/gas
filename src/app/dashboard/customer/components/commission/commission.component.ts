@@ -30,6 +30,9 @@ import {
 } from '@/dashboard/customer/components/commission/ngrx/commission.selectors';
 import { CommissionData } from '@/dashboard/customer/components/commission/ngrx/commission.models';
 
+// Customer global state
+import { selectIsReadonlyMode } from '@/app/dashboard/customer/ngrx';
+
 // Validadores
 import { ReactiveValidators } from '@/app/utils/validators/ReactiveValidators';
 
@@ -77,6 +80,9 @@ export class CommissionComponent {
     canReset = this.store.selectSignal(selectCommissionDataCanReset);
     data = this.store.selectSignal(selectCommissionData);
     originalData = this.store.selectSignal(selectCommissionDataOriginal);
+    
+    // Signal para modo readonly desde estado global
+    isReadonlyMode = this.store.selectSignal(selectIsReadonlyMode);
     // formState selector removido tras simplificación
 
     // FormGroup tipado a partir de tu modelo CommissionData
@@ -105,7 +111,9 @@ export class CommissionComponent {
         // Effect para manejar estado habilitado/deshabilitado del form
         effect(() => {
             const busy = this.isBusy();
-            if (busy) {
+            const readonly = this.isReadonlyMode();
+            
+            if (busy || readonly) {
                 this.commissionDataForm.disable({ emitEvent: false });
             } else {
                 this.commissionDataForm.enable({ emitEvent: false });

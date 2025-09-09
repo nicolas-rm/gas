@@ -31,6 +31,9 @@ import {
 } from '@/dashboard/customer/components/contacts/ngrx/contacts.selectors';
 import { ContactsData, ContactData } from '@/dashboard/customer/components/contacts/ngrx/contacts.models';
 
+// Customer global state
+import { selectIsReadonlyMode } from '@/app/dashboard/customer/ngrx';
+
 // Validadores
 import { ReactiveValidators } from '@/app/utils/validators/ReactiveValidators';
 
@@ -68,6 +71,9 @@ export class ContactsComponent {
     canReset = this.store.selectSignal(selectContactsDataCanReset);
     data = this.store.selectSignal(selectContactsData);
     originalData = this.store.selectSignal(selectContactsDataOriginal);
+    
+    // Signal para modo readonly desde estado global
+    isReadonlyMode = this.store.selectSignal(selectIsReadonlyMode);
 
     // FormGroup tipado (FormArray requiere tipado menos estricto para Angular)
     contactsForm: FormGroup = this.fb.group({
@@ -111,7 +117,9 @@ export class ContactsComponent {
         // Effect para manejar estado habilitado/deshabilitado del form
         effect(() => {
             const busy = this.isBusy();
-            if (busy) {
+            const readonly = this.isReadonlyMode();
+            
+            if (busy || readonly) {
                 this.contactsForm.disable({ emitEvent: false });
             } else {
                 this.contactsForm.enable({ emitEvent: false });

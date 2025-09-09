@@ -1,1 +1,47 @@
-<p>show works!</p>
+<div class="card">
+    <div class="card-body pt-2 pb-0">
+        <nav class="flex border-b border-b-gray-100" aria-label="Tabs" role="tablist" data-simplebar>
+            <div class="flex min-w-max">
+                <div *ngFor="let tab of customerTabs">
+                    <button type="button" (click)="activeTab = tab.value"
+                        class="hs-tab-active:border-primary hs-tab-active:text-primary py-5 px-4 inline-flex items-center gap-2 border-b-2 border-transparent text-sm whitespace-nowrap text-bodytext dark:text-darklink hover:text-primary focus:outline-none focus:text-primary disabled:opacity-50 disabled:pointer-events-none dark:text-gray-400 dark:hover:text-primary"
+                        [id]="tab.value" [attr.data-hs-tab]="tab.value" [attr.aria-controls]="tab.value" role="tab"
+                        [ngClass]="{ 'active': activeTab === tab.value }">
+                        <i [ngClass]="tab.icon" class="text-xl"></i><span class="md:flex hidden">{{ tab.label }}</span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <div class="card-body ">
+        @switch (activeTab || 'general-data-tab') {
+            @case ('general-data-tab') {
+                <app-general-data></app-general-data>
+            }
+            @case ('contract-tab') {
+                <app-contract></app-contract>
+            }
+            @case ('commission-tab') {
+                <app-commission></app-commission>
+            }
+            @case ('sale-tab') {
+                <app-sale></app-sale>
+            }
+            @case ('billing-tab') {
+                <app-billing></app-billing>
+            }
+            @case ('contacts-tab') {
+                <app-contacts></app-contacts>
+            }
+            @case ('ine-tab') {
+                <app-ine></app-ine>
+            }
+            @case ('credit-request-tab') {
+                <app-credit-request></app-credit-request>
+            }
+            @default {
+                <app-general-data></app-general-data>
+            }
+        }
+    </div>
+</div>

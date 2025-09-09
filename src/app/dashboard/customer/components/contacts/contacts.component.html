@@ -19,7 +19,8 @@
                 <div class="ml-3">
                     <h3 class="text-sm font-medium text-red-800">Error</h3>
                     <p class="text-sm text-red-700 mt-1">{{ error() }}</p>
-                    <button type="button" (click)="clearErrors()" class="text-sm text-red-600 hover:text-red-500 underline mt-2">
+                    <button type="button" (click)="clearErrors()" class="text-sm text-red-600 hover:text-red-500 underline mt-2"
+                        *ngIf="!isReadonlyMode()">
                         Cerrar
                     </button>
                 </div>
@@ -70,7 +71,7 @@
                                     <div class="flex justify-between items-center mb-4">
                                         <h6 class="text-lg font-semibold text-gray-800">Contacto {{ i + 1 }}</h6>
                     <button type="button" 
-                        *ngIf="canRemoveContact(i)" 
+                        *ngIf="canRemoveContact(i) && !isReadonlyMode()" 
                         (click)="removeContact(i)"
                         class="btn btn-sm btn-light-error">
                                             <i class="ti ti-trash text-base"></i>
@@ -120,7 +121,7 @@
                             </div>
                             
                             <!-- Botón para agregar contacto -->
-                            <div class="mb-6" *ngIf="canAddContact()">
+                            <div class="mb-6" *ngIf="canAddContact() && !isReadonlyMode()">
                                 <button type="button" 
                                         (click)="addContact()"
                                         class="btn btn-light-primary">
@@ -130,14 +131,15 @@
                             </div>
                             
                             <!-- Botones de acción mejorados -->
-                            <div class="flex gap-3 justify-between mt-6">
+                            <div class="flex gap-3 justify-between mt-6" *ngIf="!isReadonlyMode()">
                                 <!-- Botones de utilidad -->
                                 <div class="flex gap-2">
                                     <button 
                                         type="button" 
                                         class="btn btn-light-secondary"
                                         (click)="resetToOriginal()"
-                                        [disabled]="!canReset()">
+                                        [disabled]="!canReset()"
+                                        *ngIf="!isReadonlyMode()">
                                         Restablecer
                                     </button>
                                     @if (error()) {

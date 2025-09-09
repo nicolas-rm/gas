@@ -31,6 +31,9 @@ import {
 } from './ngrx/credit-request.selectors';
 import { CreditRequestData, ReferenceData } from './ngrx/credit-request.models';
 
+// Customer global state
+import { selectIsReadonlyMode } from '@/app/dashboard/customer/ngrx';
+
 // Validadores
 import { ReactiveValidators } from '@/app/utils/validators/ReactiveValidators';
 
@@ -86,6 +89,9 @@ export class CreditRequestComponent {
     canReset = this.store.selectSignal(selectCreditRequestDataCanReset);
     data = this.store.selectSignal(selectCreditRequestData);
     originalData = this.store.selectSignal(selectCreditRequestDataOriginal);
+    
+    // Signal para modo readonly desde estado global
+    isReadonlyMode = this.store.selectSignal(selectIsReadonlyMode);
 
     creditRequestForm: FormGroup<CreditRequestDataFormControl> = this.fb.group<CreditRequestDataFormControl>({
         legalRepresentative: this.fb.control<string | null>(null),
@@ -145,7 +151,9 @@ export class CreditRequestComponent {
         // Effect para manejar estado habilitado/deshabilitado del form
         effect(() => {
             const busy = this.isBusy();
-            if (busy) {
+            const readonly = this.isReadonlyMode();
+            
+            if (busy || readonly) {
                 this.creditRequestForm.disable({ emitEvent: false });
             } else {
                 this.creditRequestForm.enable({ emitEvent: false });

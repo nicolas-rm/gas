@@ -30,6 +30,9 @@ import {
 } from '@/dashboard/customer/components/general-data/ngrx/general-data.selectors';
 import { GeneralData } from '@/dashboard/customer/components/general-data/ngrx/general-data.models';
 
+// Customer global state
+import { selectIsReadonlyMode } from '@/app/dashboard/customer/ngrx';
+
 // Validadores
 import { ReactiveValidators } from '@/app/utils/validators/ReactiveValidators';
 
@@ -70,6 +73,9 @@ export class GeneralDataComponent {
     canReset = this.store.selectSignal(selectGeneralDataCanReset);
     data = this.store.selectSignal(selectGeneralData);
     originalData = this.store.selectSignal(selectGeneralDataOriginal);
+    
+    // Signal para modo readonly desde estado global
+    isReadonlyMode = this.store.selectSignal(selectIsReadonlyMode);
     // formState selector removido tras simplificación
 
     // FormGroup tipado a partir de tu modelo GeneralData
@@ -110,7 +116,9 @@ export class GeneralDataComponent {
         // Effect para manejar estado habilitado/deshabilitado del form
         effect(() => {
             const busy = this.isBusy();
-            if (busy) {
+            const readonly = this.isReadonlyMode();
+            
+            if (busy || readonly) {
                 this.generalDataForm.disable({ emitEvent: false });
             } else {
                 this.generalDataForm.enable({ emitEvent: false });

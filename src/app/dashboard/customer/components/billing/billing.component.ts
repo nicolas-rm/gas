@@ -30,6 +30,9 @@ import {
 } from '@/dashboard/customer/components/billing/ngrx/billing.selectors';
 import { BillingData } from '@/dashboard/customer/components/billing/ngrx/billing.models';
 
+// Customer global state
+import { selectIsReadonlyMode } from '@/app/dashboard/customer/ngrx';
+
 // Validadores
 import { ReactiveValidators } from '@/app/utils/validators/ReactiveValidators';
 
@@ -89,6 +92,9 @@ export class BillingComponent {
     canReset = this.store.selectSignal(selectBillingDataCanReset);
     data = this.store.selectSignal(selectBillingData);
     originalData = this.store.selectSignal(selectBillingDataOriginal);
+    
+    // Signal para modo readonly desde estado global
+    isReadonlyMode = this.store.selectSignal(selectIsReadonlyMode);
 
     // FormGroup tipado a partir de tu modelo BillingData
     billingDataForm: FormGroup<ControlsOf<BillingData>> = this.fb.group<ControlsOf<BillingData>>({
@@ -118,7 +124,9 @@ export class BillingComponent {
         // Effect para manejar estado habilitado/deshabilitado del form
         effect(() => {
             const busy = this.isBusy();
-            if (busy) {
+            const readonly = this.isReadonlyMode();
+            
+            if (busy || readonly) {
                 this.billingDataForm.disable({ emitEvent: false });
             } else {
                 this.billingDataForm.enable({ emitEvent: false });

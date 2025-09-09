@@ -73,6 +73,19 @@ input:-webkit-autofill:active {
     margin-top: 0.5rem;
 }
 
+/* Estados de accesibilidad - consistente con select component */
+.form-control:disabled {
+    background-color: #e9ecef;
+    opacity: 1;
+    cursor: not-allowed;
+}
+
+.btn-link:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 /* Clase para ocultar el asterisco manteniendo el espacio (alineación) */
 .invisible {
     visibility: hidden;

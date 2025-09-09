@@ -1,5 +1,6 @@
 // Angular
 import { Component, inject, effect } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -29,6 +30,9 @@ import {
 } from './ngrx/sale.selectors';
 import { SaleData } from './ngrx/sale.models';
 
+// Customer global state
+import { selectIsReadonlyMode } from '@/app/dashboard/customer/ngrx';
+
 // Toasts
 import { HotToastService } from '@ngxpert/hot-toast';
 
@@ -36,7 +40,7 @@ type ControlsOf<T> = { [K in keyof T]: FormControl<T[K] | null> };
 
 @Component({
   selector: 'app-sale',
-  imports: [ReactiveFormsModule, TextFieldComponent, SelectFieldComponent],
+  imports: [CommonModule, ReactiveFormsModule, TextFieldComponent, SelectFieldComponent],
   templateUrl: './sale.component.html',
   styleUrl: './sale.component.css'
 })
@@ -79,6 +83,9 @@ export class SaleComponent {
     canReset = this.store.selectSignal(selectSaleDataCanReset);
     data = this.store.selectSignal(selectSaleData);
     originalData = this.store.selectSignal(selectSaleDataOriginal);
+    
+    // Signal para modo readonly desde estado global
+    isReadonlyMode = this.store.selectSignal(selectIsReadonlyMode);
 
     // FormGroup tipado a partir del modelo SaleData
     saleDataForm: FormGroup<ControlsOf<SaleData>> = this.fb.group<ControlsOf<SaleData>>({
@@ -110,7 +117,9 @@ export class SaleComponent {
         // Effect para manejar estado habilitado/deshabilitado del form
         effect(() => {
             const busy = this.isBusy();
-            if (busy) {
+            const readonly = this.isReadonlyMode();
+            
+            if (busy || readonly) {
                 this.saleDataForm.disable({ emitEvent: false });
             } else {
                 this.saleDataForm.enable({ emitEvent: false });

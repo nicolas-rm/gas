@@ -33,6 +33,9 @@ import {
 } from '@/dashboard/customer/components/contract/ngrx/contract.selectors';
 import { ContractData } from '@/dashboard/customer/components/contract/ngrx/contract.models';
 
+// Customer global state
+import { selectIsReadonlyMode } from '@/app/dashboard/customer/ngrx';
+
 // Toasts
 import { HotToastService } from '@ngxpert/hot-toast';
 
@@ -96,6 +99,9 @@ export class ContractComponent {
     canReset = this.store.selectSignal(selectContractDataCanReset);
     data = this.store.selectSignal(selectContractData);
     originalData = this.store.selectSignal(selectContractDataOriginal);
+    
+    // Signal para modo readonly desde estado global
+    isReadonlyMode = this.store.selectSignal(selectIsReadonlyMode);
 
     // FormGroup tipado a partir del modelo ContractData
     contractDataForm: FormGroup<ControlsOf<ContractData>> = this.fb.group<ControlsOf<ContractData>>({
@@ -129,7 +135,9 @@ export class ContractComponent {
         // Effect para manejar estado habilitado/deshabilitado del form
         effect(() => {
             const busy = this.isBusy();
-            if (busy) {
+            const readonly = this.isReadonlyMode();
+            
+            if (busy || readonly) {
                 this.contractDataForm.disable({ emitEvent: false });
             } else {
                 this.contractDataForm.enable({ emitEvent: false });

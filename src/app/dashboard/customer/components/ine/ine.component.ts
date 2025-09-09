@@ -34,6 +34,9 @@ import {
 } from '@/dashboard/customer/components/ine/ngrx/ine.selectors';
 import { IneData } from '@/dashboard/customer/components/ine/ngrx/ine.models';
 
+// Customer global state
+import { selectIsReadonlyMode } from '@/app/dashboard/customer/ngrx';
+
 // Toasts
 import { HotToastService } from '@ngxpert/hot-toast';
 
@@ -87,6 +90,9 @@ export class IneComponent {
     canReset = this.store.selectSignal(selectIneDataCanReset);
     data = this.store.selectSignal(selectIneData);
     originalData = this.store.selectSignal(selectIneDataOriginal);
+    
+    // Signal para modo readonly desde estado global
+    isReadonlyMode = this.store.selectSignal(selectIsReadonlyMode);
 
     // FormGroup tipado a partir del modelo IneData
     ineDataForm: FormGroup<ControlsOf<IneData>> = this.fb.group<ControlsOf<IneData>>({
@@ -114,7 +120,9 @@ export class IneComponent {
         // Effect para manejar estado habilitado/deshabilitado del form
         effect(() => {
             const busy = this.isBusy();
-            if (busy) {
+            const readonly = this.isReadonlyMode();
+            
+            if (busy || readonly) {
                 this.ineDataForm.disable({ emitEvent: false });
             } else {
                 this.ineDataForm.enable({ emitEvent: false });

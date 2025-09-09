@@ -16,7 +16,7 @@
     border-color: #dc3545 !important; /* rojo bootstrap */
 }
 
-/* Estados deshabilitado y readonly */
+/* Estados de accesibilidad - consistente con select component */
 .form-control:disabled {
     background-color: #e9ecef;
     opacity: 1;
@@ -26,6 +26,12 @@
 .form-control[readonly] {
     background-color: #f8f9fa;
     cursor: default;
+}
+
+.btn-link:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 /* Eliminar color de fondo en autofill y hacerlo transparente */

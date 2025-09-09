@@ -43,6 +43,9 @@ import { commissionDataReducer } from '@/dashboard/customer/components/commissio
 import * as BillingEffects from '@/dashboard/customer/components/billing/ngrx/billing.effects';
 import { billingDataReducer } from '@/dashboard/customer/components/billing/ngrx/billing.reducer';
 
+// Customer Global State
+import { customerReducer } from '@/dashboard/customer/ngrx/customer.reducer';
+
 export const ngrxProviders = [
     // Effects
     provideEffects(
@@ -59,6 +62,7 @@ export const ngrxProviders = [
     
     // States
     provideState('authentication', authenticationReducer),
+    provideState('customer', customerReducer),
     provideState('generalData', generalDataReducer),
     provideState('contactsData', contactsDataReducer),
     provideState('creditRequestData', creditRequestDataReducer),
