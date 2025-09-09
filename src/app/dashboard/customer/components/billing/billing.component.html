@@ -64,66 +64,66 @@
                             <div class="grid grid-cols-12 gap-x-4 gap-y-4">
                                 <!-- Primera fila: Representación Factura y Días de Facturación -->
                                 <div class="lg:col-span-6 col-span-12">
-                                    <SelectField [id]="billingData.invoiceRepresentation.id"
-                                        [label]="billingData.invoiceRepresentation.label"
-                                        [formControlName]="billingData.invoiceRepresentation.formControlName"
-                                        [control]="billingDataForm.get(billingData.invoiceRepresentation.formControlName)"
+                                    <SelectField [id]="billing.invoiceRepresentation.id"
+                                        [label]="billing.invoiceRepresentation.label"
+                                        [formControlName]="billing.invoiceRepresentation.formControlName"
+                                        [control]="billingDataForm.get(billing.invoiceRepresentation.formControlName)"
                                         [options]="invoiceRepresentationOptions"
-                                        [placeholder]="billingData.invoiceRepresentation.placeholder">
+                                        [placeholder]="billing.invoiceRepresentation.placeholder">
                                     </SelectField>
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
-                                    <SelectField [id]="billingData.billingDays.id"
-                                        [label]="billingData.billingDays.label"
-                                        [formControlName]="billingData.billingDays.formControlName"
-                                        [control]="billingDataForm.get(billingData.billingDays.formControlName)"
+                                    <SelectField [id]="billing.billingDays.id"
+                                        [label]="billing.billingDays.label"
+                                        [formControlName]="billing.billingDays.formControlName"
+                                        [control]="billingDataForm.get(billing.billingDays.formControlName)"
                                         [options]="billingDaysOptions"
-                                        [placeholder]="billingData.billingDays.placeholder">
+                                        [placeholder]="billing.billingDays.placeholder">
                                     </SelectField>
                                 </div>
 
                                 <!-- Segunda fila: Emails de Facturación y Frecuencia de Facturación -->
                                 <div class="lg:col-span-6 col-span-12">
-                                    <TextField [id]="billingData.billingEmails.id"
-                                        [label]="billingData.billingEmails.label"
-                                        [formControlName]="billingData.billingEmails.formControlName"
-                                        [placeholder]="billingData.billingEmails.placeholder"
-                                        [control]="billingDataForm.get(billingData.billingEmails.formControlName)" />
+                                    <TextField [id]="billing.billingEmails.id"
+                                        [label]="billing.billingEmails.label"
+                                        [formControlName]="billing.billingEmails.formControlName"
+                                        [placeholder]="billing.billingEmails.placeholder"
+                                        [control]="billingDataForm.get(billing.billingEmails.formControlName)" />
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
-                                    <SelectField [id]="billingData.billingFrequency.id"
-                                        [label]="billingData.billingFrequency.label"
-                                        [formControlName]="billingData.billingFrequency.formControlName"
-                                        [control]="billingDataForm.get(billingData.billingFrequency.formControlName)"
+                                    <SelectField [id]="billing.billingFrequency.id"
+                                        [label]="billing.billingFrequency.label"
+                                        [formControlName]="billing.billingFrequency.formControlName"
+                                        [control]="billingDataForm.get(billing.billingFrequency.formControlName)"
                                         [options]="billingFrequencyOptions"
-                                        [placeholder]="billingData.billingFrequency.placeholder">
+                                        [placeholder]="billing.billingFrequency.placeholder">
                                     </SelectField>
                                 </div>
 
                                 <!-- Tercera fila: Fecha de Inicio y Fecha de Fin -->
                                 <div class="lg:col-span-6 col-span-12">
-                                    <TextField [id]="billingData.startDate.id" [label]="billingData.startDate.label"
-                                        [formControlName]="billingData.startDate.formControlName"
-                                        [placeholder]="billingData.startDate.placeholder"
-                                        [type]="billingData.startDate.type"
-                                        [control]="billingDataForm.get(billingData.startDate.formControlName)" />
+                                    <TextField [id]="billing.startDate.id" [label]="billing.startDate.label"
+                                        [formControlName]="billing.startDate.formControlName"
+                                        [placeholder]="billing.startDate.placeholder"
+                                        [type]="billing.startDate.type"
+                                        [control]="billingDataForm.get(billing.startDate.formControlName)" />
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
-                                    <TextField [id]="billingData.endDate.id" [label]="billingData.endDate.label"
-                                        [formControlName]="billingData.endDate.formControlName"
-                                        [placeholder]="billingData.endDate.placeholder"
-                                        [type]="billingData.endDate.type"
-                                        [control]="billingDataForm.get(billingData.endDate.formControlName)" />
+                                    <TextField [id]="billing.endDate.id" [label]="billing.endDate.label"
+                                        [formControlName]="billing.endDate.formControlName"
+                                        [placeholder]="billing.endDate.placeholder"
+                                        [type]="billing.endDate.type"
+                                        [control]="billingDataForm.get(billing.endDate.formControlName)" />
                                 </div>
 
                                 <!-- Cuarta fila: Facturación Automática -->
                                 <div class="lg:col-span-6 col-span-12">
-                                    <SelectField [id]="billingData.automaticBilling.id"
-                                        [label]="billingData.automaticBilling.label"
-                                        [formControlName]="billingData.automaticBilling.formControlName"
-                                        [control]="billingDataForm.get(billingData.automaticBilling.formControlName)"
+                                    <SelectField [id]="billing.automaticBilling.id"
+                                        [label]="billing.automaticBilling.label"
+                                        [formControlName]="billing.automaticBilling.formControlName"
+                                        [control]="billingDataForm.get(billing.automaticBilling.formControlName)"
                                         [options]="automaticBillingOptions"
-                                        [placeholder]="billingData.automaticBilling.placeholder">
+                                        [placeholder]="billing.automaticBilling.placeholder">
                                     </SelectField>
                                 </div>
                             </div>
@@ -165,7 +165,7 @@
                                                 Guardando...
                                             </div>
                                         } @else {
-                                            Guardar Facturación
+                                            Guardar Información
                                         }
                                     </button>
                                 </div>

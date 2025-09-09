@@ -1,4 +1,7 @@
-import { BillingData } from './billing.models';
+// NgRx
+import { EntityState } from '@ngrx/entity';
+
+import { BillingData } from '@/dashboard/customer/components/billing/ngrx/billing.models';
 
 export type BillingDataStatus =
     | 'idle'
@@ -7,9 +10,9 @@ export type BillingDataStatus =
     | 'saved'
     | 'error';
 
-export interface BillingDataState {
+export interface BillingDataState extends EntityState<BillingData> {
     // Datos del formulario
-    data: BillingData;
+    data: BillingData | null;
     
     // Datos originales para restablecer
     originalData: BillingData | null;
@@ -28,15 +31,12 @@ export interface BillingDataState {
 }
 
 export const initialBillingDataState: BillingDataState = {
-    data: {
-        invoiceRepresentation: null,
-        billingDays: null,
-        billingEmails: null,
-        billingFrequency: null,
-        startDate: null,
-        endDate: null,
-        automaticBilling: null
-    },
+    // Propiedades del EntityState
+    ids: [],
+    entities: {},
+    
+    // Propiedades customizadas
+    data: null,
     originalData: null,
     status: 'idle',
     loading: false,

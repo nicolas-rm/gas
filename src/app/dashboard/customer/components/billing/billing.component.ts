@@ -1,5 +1,6 @@
 // Angular
-import { Component, inject, effect } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, effect } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -16,18 +17,21 @@ import { SelectFieldComponent, TextFieldComponent } from '@/app/components/compo
 import { billingForm } from '@/app/dashboard/customer/components/billing/form';
 
 // NgRx Billing Data
-import { BillingDataPageActions } from './ngrx/billing.actions';
-import { 
-    selectBillingData, 
-    selectBillingDataLoading, 
-    selectBillingDataSaving, 
+import { BillingDataPageActions } from '@/dashboard/customer/components/billing/ngrx/billing.actions';
+import {
+    selectBillingData,
+    selectBillingDataOriginal,
     selectBillingDataIsBusy,
+    selectBillingDataLoading,
+    selectBillingDataSaving,
     selectBillingDataError,
     selectBillingDataHasUnsavedChanges,
-    selectBillingDataCanReset,
-    selectBillingDataOriginal
-} from './ngrx/billing.selectors';
-import { BillingData } from './ngrx/billing.models';
+    selectBillingDataCanReset
+} from '@/dashboard/customer/components/billing/ngrx/billing.selectors';
+import { BillingData } from '@/dashboard/customer/components/billing/ngrx/billing.models';
+
+// Validadores
+import { ReactiveValidators } from '@/app/utils/validators/ReactiveValidators';
 
 // Toasts
 import { HotToastService } from '@ngxpert/hot-toast';
@@ -36,14 +40,16 @@ type ControlsOf<T> = { [K in keyof T]: FormControl<T[K] | null> };
 
 @Component({
     selector: 'app-billing',
-    imports: [ReactiveFormsModule, TextFieldComponent, SelectFieldComponent],
+    standalone: true,
+    imports: [CommonModule, ReactiveFormsModule, SelectFieldComponent, TextFieldComponent],
     templateUrl: './billing.component.html',
-    styleUrl: './billing.component.css'
+    styleUrl: './billing.component.css',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BillingComponent {
 
     // UI metadata (labels, placeholders…)
-    readonly billingData = billingForm;
+    readonly billing = billingForm;
 
     readonly invoiceRepresentationOptions = [
         { label: 'CFDI', value: 'cfdi' },
@@ -84,9 +90,9 @@ export class BillingComponent {
     data = this.store.selectSignal(selectBillingData);
     originalData = this.store.selectSignal(selectBillingDataOriginal);
 
-    // FormGroup tipado a partir del modelo BillingData
+    // FormGroup tipado a partir de tu modelo BillingData
     billingDataForm: FormGroup<ControlsOf<BillingData>> = this.fb.group<ControlsOf<BillingData>>({
-        invoiceRepresentation: this.fb.control<string | null>(null),
+        invoiceRepresentation: this.fb.control<string | null>(null, ReactiveValidators.required),
         billingDays: this.fb.control<string | null>(null),
         billingEmails: this.fb.control<string | null>(null),
         billingFrequency: this.fb.control<string | null>(null),
@@ -98,9 +104,9 @@ export class BillingComponent {
     constructor() {
         // Store -> Form (se ejecuta cada vez que cambie el signal)
         effect(() => {
-            const currentData = this.data();
-            if (currentData) {
-                this.billingDataForm.patchValue(currentData, { emitEvent: false });
+            const d = this.data();
+            if (d) {
+                this.billingDataForm.patchValue(d, { emitEvent: false });
             } else {
                 // Soporte para time-travel / reset a estado inicial (create)
                 this.billingDataForm.reset({}, { emitEvent: false });
@@ -133,6 +139,8 @@ export class BillingComponent {
     loadData(customerId: string): void {
         this.store.dispatch(BillingDataPageActions.loadData({ customerId }));
     }
+
+    // (Eliminado updateField granular; ahora todo se maneja vía setData)
 
     // Guardar
     saveData(customerId?: string): void {

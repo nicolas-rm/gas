@@ -1,6 +1,6 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { BillingDataState } from './billing.state';
-import { BillingData } from './billing.models';
+import { BillingDataState } from '@/dashboard/customer/components/billing/ngrx/billing.state';
+import { BillingData } from '@/dashboard/customer/components/billing/ngrx/billing.models';
 
 // Feature selector
 export const selectBillingDataState = createFeatureSelector<BillingDataState>('billingData');
@@ -60,8 +60,6 @@ export const selectBillingDataIsDirty = createSelector(
     (state: BillingDataState) => state.isDirty
 );
 
-// (Se eliminó lastSaved: ya no existe en el estado estandarizado)
-
 export const selectBillingDataCanSave = createSelector(
     selectBillingDataLoading,
     selectBillingDataSaving,
@@ -78,4 +76,4 @@ export const selectBillingDataCanReset = createSelector(
         hasUnsavedChanges && !isBusy
 );
 
-// (Removidos selectores granulares específicos de campos y agrupados no utilizados para simplificar la superficie del estado)
+// (Removidos selectores granulares y agrupados no utilizados para simplificar la superficie del estado)

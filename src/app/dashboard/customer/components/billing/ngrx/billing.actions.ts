@@ -13,9 +13,7 @@ export const BillingDataPageActions = createActionGroup({
         // Cargar datos
         'Load Data': props<{ customerId: string }>(),
 
-        // Actualizar campos
-        'Update Field': props<{ field: keyof BillingData; value: string | null }>(),
-        'Update Multiple Fields': props<{ updates: Partial<BillingData> }>(),
+        // Establecer snapshot completo del formulario
         'Set Data': props<{ data: BillingData }>(),
 
         // Guardar
