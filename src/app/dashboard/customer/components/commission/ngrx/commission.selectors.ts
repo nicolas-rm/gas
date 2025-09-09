@@ -1,6 +1,6 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { CommissionDataState } from './commission.state';
-import { CommissionData } from './commission.models';
+import { CommissionDataState } from '@/dashboard/customer/components/commission/ngrx/commission.state';
+import { CommissionData } from '@/dashboard/customer/components/commission/ngrx/commission.models';
 
 // Feature selector
 export const selectCommissionDataState = createFeatureSelector<CommissionDataState>('commissionData');
@@ -76,8 +76,4 @@ export const selectCommissionDataCanReset = createSelector(
         hasUnsavedChanges && !isBusy
 );
 
-// (Se eliminó lastSaved: ya no existe en el estado estandarizado)
-
-// (Removidos selectores granulares específicos de campos y agrupados no utilizados para simplificar la superficie del estado)
-
-// (Removidos selectores granulares específicos de campos no utilizados para simplificar la superficie del estado)
+// (Removidos selectores granulares y agrupados no utilizados para simplificar la superficie del estado)

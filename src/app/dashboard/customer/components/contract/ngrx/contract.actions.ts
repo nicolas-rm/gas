@@ -13,9 +13,7 @@ export const ContractDataPageActions = createActionGroup({
         // Cargar datos
         'Load Data': props<{ customerId: string }>(),
 
-        // Actualizar campos
-        'Update Field': props<{ field: keyof ContractData; value: string | null }>(),
-        'Update Multiple Fields': props<{ updates: Partial<ContractData> }>(),
+        // Establecer snapshot completo del formulario
         'Set Data': props<{ data: ContractData }>(),
 
         // Guardar

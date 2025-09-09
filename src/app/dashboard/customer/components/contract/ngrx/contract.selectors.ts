@@ -1,8 +1,8 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { ContractDataState } from './contract.state';
-import { ContractData } from './contract.models';
+import { ContractDataState } from '@/dashboard/customer/components/contract/ngrx/contract.state';
+import { ContractData } from '@/dashboard/customer/components/contract/ngrx/contract.models';
 
-// Feature selector
+// Feature selector para el state del componente
 export const selectContractDataState = createFeatureSelector<ContractDataState>('contractData');
 
 // === DATA SELECTORS ===
@@ -49,6 +49,11 @@ export const selectContractDataError = createSelector(
     (state: ContractDataState) => state.error
 );
 
+export const selectContractDataHasError = createSelector(
+    selectContractDataError,
+    (error: string | null) => !!error
+);
+
 // === CHANGE TRACKING SELECTORS ===
 export const selectContractDataHasUnsavedChanges = createSelector(
     selectContractDataState,
@@ -76,8 +81,32 @@ export const selectContractDataCanReset = createSelector(
         hasUnsavedChanges && !isBusy
 );
 
-// (Se eliminó lastSaved: ya no existe en el estado estandarizado)
+export const selectContractDataIsValid = createSelector(
+    selectContractData,
+    (data: ContractData | null) => {
+        if (!data) return false;
+        // Lógica de validación básica aquí si es necesaria
+        return true;
+    }
+);
 
-// (Removidos selectores granulares específicos de campos y agrupados no utilizados para simplificar la superficie del estado)
-
-// (Removidos selectores granulares y agrupados no utilizados para simplificar la superficie del estado)
+// === FORM STATE SELECTORS ===
+export const selectContractDataFormState = createSelector(
+    selectContractData,
+    selectContractDataLoading,
+    selectContractDataSaving,
+    selectContractDataError,
+    selectContractDataHasUnsavedChanges,
+    selectContractDataIsDirty,
+    (data, loading, saving, error, hasUnsavedChanges, isDirty) => ({
+        data,
+        loading,
+        saving,
+        error,
+        hasUnsavedChanges,
+        isDirty,
+        isBusy: loading || saving,
+        canSave: !loading && !saving && !error && hasUnsavedChanges,
+        canReset: hasUnsavedChanges && !loading && !saving
+    })
+);

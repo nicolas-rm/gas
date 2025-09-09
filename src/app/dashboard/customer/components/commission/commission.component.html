@@ -64,47 +64,47 @@
                             <div class="grid grid-cols-12 gap-x-4 gap-y-4">
                                 <!-- Primera fila: Clasificación de Comisión y Nivel del Cliente -->
                                 <div class="lg:col-span-6 col-span-12">
-                                    <SelectField [id]="commissionData.commissionClassification.id"
-                                        [label]="commissionData.commissionClassification.label"
-                                        [formControlName]="commissionData.commissionClassification.formControlName"
-                                        [control]="commissionDataForm.get(commissionData.commissionClassification.formControlName)"
+                                    <SelectField [id]="commission.commissionClassification.id"
+                                        [label]="commission.commissionClassification.label"
+                                        [formControlName]="commission.commissionClassification.formControlName"
+                                        [control]="commissionDataForm.get(commission.commissionClassification.formControlName)"
                                         [options]="commissionClassificationOptions"
-                                        [placeholder]="commissionData.commissionClassification.placeholder">
+                                        [placeholder]="commission.commissionClassification.placeholder">
                                     </SelectField>
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
-                                    <SelectField [id]="commissionData.customerLevel.id"
-                                        [label]="commissionData.customerLevel.label"
-                                        [formControlName]="commissionData.customerLevel.formControlName"
-                                        [control]="commissionDataForm.get(commissionData.customerLevel.formControlName)"
+                                    <SelectField [id]="commission.customerLevel.id"
+                                        [label]="commission.customerLevel.label"
+                                        [formControlName]="commission.customerLevel.formControlName"
+                                        [control]="commissionDataForm.get(commission.customerLevel.formControlName)"
                                         [options]="customerLevelOptions"
-                                        [placeholder]="commissionData.customerLevel.placeholder">
+                                        [placeholder]="commission.customerLevel.placeholder">
                                     </SelectField>
                                 </div>
 
                                 <!-- Segunda fila: Porcentajes -->
                                 <div class="lg:col-span-6 col-span-12">
-                                    <TextField [id]="commissionData.normalPercentage.id"
-                                        [label]="commissionData.normalPercentage.label"
-                                        [formControlName]="commissionData.normalPercentage.formControlName"
-                                        [placeholder]="commissionData.normalPercentage.placeholder"
-                                        [control]="commissionDataForm.get(commissionData.normalPercentage.formControlName)" />
+                                    <TextField [id]="commission.normalPercentage.id"
+                                        [label]="commission.normalPercentage.label"
+                                        [formControlName]="commission.normalPercentage.formControlName"
+                                        [placeholder]="commission.normalPercentage.placeholder"
+                                        [control]="commissionDataForm.get(commission.normalPercentage.formControlName)" />
                                 </div>
                                 <div class="lg:col-span-6 col-span-12">
-                                    <TextField [id]="commissionData.earlyPaymentPercentage.id"
-                                        [label]="commissionData.earlyPaymentPercentage.label"
-                                        [formControlName]="commissionData.earlyPaymentPercentage.formControlName"
-                                        [placeholder]="commissionData.earlyPaymentPercentage.placeholder"
-                                        [control]="commissionDataForm.get(commissionData.earlyPaymentPercentage.formControlName)" />
+                                    <TextField [id]="commission.earlyPaymentPercentage.id"
+                                        [label]="commission.earlyPaymentPercentage.label"
+                                        [formControlName]="commission.earlyPaymentPercentage.formControlName"
+                                        [placeholder]="commission.earlyPaymentPercentage.placeholder"
+                                        [control]="commissionDataForm.get(commission.earlyPaymentPercentage.formControlName)" />
                                 </div>
 
                                 <!-- Tercera fila: Cuenta Contable -->
                                 <div class="col-span-12">
-                                    <TextField [id]="commissionData.incomeAccountingAccount.id"
-                                        [label]="commissionData.incomeAccountingAccount.label"
-                                        [formControlName]="commissionData.incomeAccountingAccount.formControlName"
-                                        [placeholder]="commissionData.incomeAccountingAccount.placeholder"
-                                        [control]="commissionDataForm.get(commissionData.incomeAccountingAccount.formControlName)" />
+                                    <TextField [id]="commission.incomeAccountingAccount.id"
+                                        [label]="commission.incomeAccountingAccount.label"
+                                        [formControlName]="commission.incomeAccountingAccount.formControlName"
+                                        [placeholder]="commission.incomeAccountingAccount.placeholder"
+                                        [control]="commissionDataForm.get(commission.incomeAccountingAccount.formControlName)" />
                                 </div>
                             </div>
 
@@ -145,7 +145,7 @@
                                                 Guardando...
                                             </div>
                                         } @else {
-                                            Guardar Comisión
+                                            Guardar Información
                                         }
                                     </button>
                                 </div>

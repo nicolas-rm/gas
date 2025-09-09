@@ -13,9 +13,7 @@ export const CommissionDataPageActions = createActionGroup({
         // Cargar datos
         'Load Data': props<{ customerId: string }>(),
 
-        // Actualizar campos
-        'Update Field': props<{ field: keyof CommissionData; value: string | null }>(),
-        'Update Multiple Fields': props<{ updates: Partial<CommissionData> }>(),
+        // Establecer snapshot completo del formulario
         'Set Data': props<{ data: CommissionData }>(),
 
         // Guardar

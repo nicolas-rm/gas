@@ -1,4 +1,7 @@
-import { ContractData } from './contract.models';
+// NgRx
+import { EntityState } from '@ngrx/entity';
+
+import { ContractData } from '@/dashboard/customer/components/contract/ngrx/contract.models';
 
 export type ContractDataStatus =
     | 'idle'
@@ -7,9 +10,9 @@ export type ContractDataStatus =
     | 'saved'
     | 'error';
 
-export interface ContractDataState {
+export interface ContractDataState extends EntityState<ContractData> {
     // Datos del formulario
-    data: ContractData;
+    data: ContractData | null;
     
     // Datos originales para restablecer
     originalData: ContractData | null;
@@ -19,7 +22,7 @@ export interface ContractDataState {
     loading: boolean;
     saving: boolean;
 
-    // Errores generales
+    // Errores
     error: string | null;
 
     // Metadatos
@@ -28,19 +31,12 @@ export interface ContractDataState {
 }
 
 export const initialContractDataState: ContractDataState = {
-    data: {
-        printName: null,
-        adminFee: null,
-        cardIssueFee: null,
-        reportsFee: null,
-        accountingAccount: null,
-        cfdiUsage: null,
-        type: null,
-        loyalty: null,
-        percentage: null,
-        rfcOrderingAccount: null,
-        bank: null
-    },
+    // Propiedades del EntityState
+    ids: [],
+    entities: {},
+    
+    // Propiedades customizadas
+    data: null,
     originalData: null,
     status: 'idle',
     loading: false,

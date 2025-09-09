@@ -1,7 +1,8 @@
 // Angular
-import { Component, inject, effect } from '@angular/core';
+import { Component, inject, effect, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CommonModule } from '@angular/common';
 
 // NgRx
 import { Store } from '@ngrx/store';
@@ -12,11 +13,14 @@ import { debounceTime } from 'rxjs/operators';
 // Componentes
 import { SelectFieldComponent, TextFieldComponent } from '@/app/components/components';
 
+// Validadores
+import { ReactiveValidators } from '@/app/utils/validators/ReactiveValidators';
+
 // Config del formulario (labels, ids, etc.)
 import { contractForm } from '@/app/dashboard/customer/components/contract/form';
 
 // NgRx Contract Data
-import { ContractDataPageActions } from './ngrx/contract.actions';
+import { ContractDataPageActions } from '@/dashboard/customer/components/contract/ngrx/contract.actions';
 import { 
     selectContractData, 
     selectContractDataLoading, 
@@ -26,8 +30,8 @@ import {
     selectContractDataHasUnsavedChanges,
     selectContractDataCanReset,
     selectContractDataOriginal
-} from './ngrx/contract.selectors';
-import { ContractData } from './ngrx/contract.models';
+} from '@/dashboard/customer/components/contract/ngrx/contract.selectors';
+import { ContractData } from '@/dashboard/customer/components/contract/ngrx/contract.models';
 
 // Toasts
 import { HotToastService } from '@ngxpert/hot-toast';
@@ -35,10 +39,12 @@ import { HotToastService } from '@ngxpert/hot-toast';
 type ControlsOf<T> = { [K in keyof T]: FormControl<T[K] | null> };
 
 @Component({
-  selector: 'app-contract',
-  imports: [ReactiveFormsModule, TextFieldComponent, SelectFieldComponent],
-  templateUrl: './contract.component.html',
-  styleUrl: './contract.component.css'
+    selector: 'app-contract',
+    standalone: true,
+    imports: [CommonModule, ReactiveFormsModule, TextFieldComponent, SelectFieldComponent],
+    templateUrl: './contract.component.html',
+    styleUrl: './contract.component.css',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContractComponent {
 

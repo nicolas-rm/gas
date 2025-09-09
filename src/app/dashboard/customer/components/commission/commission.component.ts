@@ -1,5 +1,6 @@
 // Angular
-import { Component, inject, effect } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, effect } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -16,18 +17,21 @@ import { SelectFieldComponent, TextFieldComponent } from '@/app/components/compo
 import { commissionForm } from '@/app/dashboard/customer/components/commission/form';
 
 // NgRx Commission Data
-import { CommissionDataPageActions } from './ngrx/commission.actions';
-import { 
-    selectCommissionData, 
-    selectCommissionDataLoading, 
-    selectCommissionDataSaving, 
+import { CommissionDataPageActions } from '@/dashboard/customer/components/commission/ngrx/commission.actions';
+import {
+    selectCommissionData,
+    selectCommissionDataOriginal,
     selectCommissionDataIsBusy,
+    selectCommissionDataLoading,
+    selectCommissionDataSaving,
     selectCommissionDataError,
     selectCommissionDataHasUnsavedChanges,
-    selectCommissionDataCanReset,
-    selectCommissionDataOriginal
-} from './ngrx/commission.selectors';
-import { CommissionData } from './ngrx/commission.models';
+    selectCommissionDataCanReset
+} from '@/dashboard/customer/components/commission/ngrx/commission.selectors';
+import { CommissionData } from '@/dashboard/customer/components/commission/ngrx/commission.models';
+
+// Validadores
+import { ReactiveValidators } from '@/app/utils/validators/ReactiveValidators';
 
 // Toasts
 import { HotToastService } from '@ngxpert/hot-toast';
@@ -35,15 +39,17 @@ import { HotToastService } from '@ngxpert/hot-toast';
 type ControlsOf<T> = { [K in keyof T]: FormControl<T[K] | null> };
 
 @Component({
-  selector: 'app-commission',
-  imports: [ReactiveFormsModule, TextFieldComponent, SelectFieldComponent],
-  templateUrl: './commission.component.html',
-  styleUrl: './commission.component.css'
+    selector: 'app-commission',
+    standalone: true,
+    imports: [CommonModule, ReactiveFormsModule, SelectFieldComponent, TextFieldComponent],
+    templateUrl: './commission.component.html',
+    styleUrl: './commission.component.css',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CommissionComponent {
 
     // UI metadata (labels, placeholders…)
-    readonly commissionData = commissionForm;
+    readonly commission = commissionForm;
 
     readonly commissionClassificationOptions = [
         { label: 'Comisión por Venta', value: 'venta' },
@@ -62,7 +68,7 @@ export class CommissionComponent {
     private readonly toast = inject(HotToastService);
     private readonly store = inject(Store);
 
-    // Signals desde NgRx
+    // Signals desde NgRx (ya los tenías)
     isLoading = this.store.selectSignal(selectCommissionDataLoading);
     isSaving = this.store.selectSignal(selectCommissionDataSaving);
     isBusy = this.store.selectSignal(selectCommissionDataIsBusy);
@@ -71,11 +77,12 @@ export class CommissionComponent {
     canReset = this.store.selectSignal(selectCommissionDataCanReset);
     data = this.store.selectSignal(selectCommissionData);
     originalData = this.store.selectSignal(selectCommissionDataOriginal);
+    // formState selector removido tras simplificación
 
-    // FormGroup tipado a partir del modelo CommissionData
+    // FormGroup tipado a partir de tu modelo CommissionData
     commissionDataForm: FormGroup<ControlsOf<CommissionData>> = this.fb.group<ControlsOf<CommissionData>>({
-        commissionClassification: this.fb.control<string | null>(null),
-        customerLevel: this.fb.control<string | null>(null),
+        commissionClassification: this.fb.control<string | null>(null, ReactiveValidators.required),
+        customerLevel: this.fb.control<string | null>(null, ReactiveValidators.required),
         normalPercentage: this.fb.control<string | null>(null),
         earlyPaymentPercentage: this.fb.control<string | null>(null),
         incomeAccountingAccount: this.fb.control<string | null>(null),
@@ -84,9 +91,9 @@ export class CommissionComponent {
     constructor() {
         // Store -> Form (se ejecuta cada vez que cambie el signal)
         effect(() => {
-            const currentData = this.data();
-            if (currentData) {
-                this.commissionDataForm.patchValue(currentData, { emitEvent: false });
+            const d = this.data();
+            if (d) {
+                this.commissionDataForm.patchValue(d, { emitEvent: false });
             } else {
                 // Soporte para time-travel / reset a estado inicial (create)
                 this.commissionDataForm.reset({}, { emitEvent: false });
@@ -119,6 +126,8 @@ export class CommissionComponent {
     loadData(customerId: string): void {
         this.store.dispatch(CommissionDataPageActions.loadData({ customerId }));
     }
+
+    // (Eliminado updateField granular; ahora todo se maneja vía setData)
 
     // Guardar
     saveData(customerId?: string): void {
