@@ -1,9 +1,16 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { CreditRequestDataState } from './credit-request.state';
-import { CreditRequestData } from './credit-request.models';
+import { CreditRequestDataState, creditRequestDataAdapter } from './credit-request.state';
 
 // Feature selector
 export const selectCreditRequestDataState = createFeatureSelector<CreditRequestDataState>('creditRequestData');
+
+// === SELECTORES BÁSICOS DE ENTIDAD (EntityAdapter) ===
+export const {
+    selectIds: selectCreditRequestDataIds,
+    selectEntities: selectCreditRequestDataEntities,
+    selectAll: selectCreditRequestDataAll,
+    selectTotal: selectCreditRequestDataTotal,
+} = creditRequestDataAdapter.getSelectors(selectCreditRequestDataState);
 
 // === DATA SELECTORS ===
 export const selectCreditRequestData = createSelector(
@@ -14,11 +21,6 @@ export const selectCreditRequestData = createSelector(
 export const selectCreditRequestDataOriginal = createSelector(
     selectCreditRequestDataState,
     (state: CreditRequestDataState) => state.originalData
-);
-
-export const selectCreditRequestDataField = (field: keyof CreditRequestData) => createSelector(
-    selectCreditRequestData,
-    (data: CreditRequestData | null) => data ? data[field] : null
 );
 
 // === STATUS SELECTORS ===
@@ -75,6 +77,3 @@ export const selectCreditRequestDataCanReset = createSelector(
     (hasUnsavedChanges: boolean, isBusy: boolean) =>
         hasUnsavedChanges && !isBusy
 );
-
-// === FORM STATE SELECTOR ===
-// (Removidos selectores granulares específicos de campos y agrupados no utilizados para simplificar la superficie del estado)

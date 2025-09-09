@@ -1,6 +1,12 @@
 import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
 import { CreditRequestData } from './credit-request.models';
 
+// EntityAdapter para manejo eficiente del estado
+export const creditRequestDataAdapter: EntityAdapter<CreditRequestData> = createEntityAdapter<CreditRequestData>({
+    selectId: () => 'creditRequest', // Solo hay un registro de credit request por customer
+    sortComparer: false
+});
+
 // Estados operacionales específicos siguiendo el estándar de general-data
 export type CreditRequestDataStatus = 'idle' | 'loading' | 'saving' | 'saved' | 'error';
 
@@ -27,16 +33,11 @@ export interface CreditRequestDataState extends EntityState<CreditRequestData> {
     isDirty: boolean;
 }
 
-// Entity Adapter
-export const creditRequestDataAdapter: EntityAdapter<CreditRequestData> = createEntityAdapter<CreditRequestData>({
-    selectId: () => 'creditRequest' // Solo hay un registro de credit request por customer
-});
-
-// Estado inicial
+// Estado inicial usando EntityAdapter
 export const initialCreditRequestDataState: CreditRequestDataState = creditRequestDataAdapter.getInitialState({
     data: null,
     originalData: null,
-    status: 'idle',
+    status: 'idle' as CreditRequestDataStatus,
     loading: false,
     saving: false,
     error: null,

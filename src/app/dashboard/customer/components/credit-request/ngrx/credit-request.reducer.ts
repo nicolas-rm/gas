@@ -8,28 +8,31 @@ export const creditRequestDataReducer = createReducer(
     // === LOAD DATA ===
     on(CreditRequestDataPageActions.loadData, (state): CreditRequestDataState => ({
         ...state,
-        status: 'loading',
+        status: 'loading' as const,
         loading: true,
         error: null
     })),
     
-    on(CreditRequestDataApiActions.loadDataSuccess, (state, { data }): CreditRequestDataState => 
-        creditRequestDataAdapter.setOne(data, {
+    on(CreditRequestDataApiActions.loadDataSuccess, (state, { data }): CreditRequestDataState => {
+        const withEntity = creditRequestDataAdapter.setOne(data, state);
+        
+        return {
             ...state,
+            ...withEntity,
             data,
             originalData: data, // Guardar datos originales al cargar
-            status: 'idle',
+            status: 'idle' as const,
             loading: false,
             saving: false,
             error: null,
             hasUnsavedChanges: false,
             isDirty: false
-        })
-    ),
+        };
+    }),
     
     on(CreditRequestDataApiActions.loadDataFailure, (state, { error }): CreditRequestDataState => ({
         ...state,
-        status: 'error',
+        status: 'error' as const,
         loading: false,
         error: error.message
     })),
@@ -53,57 +56,63 @@ export const creditRequestDataReducer = createReducer(
     // === SAVE DATA ===
     on(CreditRequestDataPageActions.saveData, (state): CreditRequestDataState => ({
         ...state,
-        status: 'saving',
+        status: 'saving' as const,
         saving: true,
         error: null
     })),
     
-    on(CreditRequestDataApiActions.saveDataSuccess, (state, { data }): CreditRequestDataState => 
-        creditRequestDataAdapter.setOne(data, {
+    on(CreditRequestDataApiActions.saveDataSuccess, (state, { data }): CreditRequestDataState => {
+        const withEntity = creditRequestDataAdapter.setOne(data, state);
+        
+        return {
             ...state,
+            ...withEntity,
             data,
             originalData: data, // Actualizar datos originales después de guardar exitosamente
-            status: 'saved',
+            status: 'saved' as const,
+            loading: false,
             saving: false,
             error: null,
             hasUnsavedChanges: false,
             isDirty: false
-        })
-    ),
+        };
+    }),
     
     on(CreditRequestDataApiActions.saveDataFailure, (state, { error }): CreditRequestDataState => ({
         ...state,
-        status: 'error',
+        status: 'error' as const,
         saving: false,
         error: error.message
     })),
     
-    // === FORM MANAGEMENT ===
+    // === RESET Y LIMPIEZA ===
     // Resetear formulario completamente (volver al estado inicial)
-    on(CreditRequestDataPageActions.resetForm, (state): CreditRequestDataState => 
-        creditRequestDataAdapter.removeAll({
-            ...initialCreditRequestDataState
-        })
-    ),
+    on(CreditRequestDataPageActions.resetForm, (): CreditRequestDataState => ({
+        ...initialCreditRequestDataState
+    })),
     
     // Restablecer a datos originales (crear: campos vacíos, actualizar: datos cargados)
     on(CreditRequestDataPageActions.resetToOriginal, (state): CreditRequestDataState => {
         const dataToRestore = state.originalData || null;
         
         if (dataToRestore) {
-            return creditRequestDataAdapter.setOne(dataToRestore, {
+            const withEntity = creditRequestDataAdapter.setOne(dataToRestore, state);
+            return {
                 ...state,
+                ...withEntity,
                 data: dataToRestore,
                 hasUnsavedChanges: false,
-                isDirty: false
-            });
+                isDirty: false,
+                error: null
+            };
         } else {
-            return creditRequestDataAdapter.removeAll({
-                ...state,
+            return {
+                ...initialCreditRequestDataState,
                 data: null,
+                originalData: null,
                 hasUnsavedChanges: false,
                 isDirty: false
-            });
+            };
         }
     }),
 
@@ -125,3 +134,6 @@ export const creditRequestDataReducer = createReducer(
         isDirty: true
     }))
 );
+
+// Selectores del adapter para listar entidades o IDs
+export const { selectIds, selectEntities, selectAll, selectTotal } = creditRequestDataAdapter.getSelectors();

@@ -1,7 +1,13 @@
 // NgRx
-import { EntityState } from '@ngrx/entity';
+import { EntityState, createEntityAdapter } from '@ngrx/entity';
 
 import { ContactsData } from './contacts.models';
+
+// EntityAdapter para manejo eficiente del estado
+export const contactsDataAdapter = createEntityAdapter<ContactsData>({
+    selectId: (data: ContactsData) => 'contacts', // Solo un registro
+    sortComparer: false
+});
 
 // Estados operacionales específicos siguiendo el estándar de general-data
 export type ContactsDataStatus = 'idle' | 'loading' | 'saving' | 'saved' | 'error';
@@ -29,19 +35,15 @@ export interface ContactsDataState extends EntityState<ContactsData> {
     isDirty: boolean;
 }
 
-// Estado inicial
-export const initialContactsDataState: ContactsDataState = {
-    // Propiedades del EntityState
-    ids: [],
-    entities: {},
-    
+// Estado inicial usando EntityAdapter
+export const initialContactsDataState: ContactsDataState = contactsDataAdapter.getInitialState({
     // Propiedades customizadas
     data: null,
     originalData: null,
-    status: 'idle',
+    status: 'idle' as ContactsDataStatus,
     loading: false,
     saving: false,
     error: null,
     hasUnsavedChanges: false,
     isDirty: false
-};
+});

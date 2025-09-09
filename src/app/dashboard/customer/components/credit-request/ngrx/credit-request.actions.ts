@@ -6,19 +6,20 @@ import {
     CreditRequestDataResponse
 } from './credit-request.models';
 
-// Acciones de UI
+// Acciones de página (UI) - Siguiendo el estándar de general-data
 export const CreditRequestDataPageActions = createActionGroup({
     source: 'Credit Request Data Page',
     events: {
         // Cargar datos
         'Load Data': props<{ customerId: string }>(),
-        // Establecer snapshot completo (alineado con general-data)
+        
+        // Establecer snapshot completo (la única forma de cambiar datos)
         'Set Data': props<{ data: CreditRequestData }>(),
 
-        // Guardar
-        'Save Data': props<SaveCreditRequestDataRequest>(),
+        // Guardar datos (con datos opcionales, si no se proveen usa los del store)
+        'Save Data': props<{ customerId: string; data?: CreditRequestData }>(),
 
-        // Reset y limpieza
+        // Operaciones de formulario
         'Reset Form': emptyProps(),
         'Reset To Original': emptyProps(),
         'Clear Errors': emptyProps(),
@@ -27,7 +28,7 @@ export const CreditRequestDataPageActions = createActionGroup({
     }
 });
 
-// Acciones de API
+// Acciones de API - Respuestas del backend
 export const CreditRequestDataApiActions = createActionGroup({
     source: 'Credit Request Data API',
     events: {

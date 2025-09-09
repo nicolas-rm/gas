@@ -1,5 +1,5 @@
 // Component
-export * from './contacts.component';
+export * from './credit-request.component';
 
 // NgRx
 export * from './ngrx';

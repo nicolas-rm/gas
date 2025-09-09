@@ -6,19 +6,20 @@ import {
     ContactsDataResponse
 } from './contacts.models';
 
-// Acciones de UI
-export const ContactsPageActions = createActionGroup({
-    source: 'Contacts Page',
+// Acciones de página (UI) - Siguiendo el estándar de general-data
+export const ContactsDataPageActions = createActionGroup({
+    source: 'Contacts Data Page',
     events: {
         // Cargar datos
         'Load Data': props<{ customerId: string }>(),
-        // Establecer snapshot completo
+        
+        // Establecer snapshot completo (la única forma de cambiar datos)
         'Set Data': props<{ data: ContactsData }>(),
 
-        // Guardar
-        'Save Data': props<SaveContactsDataRequest>(),
+        // Guardar datos (con datos opcionales, si no se proveen usa los del store)
+        'Save Data': props<{ customerId: string; data?: ContactsData }>(),
 
-        // Reset y limpieza
+        // Operaciones de formulario
         'Reset Form': emptyProps(),
         'Reset To Original': emptyProps(),
         'Clear Errors': emptyProps(),
@@ -27,9 +28,9 @@ export const ContactsPageActions = createActionGroup({
     }
 });
 
-// Acciones de API
-export const ContactsApiActions = createActionGroup({
-    source: 'Contacts API',
+// Acciones de API - Respuestas del backend
+export const ContactsDataApiActions = createActionGroup({
+    source: 'Contacts Data API',
     events: {
         // Load
         'Load Data Success': props<{ data: ContactsData }>(),

@@ -1,13 +1,23 @@
-import { TextFieldComponent } from '@/app/components/components';
-import { FileInputFieldComponent } from '@/components/file-input/file-input.component';
-import { Component, inject, effect } from '@angular/core';
+// Angular
+import { Component, inject, effect, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, FormArray, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { creditRequestForm } from '@/app/dashboard/customer/components/credit-request/form';
-import { CommonModule } from '@angular/common';
-import { HotToastService } from '@ngxpert/hot-toast';
+
+// NgRx
 import { Store } from '@ngrx/store';
+
+// RxJS
 import { debounceTime } from 'rxjs/operators';
+
+// Componentes
+import { TextFieldComponent } from '@/app/components/components';
+import { FileInputFieldComponent } from '@/components/file-input/file-input.component';
+
+// Config del formulario (labels, ids, etc.)
+import { creditRequestForm } from '@/app/dashboard/customer/components/credit-request/form';
+
+// NgRx Credit Request
 import { CreditRequestDataPageActions } from './ngrx/credit-request.actions';
 import { 
     selectCreditRequestData, 
@@ -20,6 +30,9 @@ import {
     selectCreditRequestDataOriginal
 } from './ngrx/credit-request.selectors';
 import { CreditRequestData, ReferenceData } from './ngrx/credit-request.models';
+
+// Toasts
+import { HotToastService } from '@ngxpert/hot-toast';
 
 export type CreditRequestDataFormControl = {
     legalRepresentative: FormControl<string | null>;
@@ -37,9 +50,11 @@ export type ReferenceDataFormControl = {
 
 @Component({
     selector: 'app-credit-request',
+    standalone: true,
     imports: [CommonModule, ReactiveFormsModule, TextFieldComponent, FileInputFieldComponent],
     templateUrl: './credit-request.component.html',
-    styleUrl: './credit-request.component.css'
+    styleUrl: './credit-request.component.css',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CreditRequestComponent {
     readonly creditRequestData = creditRequestForm.creditRequest;
