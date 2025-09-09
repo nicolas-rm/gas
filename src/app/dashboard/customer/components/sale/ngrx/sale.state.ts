@@ -1,44 +1,41 @@
-import { SaleData } from './sale.models';
+import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
+import { SaleData } from '@/dashboard/customer/components/sale/ngrx/sale.models';
 
-export type SaleDataStatus =
-    | 'idle'
-    | 'loading'
-    | 'saving'
-    | 'saved'
-    | 'error';
+// Estados operacionales específicos siguiendo el estándar de general-data
+export type SaleDataStatus = 'idle' | 'loading' | 'saving' | 'saved' | 'error';
 
-export interface SaleDataState {
+// Estado principal del formulario Sale siguiendo el estándar
+export interface SaleDataState extends EntityState<SaleData> {
     // Datos del formulario
-    data: SaleData;
+    data: SaleData | null;
     
     // Datos originales para restablecer
     originalData: SaleData | null;
-
-    // Estado de la operación
+    
+    // Estados operacionales
     status: SaleDataStatus;
+    
+    // Estados de carga y guardado
     loading: boolean;
     saving: boolean;
-
-    // Errores
+    
+    // Manejo de errores
     error: string | null;
-
-    // Metadatos
+    
+    // Control de cambios
     hasUnsavedChanges: boolean;
     isDirty: boolean;
 }
 
-export const initialSaleDataState: SaleDataState = {
-    data: {
-        accountType: null,
-        seller: null,
-        accountNumber: null,
-        prepaidType: null,
-        creditDays: null,
-        creditLimit: null,
-        advanceCommission: null,
-        paymentMethod: null,
-        voucherAmount: null
-    },
+// Entity Adapter
+export const saleDataAdapter: EntityAdapter<SaleData> = createEntityAdapter<SaleData>({
+    selectId: (data: SaleData) => data.accountNumber || 'temp-id',
+    sortComparer: false,
+});
+
+// Estado inicial
+export const initialSaleDataState: SaleDataState = saleDataAdapter.getInitialState({
+    data: null,
     originalData: null,
     status: 'idle',
     loading: false,
@@ -46,4 +43,4 @@ export const initialSaleDataState: SaleDataState = {
     error: null,
     hasUnsavedChanges: false,
     isDirty: false
-};
+});

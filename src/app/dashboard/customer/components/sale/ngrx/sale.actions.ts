@@ -4,7 +4,7 @@ import {
     SaveSaleDataRequest,
     SaleDataError,
     SaleDataResponse
-} from './sale.models';
+} from '@/dashboard/customer/components/sale/ngrx/sale.models';
 
 // Acciones de UI
 export const SaleDataPageActions = createActionGroup({
@@ -13,9 +13,7 @@ export const SaleDataPageActions = createActionGroup({
         // Cargar datos
         'Load Data': props<{ customerId: string }>(),
 
-        // Actualizar campos
-        'Update Field': props<{ field: keyof SaleData; value: string | null }>(),
-        'Update Multiple Fields': props<{ updates: Partial<SaleData> }>(),
+        // Establecer snapshot completo del formulario
         'Set Data': props<{ data: SaleData }>(),
 
         // Guardar

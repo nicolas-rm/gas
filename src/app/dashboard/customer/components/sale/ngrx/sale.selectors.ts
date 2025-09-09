@@ -1,8 +1,8 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { SaleDataState } from './sale.state';
-import { SaleData } from './sale.models';
+import { SaleDataState } from '@/dashboard/customer/components/sale/ngrx/sale.state';
+import { SaleData } from '@/dashboard/customer/components/sale/ngrx/sale.models';
 
-// Feature selector
+// Feature selector para el state del componente
 export const selectSaleDataState = createFeatureSelector<SaleDataState>('saleData');
 
 // === DATA SELECTORS ===
@@ -49,6 +49,11 @@ export const selectSaleDataError = createSelector(
     (state: SaleDataState) => state.error
 );
 
+export const selectSaleDataHasError = createSelector(
+    selectSaleDataError,
+    (error: string | null) => !!error
+);
+
 // === CHANGE TRACKING SELECTORS ===
 export const selectSaleDataHasUnsavedChanges = createSelector(
     selectSaleDataState,
@@ -59,7 +64,6 @@ export const selectSaleDataIsDirty = createSelector(
     selectSaleDataState,
     (state: SaleDataState) => state.isDirty
 );
-
 
 export const selectSaleDataCanSave = createSelector(
     selectSaleDataLoading,
@@ -77,4 +81,32 @@ export const selectSaleDataCanReset = createSelector(
         hasUnsavedChanges && !isBusy
 );
 
-// (Removidos selectores granulares específicos de campos y agrupados no utilizados para simplificar la superficie del estado)
+export const selectSaleDataIsValid = createSelector(
+    selectSaleData,
+    (data: SaleData | null) => {
+        if (!data) return false;
+        // Lógica de validación básica aquí si es necesaria
+        return true;
+    }
+);
+
+// === FORM STATE SELECTORS ===
+export const selectSaleDataFormState = createSelector(
+    selectSaleData,
+    selectSaleDataLoading,
+    selectSaleDataSaving,
+    selectSaleDataError,
+    selectSaleDataHasUnsavedChanges,
+    selectSaleDataIsDirty,
+    (data, loading, saving, error, hasUnsavedChanges, isDirty) => ({
+        data,
+        loading,
+        saving,
+        error,
+        hasUnsavedChanges,
+        isDirty,
+        isBusy: loading || saving,
+        canSave: !loading && !saving && !error && hasUnsavedChanges,
+        canReset: hasUnsavedChanges && !loading && !saving
+    })
+);
