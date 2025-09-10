@@ -16,8 +16,8 @@ export const ContactsDataPageActions = createActionGroup({
         // Establecer snapshot completo (la única forma de cambiar datos)
         'Set Data': props<{ data: ContactsData }>(),
 
-        // Guardar datos (con datos opcionales, si no se proveen usa los del store)
-        'Save Data': props<{ customerId: string; data?: ContactsData }>(),
+        // Guardar datos
+        'Save Data': props<SaveContactsDataRequest>(),
 
         // Operaciones de formulario
         'Reset Form': emptyProps(),
