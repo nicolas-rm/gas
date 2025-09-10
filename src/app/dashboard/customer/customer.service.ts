@@ -12,42 +12,42 @@ export class CustomerService {
     private http = inject(HttpClient);
     private readonly apiUrl = `${environment.apiUrl}/customers`;
 
-    // Get all customers
+    // Obtener todos los clientes
     getCustomers(): Observable<ICustomer[]> {
         return this.http.get<ICustomer[]>(this.apiUrl).pipe(
             catchError(error => throwError(() => this.extractErrorMessage(error)))
         );
     }
 
-    // Get single customer
+    // Obtener cliente por ID
     getCustomer(customerId: string): Observable<ICustomer> {
         return this.http.get<ICustomer>(`${this.apiUrl}/${customerId}`).pipe(
             catchError(error => throwError(() => this.extractErrorMessage(error)))
         );
     }
 
-    // Create new customer
+    // Crear nuevo cliente
     createCustomer(customer: Partial<ICustomer>): Observable<ICustomer> {
         return this.http.post<ICustomer>(this.apiUrl, customer).pipe(
             catchError(error => throwError(() => this.extractErrorMessage(error)))
         );
     }
 
-    // Update existing customer
+    // Actualizar cliente existente
     updateCustomer(customerId: string, updates: Partial<ICustomer>): Observable<ICustomer> {
         return this.http.put<ICustomer>(`${this.apiUrl}/${customerId}`, updates).pipe(
             catchError(error => throwError(() => this.extractErrorMessage(error)))
         );
     }
 
-    // Delete customer
+    // Eliminar cliente
     deleteCustomer(customerId: string): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}/${customerId}`).pipe(
             catchError(error => throwError(() => this.extractErrorMessage(error)))
         );
     }
 
-    // Save complete customer
+    // Guardar cliente completo
     saveCustomer(customer: ICustomer): Observable<ICustomer> {
         if (customer.id) {
             return this.updateCustomer(customer.id, customer);
@@ -56,7 +56,7 @@ export class CustomerService {
         }
     }
 
-    // Save specific section
+    // Guardar sección específica
     saveSection(request: SaveFormRequest): Observable<ICustomerResponse> {
         const url = request.customerId
             ? `${this.apiUrl}/${request.customerId}/sections/${request.section}`
@@ -70,7 +70,7 @@ export class CustomerService {
         );
     }
 
-    // Get customer by section
+    // Obtener cliente por sección
     getCustomerSection(customerId: string, section: string): Observable<any> {
         return this.http.get(`${this.apiUrl}/${customerId}/sections/${section}`).pipe(
             catchError(error => throwError(() => this.extractErrorMessage(error)))

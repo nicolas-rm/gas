@@ -45,11 +45,13 @@ import { billingDataReducer } from '@/dashboard/customer/components/billing/ngrx
 
 // Customer Global State
 import { customerReducer } from '@/dashboard/customer/ngrx/customer.reducer';
+import * as CustomerEffects from '@/dashboard/customer/ngrx/customer.effects';
 
 export const ngrxProviders = [
     // Effects
     provideEffects(
         authenticationEffects, 
+        CustomerEffects,
         GeneralDataEffects,
         ContactsEffects,
         CreditRequestEffects,

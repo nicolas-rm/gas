@@ -1,12 +1,24 @@
 // Estado global del módulo customer
-export type CustomerViewMode = 'edit' | 'readonly';
+import { CustomerViewMode, CustomerData } from './customer.models';
 
 export interface CustomerGlobalState {
     viewMode: CustomerViewMode;
     currentCustomerId: string | null;
+    
+    // Datos del cliente completo
+    customerData: CustomerData | null;
+    
+    // Estado de carga
+    loading: boolean;
+    saving: boolean;
+    error: string | null;
 }
 
 export const initialCustomerGlobalState: CustomerGlobalState = {
     viewMode: 'edit',
-    currentCustomerId: null
+    currentCustomerId: null,
+    customerData: null,
+    loading: false,
+    saving: false,
+    error: null
 };
