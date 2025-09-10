@@ -15,31 +15,7 @@ import { ContractDataPageActions, ContractDataApiActions } from '@/dashboard/cus
 // Librerías externas
 import { HotToastService } from '@ngxpert/hot-toast';
 
-/**
- * Effect: Load Contract Data
- */
-export const loadContractDataEffect = createEffect(
-    (actions$ = inject(Actions), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
-        actions$.pipe(
-            ofType(ContractDataPageActions.loadData),
-            exhaustMap(({ customerId }) => {
-                const toastRef = toast.loading('Cargando datos del contrato...');
-                return customerService.getCustomerSection(customerId, 'contractData').pipe(
-                    map(data => {
-                        toastRef.close();
-                        toast.success('Datos del contrato cargados exitosamente');
-                        return ContractDataApiActions.loadDataSuccess({ data });
-                    }),
-                    catchError(error => {
-                        toastRef.close();
-                        toast.error(error);
-                        return of(ContractDataApiActions.loadDataFailure({ error }));
-                    })
-                );
-            })
-        ),
-    { functional: true }
-);
+// loadContractDataEffect removido - los datos vienen del customer centralizado
 
 /**
  * Effect: Save Contract Data

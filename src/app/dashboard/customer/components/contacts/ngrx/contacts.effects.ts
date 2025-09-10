@@ -15,31 +15,7 @@ import { ContactsDataPageActions, ContactsDataApiActions } from '@/dashboard/cus
 // Librerías externas
 import { HotToastService } from '@ngxpert/hot-toast';
 
-/**
- * Effect: Load Contacts Data
- */
-export const loadContactsDataEffect = createEffect(
-    (actions$ = inject(Actions), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
-        actions$.pipe(
-            ofType(ContactsDataPageActions.loadData),
-            exhaustMap(({ customerId }) => {
-                const toastRef = toast.loading('Cargando contactos...');
-                return customerService.getCustomerSection(customerId, 'contactsData').pipe(
-                    map(data => {
-                        toastRef.close();
-                        toast.success('Contactos cargados exitosamente');
-                        return ContactsDataApiActions.loadDataSuccess({ data });
-                    }),
-                    catchError(error => {
-                        toastRef.close();
-                        toast.error(error);
-                        return of(ContactsDataApiActions.loadDataFailure({ error }));
-                    })
-                );
-            })
-        ),
-    { functional: true }
-);
+// loadContactsDataEffect removido - los datos vienen del customer centralizado
 
 /**
  * Effect: Save Contacts Data

@@ -15,31 +15,7 @@ import { SaleDataPageActions, SaleDataApiActions } from '@/dashboard/customer/co
 // Librerías externas
 import { HotToastService } from '@ngxpert/hot-toast';
 
-/**
- * Effect: Load Sale Data
- */
-export const loadSaleDataEffect = createEffect(
-    (actions$ = inject(Actions), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
-        actions$.pipe(
-            ofType(SaleDataPageActions.loadData),
-            exhaustMap(({ customerId }) => {
-                const toastRef = toast.loading('Cargando datos de venta...');
-                return customerService.getCustomerSection(customerId, 'saleData').pipe(
-                    map(data => {
-                        toastRef.close();
-                        toast.success('Datos de venta cargados exitosamente');
-                        return SaleDataApiActions.loadDataSuccess({ data });
-                    }),
-                    catchError(error => {
-                        toastRef.close();
-                        toast.error(error);
-                        return of(SaleDataApiActions.loadDataFailure({ error }));
-                    })
-                );
-            })
-        ),
-    { functional: true }
-);
+// loadSaleDataEffect removido - los datos vienen del customer centralizado
 
 /**
  * Effect: Save Sale Data

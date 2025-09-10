@@ -15,31 +15,7 @@ import { CreditRequestDataPageActions, CreditRequestDataApiActions } from '@/das
 // Librerías externas
 import { HotToastService } from '@ngxpert/hot-toast';
 
-/**
- * Effect: Load Credit Request Data
- */
-export const loadCreditRequestDataEffect = createEffect(
-    (actions$ = inject(Actions), customerService = inject(CustomerService), toast = inject(HotToastService)) =>
-        actions$.pipe(
-            ofType(CreditRequestDataPageActions.loadData),
-            exhaustMap(({ customerId }) => {
-                const toastRef = toast.loading('Cargando datos de solicitud de crédito...');
-                return customerService.getCustomerSection(customerId, 'creditRequestData').pipe(
-                    map(data => {
-                        toastRef.close();
-                        toast.success('Datos de solicitud de crédito cargados exitosamente');
-                        return CreditRequestDataApiActions.loadDataSuccess({ data });
-                    }),
-                    catchError(error => {
-                        toastRef.close();
-                        toast.error(error);
-                        return of(CreditRequestDataApiActions.loadDataFailure({ error }));
-                    })
-                );
-            })
-        ),
-    { functional: true }
-);
+// loadCreditRequestDataEffect removido - los datos vienen del customer centralizado
 
 /**
  * Effect: Save Credit Request Data

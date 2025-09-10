@@ -35,16 +35,20 @@ export const loadCustomerEffect = createEffect(
         actions$.pipe(
             ofType(CustomerPageActions.loadCustomer),
             exhaustMap(({ customerId }) => {
+                console.log('🔍 Iniciando carga de customer con ID:', customerId);
                 const toastRef = toast.loading('Cargando datos del cliente...');
                 return customerService.getCustomer(customerId).pipe(
                     map(customerResponse => {
+                        console.log('✅ Respuesta del servicio recibida:', customerResponse);
                         toastRef.close();
                         toast.success('Datos del cliente cargados exitosamente');
                         // Transformar respuesta de API al formato del estado
                         const customerData: CustomerData = transformCustomerResponse(customerResponse, customerId);
+                        console.log('🔄 Datos transformados para el estado:', customerData);
                         return CustomerApiActions.loadCustomerSuccess({ customerData });
                     }),
                     catchError(error => {
+                        console.error('❌ Error al cargar customer:', error);
                         toastRef.close();
                         toast.error(error);
                         return of(CustomerApiActions.loadCustomerFailure({ error }));
@@ -62,9 +66,10 @@ export const distributeCustomerDataEffect = createEffect(
     (actions$ = inject(Actions)) =>
         actions$.pipe(
             ofType(CustomerApiActions.loadCustomerSuccess),
-            map(({ customerData }) =>
-                CustomerPageActions.distributeCustomerData({ customerData })
-            )
+            map(({ customerData }) => {
+                console.log('🎯 Disparando distribución automática de datos:', customerData);
+                return CustomerPageActions.distributeCustomerData({ customerData });
+            })
         ),
     { functional: true }
 );
@@ -77,54 +82,67 @@ export const distributeToTabsEffect = createEffect(
         actions$.pipe(
             ofType(CustomerPageActions.distributeCustomerData),
             tap(({ customerData }) => {
+                console.log('🔄 Distribuyendo datos del customer a los tabs:', customerData);
+                
                 // Distribuir datos a cada tab específico usando ApiActions
+                // Solo despachar si existen datos para esa sección
                 if (customerData.generalData) {
+                    console.log('📊 Distribuyendo general data:', customerData.generalData);
                     store.dispatch(GeneralDataApiActions.loadDataSuccess({ 
                         data: customerData.generalData 
                     }));
                 }
                 
                 if (customerData.contacts) {
+                    console.log('👥 Distribuyendo contacts:', customerData.contacts);
                     store.dispatch(ContactsDataApiActions.loadDataSuccess({ 
                         data: customerData.contacts 
                     }));
                 }
                 
                 if (customerData.contract) {
+                    console.log('📋 Distribuyendo contract:', customerData.contract);
                     store.dispatch(ContractDataApiActions.loadDataSuccess({ 
                         data: customerData.contract 
                     }));
                 }
                 
                 if (customerData.commission) {
+                    console.log('💰 Distribuyendo commission:', customerData.commission);
                     store.dispatch(CommissionDataApiActions.loadDataSuccess({ 
                         data: customerData.commission 
                     }));
                 }
                 
                 if (customerData.sale) {
+                    console.log('🛒 Distribuyendo sale:', customerData.sale);
                     store.dispatch(SaleDataApiActions.loadDataSuccess({ 
                         data: customerData.sale 
                     }));
                 }
                 
                 if (customerData.billing) {
+                    console.log('🧾 Distribuyendo billing:', customerData.billing);
                     store.dispatch(BillingDataApiActions.loadDataSuccess({ 
                         data: customerData.billing 
                     }));
                 }
                 
                 if (customerData.ine) {
+                    console.log('🆔 Distribuyendo ine:', customerData.ine);
                     store.dispatch(IneDataApiActions.loadDataSuccess({ 
                         data: customerData.ine 
                     }));
                 }
                 
                 if (customerData.creditRequest) {
+                    console.log('💳 Distribuyendo credit request:', customerData.creditRequest);
                     store.dispatch(CreditRequestDataApiActions.loadDataSuccess({ 
                         data: customerData.creditRequest 
                     }));
                 }
+                
+                console.log('✅ Distribución de datos completada');
             })
         ),
     { functional: true, dispatch: false }
@@ -135,54 +153,55 @@ export const distributeToTabsEffect = createEffect(
  * Transforma ICustomer del servicio a CustomerData del NgRx state
  */
 function transformCustomerResponse(customerResponse: any, customerId: string): CustomerData {
-    // Transformar la respuesta real del servicio a formato CustomerData
-    // Por ahora usar datos mock hasta que la estructura de API esté definida
-    // TODO: Mapear customerResponse.data a las secciones correspondientes
+    // Extraer los datos de la respuesta real de la API
+    const responseData = customerResponse?.data || customerResponse;
     
-    const mockCustomerData: CustomerData = {
+    const customerData: CustomerData = {
         id: customerId,
-        generalData: {
-            personType: 'Persona Física',
-            groupType: 'Individual',
-            rfc: 'XAXX010101000',
-            businessName: 'Empresa Ejemplo S.A. de C.V.',
-            tradeName: 'Empresa Ejemplo',
-            street: 'Calle Principal',
-            exteriorNumber: '123',
-            interiorNumber: 'A',
-            crossing: 'Entre Calle 1 y Calle 2',
-            country: 'México',
-            state: 'Ciudad de México',
-            colony: 'Centro',
-            municipality: 'Cuauhtémoc',
-            postalCode: '06000',
-            phone: '5555551234',
-            city: 'Ciudad de México',
-            fax: '5555555678'
-        },
-        contacts: {
-            contacts: [
-                {
-                    name: 'Juan Pérez',
-                    position: 'Gerente General',
-                    phone: '5555551111',
-                    email: 'juan.perez@empresa.com'
-                },
-                {
-                    name: 'María García',
-                    position: 'Directora Financiera',
-                    phone: '5555552222',
-                    email: 'maria.garcia@empresa.com'
-                }
-            ]
-        },
-        contract: null, // Será cargado por el tab específico si existe
-        commission: null, // Será cargado por el tab específico si existe
-        sale: null, // Será cargado por el tab específico si existe
-        billing: null, // Será cargado por el tab específico si existe
-        ine: null, // Será cargado por el tab específico si existe
-        creditRequest: null // Será cargado por el tab específico si existe
+        // Mapear general data desde la respuesta de la API
+        generalData: responseData?.generalData ? {
+            personType: responseData.generalData.personType || null,
+            groupType: responseData.generalData.groupType || null,
+            rfc: responseData.generalData.rfc || null,
+            businessName: responseData.generalData.businessName || null,
+            tradeName: responseData.generalData.tradeName || null,
+            street: responseData.generalData.street || null,
+            exteriorNumber: responseData.generalData.exteriorNumber || null,
+            interiorNumber: responseData.generalData.interiorNumber || null,
+            crossing: responseData.generalData.crossing || null,
+            country: responseData.generalData.country || null,
+            state: responseData.generalData.state || null,
+            colony: responseData.generalData.colony || null,
+            municipality: responseData.generalData.municipality || null,
+            postalCode: responseData.generalData.postalCode || null,
+            phone: responseData.generalData.phone || null,
+            city: responseData.generalData.city || null,
+            fax: responseData.generalData.fax || null
+        } : null,
+        
+        // Mapear contacts desde la respuesta de la API
+        contacts: responseData?.contacts ? {
+            contacts: Array.isArray(responseData.contacts.contacts) ? responseData.contacts.contacts : []
+        } : null,
+        
+        // Mapear contract desde la respuesta de la API
+        contract: responseData?.contract || null,
+        
+        // Mapear commission desde la respuesta de la API
+        commission: responseData?.commission || null,
+        
+        // Mapear sale desde la respuesta de la API
+        sale: responseData?.sale || null,
+        
+        // Mapear billing desde la respuesta de la API
+        billing: responseData?.billing || null,
+        
+        // Mapear ine desde la respuesta de la API
+        ine: responseData?.ine || null,
+        
+        // Mapear credit request desde la respuesta de la API
+        creditRequest: responseData?.creditRequest || null
     };
 
-    return mockCustomerData;
+    return customerData;
 }
