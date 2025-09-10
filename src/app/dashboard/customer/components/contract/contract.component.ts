@@ -1,5 +1,5 @@
 // Angular
-import { Component, inject, effect, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, effect, ChangeDetectionStrategy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
@@ -89,6 +89,8 @@ export class ContractComponent {
     private readonly fb = inject(FormBuilder);
     private readonly toast = inject(HotToastService);
     private readonly store = inject(Store);
+    private readonly cdr = inject(ChangeDetectorRef);
+    private readonly ngZone = inject(NgZone);
 
     // Signals desde NgRx
     isLoading = this.store.selectSignal(selectContractDataLoading);
@@ -122,14 +124,18 @@ export class ContractComponent {
         // Store -> Form (se ejecuta cada vez que cambie el signal)
         effect(() => {
             const currentData = this.data();
-            if (currentData) {
-                this.contractDataForm.patchValue(currentData, { emitEvent: false });
-            } else {
-                // Soporte para time-travel / reset a estado inicial (create)
-                this.contractDataForm.reset({}, { emitEvent: false });
-                this.contractDataForm.markAsPristine();
-                this.contractDataForm.markAsUntouched();
-            }
+            this.ngZone.run(() => {
+                if (currentData) {
+                    this.contractDataForm.patchValue(currentData, { emitEvent: false });
+                } else {
+                    // Soporte para time-travel / reset a estado inicial (create)
+                    this.contractDataForm.reset({}, { emitEvent: false });
+                    this.contractDataForm.markAsPristine();
+                    this.contractDataForm.markAsUntouched();
+                }
+                // Forzar actualización inmediata tras time-travel
+                this.cdr.detectChanges();
+            });
         });
 
         // Effect para manejar estado habilitado/deshabilitado del form
@@ -137,11 +143,15 @@ export class ContractComponent {
             const busy = this.isBusy();
             const readonly = this.isReadonlyMode();
             
-            if (busy || readonly) {
-                this.contractDataForm.disable({ emitEvent: false });
-            } else {
-                this.contractDataForm.enable({ emitEvent: false });
-            }
+            this.ngZone.run(() => {
+                if (busy || readonly) {
+                    this.contractDataForm.disable({ emitEvent: false });
+                } else {
+                    this.contractDataForm.enable({ emitEvent: false });
+                }
+                // Forzar actualización inmediata tras time-travel
+                this.cdr.detectChanges();
+            });
         });
 
         // Form -> Store (cambios del form)
@@ -151,6 +161,7 @@ export class ContractComponent {
                 const data = this.contractDataForm.getRawValue() as ContractData;
                 this.store.dispatch(ContractDataPageActions.setData({ data }));
                 this.store.dispatch(ContractDataPageActions.markAsDirty());
+                this.cdr.detectChanges();
             });
     }
 

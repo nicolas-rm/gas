@@ -1,5 +1,5 @@
 // Angular
-import { Component, ChangeDetectionStrategy, inject, effect } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, effect, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -63,6 +63,8 @@ export class GeneralDataComponent {
     private readonly fb = inject(FormBuilder);
     private readonly toast = inject(HotToastService);
     private readonly store = inject(Store);
+    private readonly cdr = inject(ChangeDetectorRef);
+    private readonly ngZone = inject(NgZone);
 
     // Signals desde NgRx (ya los tenías)
     isLoading = this.store.selectSignal(selectGeneralDataLoading);
@@ -73,7 +75,7 @@ export class GeneralDataComponent {
     canReset = this.store.selectSignal(selectGeneralDataCanReset);
     data = this.store.selectSignal(selectGeneralData);
     originalData = this.store.selectSignal(selectGeneralDataOriginal);
-    
+
     // Signal para modo readonly desde estado global
     isReadonlyMode = this.store.selectSignal(selectIsReadonlyMode);
     // formState selector removido tras simplificación
@@ -103,26 +105,34 @@ export class GeneralDataComponent {
         // Store -> Form (se ejecuta cada vez que cambie el signal)
         effect(() => {
             const d = this.data();
-            if (d) {
-                this.generalDataForm.patchValue(d, { emitEvent: false });
-            } else {
-                // Soporte para time-travel / reset a estado inicial (create)
-                this.generalDataForm.reset({}, { emitEvent: false });
-                this.generalDataForm.markAsPristine();
-                this.generalDataForm.markAsUntouched();
-            }
+            this.ngZone.run(() => {
+                if (d) {
+                    this.generalDataForm.patchValue(d, { emitEvent: false });
+                } else {
+                    // Soporte para time-travel / reset a estado inicial (create)
+                    this.generalDataForm.reset({}, { emitEvent: false });
+                    this.generalDataForm.markAsPristine();
+                    this.generalDataForm.markAsUntouched();
+                }
+                // Forzar actualización inmediata tras time-travel
+                this.cdr.detectChanges();
+            });
         });
 
         // Effect para manejar estado habilitado/deshabilitado del form
         effect(() => {
             const busy = this.isBusy();
             const readonly = this.isReadonlyMode();
-            
-            if (busy || readonly) {
-                this.generalDataForm.disable({ emitEvent: false });
-            } else {
-                this.generalDataForm.enable({ emitEvent: false });
-            }
+
+            this.ngZone.run(() => {
+                if (busy || readonly) {
+                    this.generalDataForm.disable({ emitEvent: false });
+                } else {
+                    this.generalDataForm.enable({ emitEvent: false });
+                }
+                // Forzar actualización inmediata tras time-travel
+                this.cdr.detectChanges();
+            });
         });
 
         // Form -> Store (cambios del form)

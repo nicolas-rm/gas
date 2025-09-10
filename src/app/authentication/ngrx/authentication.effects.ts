@@ -4,12 +4,13 @@ import { Router } from '@angular/router';
 
 // NgRx
 import { Actions, createEffect, ofType } from '@ngrx/effects';
+// (Store se mantiene si en el futuro se necesita, pero actualmente no requerido)
 
 // RxJS
-import { of, timer } from 'rxjs';
+import { of } from 'rxjs';
 import { catchError, delay, exhaustMap, map, tap } from 'rxjs/operators';
 
-// Servicios y estados propios
+// Servicios y modelos propios
 import { AuthPageActions, AuthApiActions } from '@/authentication/ngrx/authentication.actions';
 import { IAuthentication } from '@/authentication/ngrx/authentication.state';
 import { AuthenticationService } from '@/authentication/authentication.service';
@@ -20,41 +21,36 @@ import { HotToastService } from '@ngxpert/hot-toast';
 
 /**
  * Effect: Login
+ * Maneja el proceso de autenticación del usuario
  */
-
 export const loginEffect = createEffect(
     (actions$ = inject(Actions), authenticationService = inject(AuthenticationService), toast = inject(HotToastService)) =>
         actions$.pipe(
             ofType(AuthPageActions.login),
             exhaustMap(({ email, password }) => {
-                // Agregar un pequeño delay para evitar conflictos con toasts de logout
-                return timer(100).pipe(
-                    exhaustMap(() => {
-                        const toastRef = toast.loading('Iniciando sesión...');
-                        return authenticationService.login({ email, password }).pipe(
-                            map(response => {
-                                toastRef.close();
-                                toast.success('¡Inicio de sesión exitoso!');
-                                // Mapea la respuesta al modelo del state
-                                const auth: IAuthentication = {
-                                    tokens: {
-                                        accessToken: response.data.token,
-                                        refreshToken: response.data.refreshToken
-                                    },
-                                    user: {
-                                        id: response.data.userId || response.data.user?.id || '',
-                                        email: response.data.email || response.data.user?.email || ''
-                                    },
-                                    lastUpdated: Date.now()
-                                };
-                                return AuthApiActions.loginSuccess({ auth });
-                            }),
-                            catchError(error => {
-                                toastRef.close();
-                                toast.error(error);
-                                return of(AuthApiActions.loginFailure({ error }));
-                            })
-                        );
+                const toastRef = toast.loading('Iniciando sesión...');
+                return authenticationService.login({ email, password }).pipe(
+                    map(response => {
+                        toastRef.close();
+                        toast.success('¡Inicio de sesión exitoso!');
+                        // Mapea la respuesta al modelo del state
+                        const auth: IAuthentication = {
+                            tokens: {
+                                accessToken: response.data.token,
+                                refreshToken: response.data.refreshToken
+                            },
+                            user: {
+                                id: response.data.userId || response.data.user?.id || '',
+                                email: response.data.email || response.data.user?.email || ''
+                            },
+                            lastUpdated: Date.now()
+                        };
+                        return AuthApiActions.loginSuccess({ auth });
+                    }),
+                    catchError(error => {
+                        toastRef.close();
+                        toast.error(error);
+                        return of(AuthApiActions.loginFailure({ error }));
                     })
                 );
             })
@@ -64,7 +60,7 @@ export const loginEffect = createEffect(
 
 /**
  * Effect: Login Success
- * - Redirige al dashboard tras login exitoso
+ * Redirige al dashboard tras login exitoso
  */
 export const loginSuccessNav = createEffect(
     (actions$ = inject(Actions), router = inject(Router)) =>
@@ -77,6 +73,7 @@ export const loginSuccessNav = createEffect(
 
 /**
  * Effect: Register
+ * Maneja el proceso de registro de nuevos usuarios
  */
 export const registerEffect = createEffect(
     (actions$ = inject(Actions), authenticationService = inject(AuthenticationService), toast = inject(HotToastService)) =>
@@ -103,7 +100,7 @@ export const registerEffect = createEffect(
 
 /**
  * Effect: Register Success
- * - Redirige a la pantalla de login tras registro exitoso
+ * Redirige a la pantalla de login tras registro exitoso
  */
 export const registerSuccessNav = createEffect(
     (actions$ = inject(Actions), router = inject(Router)) =>
@@ -116,7 +113,7 @@ export const registerSuccessNav = createEffect(
 
 /**
  * Effect: Lock Screen
- * - Redirige a la pantalla de suspensión/bloqueo
+ * Redirige a la pantalla de suspensión/bloqueo
  */
 export const lockScreenNav = createEffect(
     (actions$ = inject(Actions), router = inject(Router)) =>
@@ -129,6 +126,7 @@ export const lockScreenNav = createEffect(
 
 /**
  * Effect: Unlock Screen
+ * Maneja el proceso de desbloqueo de pantalla con verificación de contraseña
  */
 export const unlockScreenEffect = createEffect(
     (actions$ = inject(Actions), authenticationService = inject(AuthenticationService), toast = inject(HotToastService)) =>
@@ -172,7 +170,7 @@ export const unlockScreenEffect = createEffect(
 
 /**
  * Effect: Unlock Screen Success
- * - Redirige al dashboard tras desbloquear pantalla
+ * Redirige al dashboard tras desbloquear pantalla exitosamente
  */
 export const unlockSuccessNav = createEffect(
     (actions$ = inject(Actions), router = inject(Router)) =>
@@ -185,6 +183,7 @@ export const unlockSuccessNav = createEffect(
 
 /**
  * Effect: Logout
+ * Maneja el proceso de cierre de sesión del usuario
  */
 export const logoutEffect = createEffect(
     (actions$ = inject(Actions), authenticationService = inject(AuthenticationService), toast = inject(HotToastService)) =>
@@ -218,7 +217,7 @@ export const logoutEffect = createEffect(
 
 /**
  * Effect: Logout Success
- * - Redirige a la pantalla de login tras cerrar sesión
+ * Redirige a la pantalla de login tras cerrar sesión exitosamente
  */
 export const logoutSuccessNav = createEffect(
     (actions$ = inject(Actions), router = inject(Router)) =>
@@ -231,6 +230,7 @@ export const logoutSuccessNav = createEffect(
 
 /**
  * Effect: Refresh Token
+ * Maneja la renovación de tokens de autenticación expirados
  */
 export const refreshTokenEffect = createEffect(
     (actions$ = inject(Actions), authenticationService = inject(AuthenticationService), toast = inject(HotToastService)) =>
@@ -262,8 +262,8 @@ export const refreshTokenEffect = createEffect(
 );
 
 /**
- * Effect: Trigger Refresh Token (desde interceptor)
- * - Despacha la acción de refresh sin mostrar toast
+ * Effect: Trigger Refresh Token
+ * Despacha la acción de refresh sin mostrar toast (usado desde interceptor)
  */
 export const triggerRefreshTokenEffect = createEffect(
     (actions$ = inject(Actions)) =>
@@ -275,8 +275,8 @@ export const triggerRefreshTokenEffect = createEffect(
 );
 
 /**
- * Effect: Trigger Logout (desde interceptor)
- * - Despacha la acción de logout cuando el refresh falla
+ * Effect: Trigger Logout
+ * Despacha la acción de logout cuando el refresh falla (usado desde interceptor)
  */
 export const triggerLogoutEffect = createEffect(
     (actions$ = inject(Actions)) =>

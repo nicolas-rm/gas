@@ -79,7 +79,7 @@ export const ngrxProviders = [
     provideStore({}, { metaReducers }),
     
     // DevTools
-    provideStoreDevtools({ maxAge: 100 }),
+    provideStoreDevtools({ maxAge: 100, logOnly: false, connectInZone: true }),
     
     // Router Serializer
     { provide: RouterStateSerializer, useClass: CustomRouterSerializer }

@@ -1,5 +1,5 @@
 // Angular
-import { Component, ChangeDetectionStrategy, inject, effect } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, effect, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -70,6 +70,8 @@ export class CommissionComponent {
     private readonly fb = inject(FormBuilder);
     private readonly toast = inject(HotToastService);
     private readonly store = inject(Store);
+    private readonly cdr = inject(ChangeDetectorRef);
+    private readonly ngZone = inject(NgZone);
 
     // Signals desde NgRx (ya los tenías)
     isLoading = this.store.selectSignal(selectCommissionDataLoading);
@@ -98,14 +100,18 @@ export class CommissionComponent {
         // Store -> Form (se ejecuta cada vez que cambie el signal)
         effect(() => {
             const d = this.data();
-            if (d) {
-                this.commissionDataForm.patchValue(d, { emitEvent: false });
-            } else {
-                // Soporte para time-travel / reset a estado inicial (create)
-                this.commissionDataForm.reset({}, { emitEvent: false });
-                this.commissionDataForm.markAsPristine();
-                this.commissionDataForm.markAsUntouched();
-            }
+            this.ngZone.run(() => {
+                if (d) {
+                    this.commissionDataForm.patchValue(d, { emitEvent: false });
+                } else {
+                    // Soporte para time-travel / reset a estado inicial (create)
+                    this.commissionDataForm.reset({}, { emitEvent: false });
+                    this.commissionDataForm.markAsPristine();
+                    this.commissionDataForm.markAsUntouched();
+                }
+                // Forzar actualización inmediata tras time-travel
+                this.cdr.detectChanges();
+            });
         });
 
         // Effect para manejar estado habilitado/deshabilitado del form
@@ -113,11 +119,15 @@ export class CommissionComponent {
             const busy = this.isBusy();
             const readonly = this.isReadonlyMode();
             
-            if (busy || readonly) {
-                this.commissionDataForm.disable({ emitEvent: false });
-            } else {
-                this.commissionDataForm.enable({ emitEvent: false });
-            }
+            this.ngZone.run(() => {
+                if (busy || readonly) {
+                    this.commissionDataForm.disable({ emitEvent: false });
+                } else {
+                    this.commissionDataForm.enable({ emitEvent: false });
+                }
+                // Forzar actualización inmediata tras time-travel
+                this.cdr.detectChanges();
+            });
         });
 
         // Form -> Store (cambios del form)
@@ -127,6 +137,7 @@ export class CommissionComponent {
                 const data = this.commissionDataForm.getRawValue() as CommissionData;
                 this.store.dispatch(CommissionDataPageActions.setData({ data }));
                 this.store.dispatch(CommissionDataPageActions.markAsDirty());
+                this.cdr.detectChanges();
             });
     }
 

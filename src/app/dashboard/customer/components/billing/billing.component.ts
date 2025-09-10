@@ -1,5 +1,5 @@
 // Angular
-import { Component, ChangeDetectionStrategy, inject, effect } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, effect, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -82,6 +82,8 @@ export class BillingComponent {
     private readonly fb = inject(FormBuilder);
     private readonly toast = inject(HotToastService);
     private readonly store = inject(Store);
+    private readonly cdr = inject(ChangeDetectorRef);
+    private readonly ngZone = inject(NgZone);
 
     // Signals desde NgRx
     isLoading = this.store.selectSignal(selectBillingDataLoading);
@@ -111,14 +113,18 @@ export class BillingComponent {
         // Store -> Form (se ejecuta cada vez que cambie el signal)
         effect(() => {
             const d = this.data();
-            if (d) {
-                this.billingDataForm.patchValue(d, { emitEvent: false });
-            } else {
-                // Soporte para time-travel / reset a estado inicial (create)
-                this.billingDataForm.reset({}, { emitEvent: false });
-                this.billingDataForm.markAsPristine();
-                this.billingDataForm.markAsUntouched();
-            }
+            this.ngZone.run(() => {
+                if (d) {
+                    this.billingDataForm.patchValue(d, { emitEvent: false });
+                } else {
+                    // Soporte para time-travel / reset a estado inicial (create)
+                    this.billingDataForm.reset({}, { emitEvent: false });
+                    this.billingDataForm.markAsPristine();
+                    this.billingDataForm.markAsUntouched();
+                }
+                // Forzar actualización inmediata tras time-travel
+                this.cdr.detectChanges();
+            });
         });
 
         // Effect para manejar estado habilitado/deshabilitado del form
@@ -126,11 +132,15 @@ export class BillingComponent {
             const busy = this.isBusy();
             const readonly = this.isReadonlyMode();
             
-            if (busy || readonly) {
-                this.billingDataForm.disable({ emitEvent: false });
-            } else {
-                this.billingDataForm.enable({ emitEvent: false });
-            }
+            this.ngZone.run(() => {
+                if (busy || readonly) {
+                    this.billingDataForm.disable({ emitEvent: false });
+                } else {
+                    this.billingDataForm.enable({ emitEvent: false });
+                }
+                // Forzar actualización inmediata tras time-travel
+                this.cdr.detectChanges();
+            });
         });
 
         // Form -> Store (cambios del form)
@@ -140,6 +150,7 @@ export class BillingComponent {
                 const data = this.billingDataForm.getRawValue() as BillingData;
                 this.store.dispatch(BillingDataPageActions.setData({ data }));
                 this.store.dispatch(BillingDataPageActions.markAsDirty());
+                this.cdr.detectChanges();
             });
     }
 

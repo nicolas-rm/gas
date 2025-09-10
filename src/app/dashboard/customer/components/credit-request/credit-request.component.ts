@@ -1,5 +1,5 @@
 // Angular
-import { Component, inject, effect, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, effect, ChangeDetectionStrategy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, FormArray, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -79,6 +79,8 @@ export class CreditRequestComponent {
     private readonly fb = inject(FormBuilder);
     private readonly toast = inject(HotToastService);
     private readonly store = inject(Store);
+    private readonly cdr = inject(ChangeDetectorRef);
+    private readonly ngZone = inject(NgZone);
 
     // NgRx signals
     isLoading = this.store.selectSignal(selectCreditRequestDataLoading);

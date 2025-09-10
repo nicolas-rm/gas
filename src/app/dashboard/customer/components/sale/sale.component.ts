@@ -1,5 +1,5 @@
 // Angular
-import { Component, inject, effect } from '@angular/core';
+import { Component, inject, effect, ChangeDetectionStrategy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -40,9 +40,11 @@ type ControlsOf<T> = { [K in keyof T]: FormControl<T[K] | null> };
 
 @Component({
   selector: 'app-sale',
+  standalone: true,
   imports: [CommonModule, ReactiveFormsModule, TextFieldComponent, SelectFieldComponent],
   templateUrl: './sale.component.html',
-  styleUrl: './sale.component.css'
+  styleUrl: './sale.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SaleComponent {
 
@@ -73,6 +75,8 @@ export class SaleComponent {
     private readonly fb = inject(FormBuilder);
     private readonly toast = inject(HotToastService);
     private readonly store = inject(Store);
+    private readonly cdr = inject(ChangeDetectorRef);
+    private readonly ngZone = inject(NgZone);
 
     // Signals desde NgRx
     isLoading = this.store.selectSignal(selectSaleDataLoading);
@@ -104,14 +108,18 @@ export class SaleComponent {
         // Store -> Form (se ejecuta cada vez que cambie el signal)
         effect(() => {
             const currentData = this.data();
-            if (currentData) {
-                this.saleDataForm.patchValue(currentData, { emitEvent: false });
-            } else {
-                // Soporte para time-travel / reset a estado inicial (create)
-                this.saleDataForm.reset({}, { emitEvent: false });
-                this.saleDataForm.markAsPristine();
-                this.saleDataForm.markAsUntouched();
-            }
+            this.ngZone.run(() => {
+                if (currentData) {
+                    this.saleDataForm.patchValue(currentData, { emitEvent: false });
+                } else {
+                    // Soporte para time-travel / reset a estado inicial (create)
+                    this.saleDataForm.reset({}, { emitEvent: false });
+                    this.saleDataForm.markAsPristine();
+                    this.saleDataForm.markAsUntouched();
+                }
+                // Forzar actualización inmediata tras time-travel
+                this.cdr.detectChanges();
+            });
         });
 
         // Effect para manejar estado habilitado/deshabilitado del form
@@ -119,11 +127,15 @@ export class SaleComponent {
             const busy = this.isBusy();
             const readonly = this.isReadonlyMode();
             
-            if (busy || readonly) {
-                this.saleDataForm.disable({ emitEvent: false });
-            } else {
-                this.saleDataForm.enable({ emitEvent: false });
-            }
+            this.ngZone.run(() => {
+                if (busy || readonly) {
+                    this.saleDataForm.disable({ emitEvent: false });
+                } else {
+                    this.saleDataForm.enable({ emitEvent: false });
+                }
+                // Forzar actualización inmediata tras time-travel
+                this.cdr.detectChanges();
+            });
         });
 
         // Form -> Store (cambios del form)
@@ -133,6 +145,7 @@ export class SaleComponent {
                 const data = this.saleDataForm.getRawValue() as SaleData;
                 this.store.dispatch(SaleDataPageActions.setData({ data }));
                 this.store.dispatch(SaleDataPageActions.markAsDirty());
+                this.cdr.detectChanges();
             });
     }
 

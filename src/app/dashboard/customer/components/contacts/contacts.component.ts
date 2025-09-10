@@ -1,5 +1,5 @@
 // Angular
-import { Component, ChangeDetectionStrategy, inject, effect } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, effect, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -61,6 +61,8 @@ export class ContactsComponent {
     private readonly fb = inject(FormBuilder);
     private readonly toast = inject(HotToastService);
     private readonly store = inject(Store);
+    private readonly cdr = inject(ChangeDetectorRef);
+    private readonly ngZone = inject(NgZone);
 
     // Signals desde NgRx
     isLoading = this.store.selectSignal(selectContactsDataLoading);
@@ -84,34 +86,38 @@ export class ContactsComponent {
         // Store -> Form (se ejecuta cada vez que cambie el signal)
         effect(() => {
             const d = this.data();
-            const arr = this.contactsForm.get('contacts') as FormArray;
-            
-            if (d && Array.isArray(d.contacts)) {
-                // Solo reconstruir si la estructura es diferente o viene de carga inicial
-                const currentContacts = arr.controls.map(ctrl => ctrl.getRawValue());
-                const needsSync = currentContacts.length !== d.contacts.length || 
-                                 JSON.stringify(currentContacts) !== JSON.stringify(d.contacts);
+            this.ngZone.run(() => {
+                const arr = this.contactsForm.get('contacts') as FormArray;
                 
-                if (needsSync) {
-                    // Sincroniza el array de contactos sin emitir eventos
-                    arr.clear({ emitEvent: false });
-                    d.contacts.forEach(contact => {
-                        arr.push(this.createContactFormGroup(contact), { emitEvent: false });
-                    });
+                if (d && Array.isArray(d.contacts)) {
+                    // Solo reconstruir si la estructura es diferente o viene de carga inicial
+                    const currentContacts = arr.controls.map(ctrl => ctrl.getRawValue());
+                    const needsSync = currentContacts.length !== d.contacts.length || 
+                                     JSON.stringify(currentContacts) !== JSON.stringify(d.contacts);
+                    
+                    if (needsSync) {
+                        // Sincroniza el array de contactos sin emitir eventos
+                        arr.clear({ emitEvent: false });
+                        d.contacts.forEach(contact => {
+                            arr.push(this.createContactFormGroup(contact), { emitEvent: false });
+                        });
+                    }
+                } else {
+                    // Soporte para time-travel / reset a estado inicial (create)
+                    if (arr.length > 0) {
+                        this.contactsForm.reset({}, { emitEvent: false });
+                        arr.clear({ emitEvent: false });
+                        this.contactsForm.markAsPristine();
+                        this.contactsForm.markAsUntouched();
+                    }
+                    // Asegurar que siempre haya al menos un contacto vacío
+                    if (arr.length === 0) {
+                        arr.push(this.createContactFormGroup(), { emitEvent: false });
+                    }
                 }
-            } else {
-                // Soporte para time-travel / reset a estado inicial (create)
-                if (arr.length > 0) {
-                    this.contactsForm.reset({}, { emitEvent: false });
-                    arr.clear({ emitEvent: false });
-                    this.contactsForm.markAsPristine();
-                    this.contactsForm.markAsUntouched();
-                }
-                // Asegurar que siempre haya al menos un contacto vacío
-                if (arr.length === 0) {
-                    arr.push(this.createContactFormGroup(), { emitEvent: false });
-                }
-            }
+                // Forzar actualización inmediata tras time-travel
+                this.cdr.detectChanges();
+            });
         });
 
         // Effect para manejar estado habilitado/deshabilitado del form
@@ -119,11 +125,15 @@ export class ContactsComponent {
             const busy = this.isBusy();
             const readonly = this.isReadonlyMode();
             
-            if (busy || readonly) {
-                this.contactsForm.disable({ emitEvent: false });
-            } else {
-                this.contactsForm.enable({ emitEvent: false });
-            }
+            this.ngZone.run(() => {
+                if (busy || readonly) {
+                    this.contactsForm.disable({ emitEvent: false });
+                } else {
+                    this.contactsForm.enable({ emitEvent: false });
+                }
+                // Forzar actualización inmediata tras time-travel
+                this.cdr.detectChanges();
+            });
         });
 
         // Form -> Store (cambios del form)
@@ -134,6 +144,7 @@ export class ContactsComponent {
                 const contacts: ContactData[] = arr.controls.map((ctrl: any) => ctrl.getRawValue() as ContactData);
                 this.store.dispatch(ContactsDataPageActions.setData({ data: { contacts } }));
                 this.store.dispatch(ContactsDataPageActions.markAsDirty());
+                this.cdr.detectChanges();
             });
     }
 
